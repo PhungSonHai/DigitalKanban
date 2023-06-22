@@ -168,6 +168,8 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        // Tiên nhân háo sắc, Config kết nối OCI Oracle Database
+        Yajra\Oci8\Oci8ServiceProvider::class,
     ])->toArray(),
 
     /*
