@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\TestController;
+use App\Models\UserToken;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -20,3 +21,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get("test", [TestController::class, 'index']);
+Route::get("test2", function(){
+    $getUser = UserToken::query()->where('UserCode', 'sonhai-phung')->get();
+    return $getUser;
+});
