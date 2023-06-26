@@ -42,6 +42,3 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__ . '/auth.php';
-
-require __DIR__ . '/web1.php';
-require __DIR__ . '/web2.php';
