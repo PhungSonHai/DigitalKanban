@@ -1,10 +1,10 @@
 import { Link, Head } from "@inertiajs/react";
 
-export default function Welcome({ auth, laravelVersion, phpVersion }) {
+export default function HuongDanCuocHopCapBac({ auth, laravelVersion, phpVersion }) {
     const list = [
         "HƯỚNG DẪN HỌP CẤP BẬC",
-        "BẢNG HIỂN THỊ CUỘC HỌP CẤP BẬC",
-        "KAIZEN CỦA THÁNG",
+        "HƯỚNG DẪN GIẢI QUYẾT VẤN ĐỀ PDCA",
+        "BÁO CÁO A3",
     ];
 
     return (
@@ -12,7 +12,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
             <div className="w-full h-full bg-black/50 backdrop-blur-[1px]">
                 <div className="flex w-full h-full text-white">
                     <div className="flex-1 px-16">
-                        <div className="bg-gray-500 text-4xl lg:text-6xl font-bold text-center p-5 lg:p-10">
+                        <div className="bg-orange-500 text-4xl lg:text-6xl font-semibold text-center p-5 lg:p-10 rounded-[3rem]">
                             DANH MỤC CHO CUỘC HỌP CẤP BẬC
                         </div>
                     </div>
