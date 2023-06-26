@@ -17,13 +17,19 @@ use Inertia\Inertia;
 */
 
 Route::middleware('verifyMes')->group(function () {
-    Route::get('/dat', function () {
-        return Inertia::render('HuongDanCuocHopCapBac', [
-            'canLogin' => Route::has('login'),
-            'canRegister' => Route::has('register'),
-            'laravelVersion' => Application::VERSION,
-            'phpVersion' => PHP_VERSION,
-        ]);
+
+    Route::prefix('category')->group(function () {
+        Route::get('/', function () {
+            return Inertia::render('ListDirectory');
+        })->name('ListDirectory');
+
+        Route::get('/GuideResolve', function () {
+            return Inertia::render('GuideResolve');
+        })->name('GuideResolve');
+
+        Route::get('/KaizenTop', function () {
+            return Inertia::render('KaizenTop');
+        })->name('KaizenTop');
     });
 });
 
