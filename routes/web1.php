@@ -17,18 +17,14 @@ use Inertia\Inertia;
 */
 
 Route::middleware('verifyMes')->group(function () {
-    Route::get('/', function () {
-        return Inertia::render('Welcome', [
+    Route::get('/dat', function () {
+        return Inertia::render('HuongDanCuocHopCapBac', [
             'canLogin' => Route::has('login'),
             'canRegister' => Route::has('register'),
             'laravelVersion' => Application::VERSION,
             'phpVersion' => PHP_VERSION,
         ]);
     });
-});
-
-Route::get('/test', function () {
-    return Inertia::render('Test', []);
 });
 
 Route::get('/dashboard', function () {
