@@ -19,10 +19,12 @@ class VerifyAccessTokenMES
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $access_token = $request->header("access_token");
+        if (!env('APP_DEV', false)) {
+            $access_token = $request->header("access_token");
 
-        if(!$this->authService->checkToken($access_token)){
-            return abort(404, "Not found");
+            if (!$this->authService->checkToken($access_token)) {
+                return abort(404, "Not found");
+            }
         }
 
         return $next($request);
