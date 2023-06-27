@@ -18,6 +18,10 @@ use Inertia\Inertia;
 
 Route::middleware('verifyMes')->group(function () {
 
+    Route::get('/', function () {
+        return Inertia::render('Welcome');
+    })->name('Welcome');
+
     Route::prefix('category')->group(function () {
         Route::get('/', function () {
             return Inertia::render('ListDirectory');
@@ -27,10 +31,18 @@ Route::middleware('verifyMes')->group(function () {
             return Inertia::render('GuideResolve');
         })->name('GuideResolve');
 
+        Route::get('/ReportA3', function () {
+            return Inertia::render('ReportA3');
+        })->name('ReportA3');
+
         Route::get('/KaizenTop', function () {
             return Inertia::render('KaizenTop');
         })->name('KaizenTop');
     });
+
+    Route::get('/blank', function () {
+        return "Blank";
+    })->name('blank');
 });
 
 Route::get('/dashboard', function () {
