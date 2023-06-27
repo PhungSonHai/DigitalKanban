@@ -43,6 +43,10 @@ Route::middleware('verifyMes')->group(function () {
     Route::get('/blank', function () {
         return "Blank";
     })->name('blank');
+
+    Route::get('/test2', function () {
+        return Inertia::render('Test2');
+    })->name('Test2');
 });
 
 Route::get('/dashboard', function () {
