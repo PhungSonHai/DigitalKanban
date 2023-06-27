@@ -2,7 +2,7 @@ import { Link, Head } from "@inertiajs/react";
 
 export default function ListDirectory() {
     const list = [
-        { route: "blank", name: "HƯỚNG DẪN HỌP CẤP BẬC" },
+        { route: "guide", name: "HƯỚNG DẪN HỌP CẤP BẬC" },
         { route: "GuideResolve", name: "HƯỚNG DẪN GIẢI QUYẾT VẤN ĐỀ PDCA" },
         { route: "ReportA3", name: "BÁO CÁO A3" },
     ];
