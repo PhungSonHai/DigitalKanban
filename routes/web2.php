@@ -15,10 +15,14 @@ use Inertia\Inertia;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
 Route::middleware('verifyMes')->group(function () {
-    Route::get('/guide', function () {
-        return Inertia::render('Guide');
+    Route::prefix('category')->group(function () {
+        Route::get('/guide', function () {
+            return Inertia::render('Guide');
+        });
+        Route::get('/insert-kaizen', function () {
+            return Inertia::render('InsertInfoKaizen');
+        });
     });
 });
 
