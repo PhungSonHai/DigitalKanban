@@ -34,11 +34,15 @@ Route::middleware('verifyMes')->group(function () {
         Route::get('/ReportA3', function () {
             return Inertia::render('ReportA3');
         })->name('ReportA3');
-
-        Route::get('/KaizenTop', function () {
-            return Inertia::render('KaizenTop');
-        })->name('KaizenTop');
     });
+
+    Route::get('/KaizenTop', function () {
+        return Inertia::render('KaizenTop');
+    })->name('KaizenTop');
+
+    Route::get('/KPIBoard', function () {
+        return Inertia::render('KPIBoard');
+    })->name('KPIBoard');
 
     Route::get('/blank', function () {
         return "Blank";

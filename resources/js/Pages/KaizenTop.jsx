@@ -131,13 +131,13 @@ export default function KaizenTop() {
                     </div>
                 </div>
 
-                <div className="flex me-4 items-center">
-                    <div className="me-10">
+                <div className="flex flex-row items-center">
+                    <div className="me-5">
                         <button
                             onClick={() => {
                                 window.history.back();
                             }}
-                            className="focus:outline-none text-white bg-red-700 hover:bg-red-800 font-medium rounded-lg text-sm px-7 py-2.5 dark:bg-red-600 dark:hover:bg-red-700 shadow-xl shadow-[lightblue]"
+                            className="focus:outline-none text-white bg-red-700 hover:bg-red-800 font-medium rounded-lg text-sm px-7 py-1.5 dark:bg-red-600 dark:hover:bg-red-700 shadow-xl shadow-[lightblue]"
                         >
                             Trở về
                         </button>
@@ -246,9 +246,7 @@ export default function KaizenTop() {
                         <div className="bg-gray-500 min-w-[200px] px-3 py-2 rounded-lg text-white text-xl font-bold min-h-[100px] flex justify-center items-center">
                             Lợi ích
                         </div>
-                        <div className="rounded-lg border-2 border-gray-900 border-solid flex-grow">
-                            
-                        </div>
+                        <div className="rounded-lg border-2 border-gray-900 border-solid flex-grow"></div>
                     </div>
                 </div>
             </div>

@@ -3,7 +3,7 @@ import { Link, Head } from "@inertiajs/react";
 export default function Welcome() {
     const list = [
         { route: "ListDirectory", name: "HƯỚNG DẪN HỌP CẤP BẬC" },
-        { route: "blank", name: "BẢNG HIỂN THỊ CUỘC HỌP CẤP BẬC" },
+        { route: "KPIBoard", name: "BẢNG HIỂN THỊ CUỘC HỌP CẤP BẬC" },
         { route: "KaizenTop", name: "KAIZEN CỦA THÁNG" },
     ];
 
