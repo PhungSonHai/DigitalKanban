@@ -1,4 +1,5 @@
 import ChartTwoColumn from "@/Components/ChartTwoColumn";
+import TableIssue from "@/Components/tableIssue";
 import React, { useEffect, useState } from "react";
 
 export default function KPIBoard() {
@@ -69,7 +70,7 @@ export default function KPIBoard() {
                     <div>
                         <button
                             type="button"
-                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-1.5 mr-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-1.5 mr-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
                         >
                             Tìm kiếm
                         </button>
@@ -138,8 +139,10 @@ export default function KPIBoard() {
                     </div>
                 </div>
             </div>
-            <div className="h-32 bg-red-400"></div>
-            <div className="flex-1"></div>
+            
+            <div className="flex-1 bg-gray-100 mt-2 px-5">
+                <TableIssue />
+            </div>
         </div>
     );
 }

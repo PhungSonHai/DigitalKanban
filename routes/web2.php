@@ -20,9 +20,10 @@ Route::middleware('verifyMes')->group(function () {
         Route::get('/guide', function () {
             return Inertia::render('Guide');
         })->name('guide');
+
         Route::get('/insert-kaizen', function () {
             return Inertia::render('InsertInfoKaizen');
-        });
+        })->name('insertKaizen');
     });
 });
 
