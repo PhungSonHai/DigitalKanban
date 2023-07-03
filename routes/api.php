@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\TestController;
+use App\Models\Base005m;
 use App\Models\UserToken;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -29,10 +31,61 @@ Route::get("test", [TestController::class, 'index']);
 Route::post("test2", function (Request $request) {
     $file = $request->file("file");
 
-    if(!file_exists(public_path('uploads')."/".$file->getClientOriginalName())){
-        echo $file->move(public_path('uploads'), $file->getClientOriginalName());   
-    }else{
+    if (!file_exists(public_path('uploads') . "/" . $file->getClientOriginalName())) {
+        echo $file->move(public_path('uploads'), $file->getClientOriginalName());
+    } else {
         echo "tồn tại";
     }
     return "ok";
+});
+
+Route::get("get-department", function () {
+    return Base005m::query()->where(['factory_sap' => 4001])->get("DEP_SAP");
+});
+
+Route::get("get-test", function () {
+    return DB::select("SELECT
+    time_from,
+    time_to,
+    nvl(SUM(label_qty), '0') AS qty
+FROM
+    (
+        SELECT
+            label_qty,
+            to_char(scan_date, 'HH24:MI') time_scan
+        FROM
+            sfc_trackout_list
+        WHERE
+            scan_date BETWEEN TO_DATE('2023/06/30 07:30:00', 'yyyy/mm/dd HH24:MI:SS') AND TO_DATE('2023/06/30 16:30:00', 'yyyy/mm/dd HH24:MI:SS')
+            AND scan_detpt = '4001APL01'
+    ) q
+    RIGHT JOIN (
+        SELECT
+            to_char(TO_DATE('06:30', 'hh24:mi') + level / 24, 'hh24:mi') AS time_from,
+            to_char(TO_DATE('07:29', 'hh24:mi') + level / 24, 'hh24:mi') AS time_to
+        FROM
+            dual
+        CONNECT BY
+            level <= 4
+        UNION ALL
+        SELECT
+            to_char(TO_DATE('11:30', 'hh24:mi') + level / 24, 'hh24:mi') AS time_from,
+            to_char(TO_DATE('12:29', 'hh24:mi') + level / 24, 'hh24:mi') AS time_to
+        FROM
+            dual
+        CONNECT BY
+            level <= 3
+        UNION ALL
+        SELECT
+            to_char(TO_DATE('15:30', 'hh24:mi'), 'hh24:mi') AS time_from,
+            to_char(TO_DATE('16:30', 'hh24:mi'), 'hh24:mi') AS time_to
+        FROM
+            dual
+    ) t ON q.time_scan >= t.time_from
+           AND q.time_scan <= t.time_to
+GROUP BY
+    time_from,
+    time_to
+ORDER BY
+    time_from");
 });

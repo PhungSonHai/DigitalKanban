@@ -11,19 +11,20 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class MessageSent implements ShouldBroadcastNow
+class RealTimeChart implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $message;
-    
-    public function __construct($message)
+    public $data;
+
+
+    public function __construct($data)
     {
-        $this->message = $message;
+        $this->data = $data;
     }
 
     public function broadcastOn()
     {
-        return new Channel('messanger');
+        return [new Channel('department.' . $this->data["department"])];
     }
 }

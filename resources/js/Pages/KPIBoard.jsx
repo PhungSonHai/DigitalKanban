@@ -1,13 +1,38 @@
 import ChartTwoColumn from "@/Components/ChartTwoColumn";
 import TableIssue from "@/Components/tableIssue";
-import React, { useEffect, useState } from "react";
+import axios from "axios";
+import React, { useEffect, useMemo, useState } from "react";
 
 export default function KPIBoard() {
     const [actual, setActual] = useState([]);
     const [target, setTarget] = useState([]);
+    const [listDepartment, setListDepartment] = useState([]);
+    const [department, setDepartment] = useState("APL01");
 
     useEffect(() => {
         setTarget(new Array(8).fill(100));
+
+        function ListenHandle(e) {
+            console.log(e);
+            setActual(() => e.data.result);
+        }
+
+        window.Echo.channel("department.4001" + department).listen(
+            "RealTimeChart",
+            ListenHandle
+        );
+
+        return function () {
+            window.Echo.leaveChannel("department.4001" + department);
+        };
+    }, [department]);
+
+    useEffect(() => {
+        axios
+            .get("/api/get-department")
+            .then((res) =>
+                setListDepartment(res.data.map((item) => item.dep_sap))
+            );
     }, []);
 
     function handleRandom() {
@@ -29,15 +54,21 @@ export default function KPIBoard() {
                         <div className="px-2">Xưởng</div>
                         <div>
                             <select
-                                name=""
-                                id=""
+                                value={department}
                                 className="p-0.5 pl-2 pr-8 text-black"
+                                onChange={(event) => {
+                                    setDepartment(event.target.value);
+                                }}
                             >
-                                <option value="">PA</option>
+                                {listDepartment.map((item) => (
+                                    <option key={item} value={item}>
+                                        {item}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                     </div>
-                    <div className="flex items-center bg-gray-500 text-white">
+                    {/* <div className="flex items-center bg-gray-500 text-white">
                         <div className="px-2">Chuyền</div>
                         <div>
                             <select
@@ -48,7 +79,7 @@ export default function KPIBoard() {
                                 <option value="">S1</option>
                             </select>
                         </div>
-                    </div>
+                    </div> */}
                     <div className="flex items-center bg-gray-500 text-white">
                         <div className="px-2">Từ</div>
                         <div>
@@ -139,7 +170,7 @@ export default function KPIBoard() {
                     </div>
                 </div>
             </div>
-            
+
             <div className="flex-1 bg-gray-100 mt-2 px-5">
                 <TableIssue />
             </div>
