@@ -171,7 +171,7 @@ export default function KPIBoard() {
                 </div>
             </div>
 
-            <div className="flex-1 bg-gray-100 mt-2 px-5">
+            <div className="flex-1 bg-gray-100 mt-2">
                 <TableIssue />
             </div>
         </div>

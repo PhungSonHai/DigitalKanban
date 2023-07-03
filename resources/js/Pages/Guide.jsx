@@ -78,17 +78,10 @@ function Guide() {
                                                                     scope="row"
                                                                     className="px-6 py-4 font-medium text-gray-900 dark:text-white"
                                                                 >
-                                                                    {item.indexOf(
-                                                                        "/n"
-                                                                    ) > -1
+                                                                    {item.indexOf("/n") > -1
                                                                         ? item
-                                                                              .split(
-                                                                                  "/n"
-                                                                              )
-                                                                              .map(
-                                                                                  (
-                                                                                      str
-                                                                                  ) => (
+                                                                              .split("/n")
+                                                                              .map((str) => (
                                                                                       <div>
                                                                                           {
                                                                                               str
