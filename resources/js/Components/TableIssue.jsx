@@ -1,8 +1,11 @@
 import React, { useState } from 'react'
 import Modal from './Modal'
+import { Link } from '@inertiajs/react'
 import { quantityStitching, qualityStitching } from '@/Data/IssueStitching'
+import { quantityMachining, qualityMachining } from '@/Data/IssueMachining'
 
 function TableIssue() {
+    // Hanlde show & close modal stitching
     const [showModalStitching, setShowModalStitching] = useState(false)
 
     const handleShowModalStitching = () => {
@@ -13,17 +16,55 @@ function TableIssue() {
         setShowModalStitching(false)
     }
 
+    // Hanlde show & close modal machining
+    const [showModalMachining, setShowModalMachining] = useState(false)
+
+    const handleShowModalMachining = () => {
+        setShowModalMachining(true)
+    }
+
+    const handleCloseModalMachining = () => {
+        setShowModalMachining(false)
+    }
+
+    // Handle show & close modal confirm cancel
+    const [showModalCancel, setShowModalCancel] = useState(false)
+
+    const handleShowModalCancel = () => {
+        setShowModalCancel(true)
+    }
+
+    const handleCloseModalCancel = () => {
+        setShowModalCancel(false)
+    }
+
+    // Handle show & close modal confirm complete
+    const [showModalComplete, setShowModalComplete] = useState(false)
+
+    const handleShowModalComplete = () => {
+        setShowModalComplete(true)
+    }
+
+    const handleCloseModalComplete = () => {
+        setShowModalComplete(false)
+    }
+
   return (
     <React.Fragment>
+        {/* Modal issue stitching */}
         <Modal show={showModalStitching} maxWidth='6xl' onClose={handleCloseModalStitching}>
             <div>
                 <div className=''>
                     <div className="overflow-x-auto shadow-xl shadow-[lightblue] rounded-lg">
-                        <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                        <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 select-none">
                             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                 <tr className='relative'>
                                     <th scope="col" colSpan={5} className="px-6 py-3 text-center uppercase">
                                         Biểu ghi nhận vấn đề cho cuộc họp cấp bậc điện tử - chuyền may
+                                    </th>
+
+                                    <th className='absolute right-0 p-2.5 rounded-sm cursor-pointer hover:bg-gray-600' onClick={handleCloseModalStitching}>
+                                        <img width={20} src="svg/close.svg" alt="close" />
                                     </th>
                                 </tr>
                                 <tr className="border-t-2 border-sky-500">
@@ -48,24 +89,24 @@ function TableIssue() {
                                 {/* Sản lượng */}
                                 {
                                     quantityStitching.map((items, index) => (
-                                        <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                        <tr key={index} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                                             {
                                                 items.map((item, subIndex) => (
                                                     item != ""
                                                     ? 
-                                                        <td scope="row" rowSpan={index == 0 && subIndex == 0 ? quantityStitching.length : ""} className="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
+                                                        <td key={subIndex} scope="row" rowSpan={index == 0 && subIndex == 0 ? quantityStitching.length : ""} className={`px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap ${index == 0 && subIndex == 0 ? "uppercase" : ""}`}>
                                                             {
                                                                 item.indexOf("/n") > -1
                                                                 ?
                                                                     item.split("/n").map((str, strIndex) => (
-                                                                        <div className='mt-1.5'>
+                                                                        <div key={strIndex} className='mt-1.5'>
                                                                             {
                                                                                 str.indexOf('/checkbox/') > -1
                                                                                 ?
                                                                                     <div className='flex'>
-                                                                                        <input id="default-checkbox" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 mr-2 mt-0.5" />
+                                                                                        <input id={`quantityStitching-${index}-${subIndex}-${strIndex}`} type="checkbox" value="" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 mr-2 mt-0.5" />
                                                                                         <div>
-                                                                                            {str.replace('/checkbox/', '')}
+                                                                                            <label htmlFor={`quantityStitching-${index}-${subIndex}-${strIndex}`}>{str.replace('/checkbox/', '')}</label>
                                                                                         </div>
                                                                                     </div>
                                                                                 :
@@ -77,9 +118,9 @@ function TableIssue() {
                                                                     item.indexOf('/checkbox/') > -1
                                                                     ?
                                                                         <div className='flex'>
-                                                                            <input id="default-checkbox" type="checkbox" value="" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 mr-2 mt-0.5" />
+                                                                            <input id={`quantityStitching-${index}-${subIndex}`} type="checkbox" value="" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 mr-2 mt-0.5" />
                                                                             <div>
-                                                                                {item.replace('/checkbox/', '')}
+                                                                                <label htmlFor={`quantityStitching-${index}-${subIndex}`}>{item.replace('/checkbox/', '')}</label>
                                                                             </div>
                                                                         </div>
                                                                     :
@@ -97,24 +138,24 @@ function TableIssue() {
                                 {/* Chất lượng */}
                                 {
                                     qualityStitching.map((items, index) => (
-                                        <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                        <tr key={index} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                                             {
                                                 items.map((item, subIndex) => (
                                                     item != ""
                                                     ? 
-                                                        <td scope="row" rowSpan={index == 0 && subIndex == 0 ? qualityStitching.length : ""} className="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
+                                                        <td key={subIndex} scope="row" rowSpan={index == 0 && subIndex == 0 ? qualityStitching.length : ""} className={`px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap ${index == 0 && subIndex == 0 ? "uppercase" : ""}`}>
                                                             {
                                                                 item.indexOf("/n") > -1
                                                                 ?
                                                                     item.split("/n").map((str, strIndex) => (
-                                                                        <div className='mt-1.5'>
+                                                                        <div key={strIndex} className='mt-1.5'>
                                                                             {
                                                                                 str.indexOf('/checkbox/') > -1
                                                                                 ?
                                                                                     <div className='flex'>
-                                                                                        <input id="default-checkbox" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 mr-2 mt-0.5" />
+                                                                                        <input id={`qualityStitching-${index}-${subIndex}-${strIndex}`} type="checkbox" value="" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 mr-2 mt-0.5" />
                                                                                         <div>
-                                                                                            {str.replace('/checkbox/', '')}
+                                                                                            <label htmlFor={`qualityStitching-${index}-${subIndex}-${strIndex}`}>{str.replace('/checkbox/', '')}</label>
                                                                                         </div>
                                                                                     </div>
                                                                                 :
@@ -126,9 +167,9 @@ function TableIssue() {
                                                                     item.indexOf('/checkbox/') > -1
                                                                     ?
                                                                         <div className='flex'>
-                                                                            <input id="default-checkbox" type="checkbox" value="" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 mr-2 mt-0.5" />
+                                                                            <input id={`qualityStitching-${index}-${subIndex}`} type="checkbox" value="" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 mr-2 mt-0.5" />
                                                                             <div>
-                                                                                {item.replace('/checkbox/', '')}
+                                                                                <label htmlFor={`qualityStitching-${index}-${subIndex}`}>{item.replace('/checkbox/', '')}</label>
                                                                             </div>
                                                                         </div>
                                                                     :
@@ -149,6 +190,173 @@ function TableIssue() {
             </div>
         </Modal>
 
+        {/* Modal issue machining */}
+        <Modal show={showModalMachining} maxWidth='6xl' onClose={handleCloseModalMachining}>
+            <div>
+                <div className=''>
+                    <div className="overflow-x-auto shadow-xl shadow-[lightblue] rounded-lg">
+                        <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 select-none">
+                            <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                <tr className='relative'>
+                                    <th scope="col" colSpan={5} className="px-6 py-3 text-center uppercase">
+                                        Biểu ghi nhận vấn đề cho cuộc họp cấp bậc điện tử - chuyền gia công
+                                    </th>
+
+                                    <th className='absolute right-0 p-2.5 rounded-sm cursor-pointer hover:bg-gray-600' onClick={handleCloseModalMachining}>
+                                        <img width={20} src="svg/close.svg" alt="close" />
+                                    </th>
+                                </tr>
+                                <tr className="border-t-2 border-sky-500">
+                                    <th scope="col" className="px-6 py-3 whitespace-nowrap">
+                                        Ảnh hưởng tới
+                                    </th>
+                                    <th scope="col" className="px-6 py-3 whitespace-nowrap">
+                                        Nguyên nhân
+                                    </th>
+                                    <th scope="col" className="px-6 py-3 whitespace-nowrap">
+                                        Mô tả nguyên nhân
+                                    </th>
+                                    <th scope="col" className="px-6 py-3 whitespace-nowrap">
+                                        Hành động giải quyết
+                                    </th>
+                                    <th scope="col" className="px-6 py-3 whitespace-nowrap">
+                                        Người chịu trách nhiệm
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {/* Sản lượng */}
+                                {
+                                    quantityMachining.map((items, index) => (
+                                        <tr key={index} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                            {
+                                                items.map((item, subIndex) => (
+                                                    item != ""
+                                                    ? 
+                                                        <td key={subIndex} scope="row" rowSpan={index == 0 && subIndex == 0 ? quantityMachining.length : ""} className={`px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap ${index == 0 && subIndex == 0 ? "uppercase" : ""}`}>
+                                                            {
+                                                                item.indexOf("/n") > -1
+                                                                ?
+                                                                    item.split("/n").map((str, strIndex) => (
+                                                                        <div key={strIndex} className='mt-1.5'>
+                                                                            {
+                                                                                str.indexOf('/checkbox/') > -1
+                                                                                ?
+                                                                                    <div className='flex'>
+                                                                                        <input id={`machiningQuantity-${index}-${subIndex}-${strIndex}`} type="checkbox" value="" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 mr-2 mt-0.5" />
+                                                                                        <div>
+                                                                                            <label htmlFor={`machiningQuantity-${index}-${subIndex}-${strIndex}`}>{str.replace('/checkbox/', '')}</label>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                :
+                                                                                    str
+                                                                            }
+                                                                        </div>
+                                                                    ))
+                                                                :
+                                                                    item.indexOf('/checkbox/') > -1
+                                                                    ?
+                                                                        <div className='flex'>
+                                                                            <input id={`machiningQuantity-${index}-${subIndex}`} type="checkbox" value="" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 mr-2 mt-0.5" />
+                                                                            <div>
+                                                                                <label htmlFor={`machiningQuantity-${index}-${subIndex}`}>{item.replace('/checkbox/', '')}</label>
+                                                                            </div>
+                                                                        </div>
+                                                                    :
+                                                                        item
+                                                            }
+                                                        </td>
+                                                    :
+                                                        ""
+                                                ))
+                                            }
+                                        </tr>
+                                    ))
+                                }
+
+                                {/* Chất lượng */}
+                                {
+                                    qualityMachining.map((items, index) => (
+                                        <tr key={index} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                            {
+                                                items.map((item, subIndex) => (
+                                                    item != ""
+                                                    ? 
+                                                        <td key={subIndex} scope="row" rowSpan={index == 0 && subIndex == 0 ? qualityMachining.length : ""} className={`px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap ${index == 0 && subIndex == 0 ? "uppercase" : ""}`}>
+                                                            {
+                                                                item.indexOf("/n") > -1
+                                                                ?
+                                                                    item.split("/n").map((str, strIndex) => (
+                                                                        <div key={strIndex} className='mt-1.5'>
+                                                                            {
+                                                                                str.indexOf('/checkbox/') > -1
+                                                                                ?
+                                                                                    <div className='flex'>
+                                                                                        <input id={`machiningQuality-${index}-${subIndex}-${strIndex}`} type="checkbox" value="" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 mr-2 mt-0.5" />
+                                                                                        <div>
+                                                                                            <label htmlFor={`machiningQuality-${index}-${subIndex}-${strIndex}`}>{str.replace('/checkbox/', '')}</label>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                :
+                                                                                    str
+                                                                            }
+                                                                        </div>
+                                                                    ))
+                                                                :
+                                                                    item.indexOf('/checkbox/') > -1
+                                                                    ?
+                                                                        <div className='flex'>
+                                                                            <input id={`machiningQuality-${index}-${subIndex}`} type="checkbox" value="" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 mr-2 mt-0.5" />
+                                                                            <div>
+                                                                                <label htmlFor={`machiningQuality-${index}-${subIndex}`}>{item.replace('/checkbox/', '')}</label>
+                                                                            </div>
+                                                                        </div>
+                                                                    :
+                                                                        item
+                                                            }
+                                                        </td>
+                                                    :
+                                                        ""
+                                                ))
+                                            }
+                                        </tr>
+                                    ))
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </Modal>
+
+        {/* Modal confirm cancel issue */}
+        <Modal show={showModalCancel} maxWidth='md' onClose={handleCloseModalCancel}>
+            <div className='p-3'>
+                <div className='text-center mt-2'>
+                    <span className='text-xl font-semibold'>Xác nhận hủy vấn đề ?</span>
+                </div>
+                <div className='flex justify-around mt-5 mb-2'>
+                    <button type="button" className="text-white bg-green-700 hover:bg-green-800 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-green-600 dark:hover:bg-green-700">Có</button>
+
+                    <button type="button" className="text-white bg-red-700 hover:bg-red-800 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-red-600 dark:hover:bg-red-700" onClick={handleCloseModalCancel}>Không</button>
+                </div>
+            </div>
+        </Modal>
+
+        {/* Modal confirm complete issue */}
+        <Modal show={showModalComplete} maxWidth='md' onClose={handleCloseModalComplete}>
+            <div className='p-3'>
+                <div className='text-center mt-2'>
+                    <span className='text-xl font-semibold'>Xác nhận vấn đề hoàn thành ?</span>
+                </div>
+                <div className='flex justify-around mt-5 mb-2'>
+                    <button type="button" className="text-white bg-green-700 hover:bg-green-800 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-green-600 dark:hover:bg-green-700">Có</button>
+
+                    <button type="button" className="text-white bg-red-700 hover:bg-red-800 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-red-600 dark:hover:bg-red-700" onClick={handleCloseModalComplete}>Không</button>
+                </div>
+            </div>
+        </Modal>
+
         <div className='flex flex-col'>
             {/* nav table */}
             <div className='flex flex-col 2xl:flex-row pt-1 gap-8 px-5 xl:px-0'>
@@ -156,7 +364,11 @@ function TableIssue() {
                     <div className='flex gap-6'>
                         <div className='flex flex-col justify-between'>
                             <span className='font-bold bg-sky-600 text-white px-4 py-1 rounded-md text-center mb-1'>Cấp bậc 1</span>
-                            <button type="button" className="focus:outline-none text-white bg-red-700 hover:bg-red-800 font-medium rounded-lg text-sm px-5 py-1.5 dark:bg-red-600 dark:hover:bg-red-700">Xem chi tiết</button>
+                            <Link href={route('detailIssue')}>
+                                <button type="button" className="focus:outline-none text-white bg-red-700 hover:bg-red-800 font-medium rounded-lg text-sm px-5 py-1.5 dark:bg-red-600 dark:hover:bg-red-700">
+                                        Xem chi tiết
+                                </button>
+                            </Link>
                         </div>
                         <div className='flex flex-col justify-between'>
                             <div className='w-full flex shadow-lg'>
@@ -191,7 +403,11 @@ function TableIssue() {
                     </div>
                     <div className='flex flex-col justify-between'>
                         <span className='font-semibold text-gray-500 text-lg'>Tài khoản 4001APS01</span>
-                        <button type="button" className="focus:outline-none text-white bg-red-700 hover:bg-red-800 font-medium rounded-lg text-sm px-5 py-1.5 dark:bg-red-600 dark:hover:bg-red-700">Đánh giá cuộc họp</button>
+                        <Link href={route('reviewMeeting')}>
+                            <button type="button" className="focus:outline-none text-white bg-red-700 hover:bg-red-800 font-medium rounded-lg text-sm px-5 py-1.5 dark:bg-red-600 dark:hover:bg-red-700">
+                                Đánh giá cuộc họp
+                            </button>
+                        </Link>
                     </div>
                 </div>
             </div>
@@ -213,7 +429,7 @@ function TableIssue() {
                                         </th>
 
                                         <th className='absolute right-[132px] top-1.5'>
-                                            <button type="button" className="text-white bg-green-700 hover:bg-green-800 font-medium rounded-full text-sm px-5 py-1 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Vấn đề gia công</button>
+                                            <button type="button" className="text-white bg-green-700 hover:bg-green-800 font-medium rounded-full text-sm px-5 py-1 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800" onClick={handleShowModalMachining}>Vấn đề gia công</button>
                                         </th>
                                     </tr>
                                     <tr className="border-t-2 border-sky-500">
@@ -248,7 +464,7 @@ function TableIssue() {
                                         <td scope="row" className="px-6 py-4 font-medium text-gray-900 dark:text-white">
                                             1
                                         </td>
-                                        <td scope="row" className="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                                        <td scope="row" className="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
                                             06-09-2023
                                         </td>
                                         <td scope="row" className="px-6 py-4 font-medium text-gray-900 dark:text-white">
@@ -267,10 +483,10 @@ function TableIssue() {
                                             Bộ trưởng
                                         </td>
                                         <td scope="row" className="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                                            <button type="button" className="text-white bg-blue-500 hover:bg-blue-600 font-medium rounded-lg text-sm px-3 py-1 mr-2 dark:bg-blue-500 dark:hover:bg-blue-600">
+                                            <button type="button" className="text-white bg-blue-500 hover:bg-blue-600 font-medium rounded-lg text-sm px-3 py-1 mr-2 dark:bg-blue-500 dark:hover:bg-blue-600" onClick={handleShowModalComplete}> 
                                                 <img width={30} src="svg/check.svg" alt="check" />
                                             </button>
-                                            <button type="button" className="text-white bg-blue-500 hover:bg-blue-600 font-medium rounded-lg text-sm px-3 py-1 mr-2 dark:bg-blue-500 dark:hover:bg-blue-600">
+                                            <button type="button" className="text-white bg-blue-500 hover:bg-blue-600 font-medium rounded-lg text-sm px-3 py-1 mr-2 dark:bg-blue-500 dark:hover:bg-blue-600" onClick={handleShowModalCancel}>
                                                 <img width={30} src="svg/cancel.svg" alt="check" />
                                             </button>
                                         </td>
