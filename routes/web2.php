@@ -34,6 +34,10 @@ Route::middleware('verifyMes')->group(function () {
         Route::get('/review-meeting', function() {
             return Inertia::render('ReviewMeeting');
         })->name('reviewMeeting');
+
+        Route::get('/follow-meeting', function() {
+            return Inertia::render('FollowMeeting');
+        })->name('followMeeting');
     });
 });
 

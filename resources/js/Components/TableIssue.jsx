@@ -375,7 +375,11 @@ function TableIssue() {
                                 <span className='font-bold bg-sky-600 text-white px-4 py-1 text-center rounded-l-md'>Điểm</span>
                                 <span className='bg-white px-5 py-0.5 rounded-r-md font-bold'>09</span>
                             </div>
-                            <button type="button" className="focus:outline-none text-white bg-red-700 hover:bg-red-800 font-medium rounded-lg text-sm px-5 py-1.5 dark:bg-red-600 dark:hover:bg-red-700">Bảng theo dõi</button>
+                            <Link href={route('followMeeting')}>
+                                <button type="button" className="focus:outline-none text-white bg-red-700 hover:bg-red-800 font-medium rounded-lg text-sm px-5 py-1.5 dark:bg-red-600 dark:hover:bg-red-700">
+                                    Bảng theo dõi
+                                </button>
+                            </Link>
                         </div>
                     </div>
                     <div className='w-48 flex flex-col shadow-md'>
