@@ -1,10 +1,92 @@
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import Modal from './Modal'
 import { Link } from '@inertiajs/react'
 import { quantityStitching, qualityStitching } from '@/Data/IssueStitching'
 import { quantityMachining, qualityMachining } from '@/Data/IssueMachining'
 
 function TableIssue() {
+    const [check, setCheck] = useState([]);
+
+    useEffect(function() {
+        setCheck(new Array(quantityMachining[0].length).fill(''))
+    },[])
+
+    const isDisable = useCallback((value) => {
+        if(check.length === 0){
+            return false;
+        }
+        const splitValue = value.split(',')
+        const column = splitValue[0];
+        const row = splitValue[1];
+        const line = splitValue[2];
+
+
+        if(column == 1) {
+            if(check[column] != value && check[column] != "") 
+                return true;
+        }else if(column > 1){
+            const splitCheck = check[column - 1].split(',');
+            const columnCheck = splitCheck[0];
+            const rowCheck = splitCheck[1];
+            const lineCheck = splitCheck[2];
+
+            if(check[column - 1] == "" || check[column - 1] != "" && row != rowCheck){
+                return true;
+            }
+        }
+
+        return false;
+    }, [check])
+
+    const collectCheckbox = (subIndex, index, objIndex, tempCheck, isCheck = false, skip = false) => {
+        let diff = 0;
+        let collectionObject = quantityMachining;
+
+        if(index > 5){
+            diff = 6;
+            collectionObject = qualityMachining;
+        }
+
+        for(let i = subIndex; i < quantityMachining[0].length; i++) {
+            if(isCheck){
+                tempCheck[i] =  `${i},${index},${objIndex}`;
+                if(i + 1 < quantityMachining[0].length && (collectionObject[index - diff][i + 1].every(item => !item.showCheckbox) || !collectionObject[index - diff][i + 1].every(item => item.showCheckbox))) {
+                    continue;
+                }
+            }
+            if(!isCheck) {
+                if(!collectionObject[index - diff][i].every(item => item.showCheckbox) && tempCheck[i - 1] != ""){
+                    const splitCheck = check[i].split(',');
+                    const columnCheck = Number(splitCheck[0]);
+                    const rowCheck = Number(splitCheck[1]);
+                    const lineCheck = Number(splitCheck[2]);
+                    tempCheck = collectCheckbox(columnCheck, rowCheck, 0, tempCheck, true);
+                // tempCheck[i] =  `${i},${index},${lineCheck}`;
+                }else{   
+                    tempCheck[i] =  ``;
+                    continue;
+                }
+            }
+            break;
+        }
+        return tempCheck;
+    }
+
+    const handleCheck = (subIndex,index,objIndex) => (event)=>{
+        let tempCheck = [...check];
+
+        if(event.target.checked) {
+            tempCheck = collectCheckbox(subIndex, index, objIndex, tempCheck, true);
+        }
+        else
+        {
+            tempCheck = collectCheckbox(subIndex, index, objIndex, tempCheck);
+        }
+        setCheck(tempCheck);
+
+        console.log(tempCheck)
+    }
+
     // Hanlde show & close modal stitching
     const [showModalStitching, setShowModalStitching] = useState(false)
 
@@ -53,9 +135,9 @@ function TableIssue() {
     <React.Fragment>
         {/* Modal issue stitching */}
         <Modal show={showModalStitching} maxWidth='6xl' onClose={handleCloseModalStitching}>
-            <div>
+            <div className='flex flex-col bg-white dark:bg-gray-800'>
                 <div className=''>
-                    <div className="overflow-x-auto shadow-xl shadow-[lightblue] rounded-lg">
+                    <div className="overflow-x-auto rounded-lg">
                         <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 select-none">
                             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                 <tr className='relative'>
@@ -187,14 +269,23 @@ function TableIssue() {
                         </table>
                     </div>
                 </div>
+
+                <div className='py-2 flex justify-around'>
+                    <button type="button" class="text-white bg-green-700 hover:bg-green-800 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-green-600 dark:hover:bg-green-700">
+                        Xác nhận
+                    </button>
+                    <button type="button" class="text-white bg-red-700 hover:bg-red-800 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-red-600 dark:hover:bg-red-700" onClick={handleCloseModalStitching}>
+                        Thoát
+                    </button>
+                </div>
             </div>
         </Modal>
 
         {/* Modal issue machining */}
         <Modal show={showModalMachining} maxWidth='6xl' onClose={handleCloseModalMachining}>
-            <div>
+            <div className='flex flex-col bg-white dark:bg-gray-800'>
                 <div className=''>
-                    <div className="overflow-x-auto shadow-xl shadow-[lightblue] rounded-lg">
+                    <div className="overflow-x-auto rounded-lg">
                         <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 select-none">
                             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                 <tr className='relative'>
@@ -231,93 +322,69 @@ function TableIssue() {
                                         <tr key={index} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                                             {
                                                 items.map((item, subIndex) => (
-                                                    item != ""
-                                                    ? 
-                                                        <td key={subIndex} scope="row" rowSpan={index == 0 && subIndex == 0 ? quantityMachining.length : ""} className={`px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap ${index == 0 && subIndex == 0 ? "uppercase" : ""}`}>
-                                                            {
-                                                                item.indexOf("/n") > -1
-                                                                ?
-                                                                    item.split("/n").map((str, strIndex) => (
-                                                                        <div key={strIndex} className='mt-1.5'>
-                                                                            {
-                                                                                str.indexOf('/checkbox/') > -1
-                                                                                ?
-                                                                                    <div className='flex'>
-                                                                                        <input id={`machiningQuantity-${index}-${subIndex}-${strIndex}`} type="checkbox" value="" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 mr-2 mt-0.5" />
-                                                                                        <div>
-                                                                                            <label htmlFor={`machiningQuantity-${index}-${subIndex}-${strIndex}`}>{str.replace('/checkbox/', '')}</label>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                :
-                                                                                    str
-                                                                            }
+                                                    <td key={subIndex} scope="row" rowSpan={index == 0 && subIndex == 0 ? quantityMachining.length : ""} className='px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap' hidden={item[0].name == "" ? true : false}>
+                                                        {
+                                                            item.map((objItem, objIndex) => {
+                                                                var isDisabled = isDisable(`${subIndex},${index},${objIndex}`);
+
+                                                                return (
+                                                                    <div key={objIndex} className='flex mt-1.5'>
+                                                                        {
+                                                                            objItem.showCheckbox && (
+                                                                                <input 
+                                                                                    disabled={isDisabled}
+                                                                                    id={`quantityMachining-${index}-${subIndex}-${objIndex}`} 
+                                                                                    onChange={handleCheck(subIndex, index, objIndex)}
+                                                                                    type="checkbox" 
+                                                                                    value="" 
+                                                                                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 mr-2 mt-0.5" />)
+                                                                        }
+                                                                        <div>
+                                                                            <label className={`${isDisabled ? 'text-gray-900/50 dark:text-white/50' : 'text-gray-900 dark:text-white'}`} htmlFor={`quantityMachining-${index}-${subIndex}-${objIndex}`}>{objItem.name}</label>
                                                                         </div>
-                                                                    ))
-                                                                :
-                                                                    item.indexOf('/checkbox/') > -1
-                                                                    ?
-                                                                        <div className='flex'>
-                                                                            <input id={`machiningQuantity-${index}-${subIndex}`} type="checkbox" value="" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 mr-2 mt-0.5" />
-                                                                            <div>
-                                                                                <label htmlFor={`machiningQuantity-${index}-${subIndex}`}>{item.replace('/checkbox/', '')}</label>
-                                                                            </div>
-                                                                        </div>
-                                                                    :
-                                                                        item
-                                                            }
-                                                        </td>
-                                                    :
-                                                        ""
+                                                                    </div>
+                                                                );
+                                                            })
+                                                        }
+                                                    </td>
                                                 ))
                                             }
                                         </tr>
                                     ))
                                 }
-
                                 {/* Chất lượng */}
                                 {
                                     qualityMachining.map((items, index) => (
                                         <tr key={index} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                                             {
                                                 items.map((item, subIndex) => (
-                                                    item != ""
-                                                    ? 
-                                                        <td key={subIndex} scope="row" rowSpan={index == 0 && subIndex == 0 ? qualityMachining.length : ""} className={`px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap ${index == 0 && subIndex == 0 ? "uppercase" : ""}`}>
+                                                        <td key={subIndex} scope="row" rowSpan={index == 0 && subIndex == 0 ? qualityMachining.length : ""} className={'px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap'} hidden={item[0].name == "" ? true : false}>
                                                             {
-                                                                item.indexOf("/n") > -1
-                                                                ?
-                                                                    item.split("/n").map((str, strIndex) => (
-                                                                        <div key={strIndex} className='mt-1.5'>
+                                                                item.map((objItem, objIndex) => {
+                                                                    var isDisabled = isDisable(`${subIndex},${index + 6},${objIndex}`);
+
+                                                                    return (
+                                                                        <div key={objIndex} className='flex mt-1.5'>
                                                                             {
-                                                                                str.indexOf('/checkbox/') > -1
-                                                                                ?
-                                                                                    <div className='flex'>
-                                                                                        <input id={`machiningQuality-${index}-${subIndex}-${strIndex}`} type="checkbox" value="" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 mr-2 mt-0.5" />
-                                                                                        <div>
-                                                                                            <label htmlFor={`machiningQuality-${index}-${subIndex}-${strIndex}`}>{str.replace('/checkbox/', '')}</label>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                :
-                                                                                    str
+                                                                                objItem.showCheckbox && (
+                                                                                    <input 
+                                                                                        disabled={isDisabled}
+                                                                                        id={`qualityMachining-${index}-${subIndex}-${objIndex}`} 
+                                                                                        onChange={handleCheck(subIndex, index + 6, objIndex)}
+                                                                                        type="checkbox" 
+                                                                                        value="" 
+                                                                                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 mr-2 mt-0.5" />)
                                                                             }
-                                                                        </div>
-                                                                    ))
-                                                                :
-                                                                    item.indexOf('/checkbox/') > -1
-                                                                    ?
-                                                                        <div className='flex'>
-                                                                            <input id={`machiningQuality-${index}-${subIndex}`} type="checkbox" value="" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 mr-2 mt-0.5" />
                                                                             <div>
-                                                                                <label htmlFor={`machiningQuality-${index}-${subIndex}`}>{item.replace('/checkbox/', '')}</label>
+                                                                                <label className={`${isDisabled ? 'text-gray-900/50 dark:text-white/50' : 'text-gray-900 dark:text-white'}`} htmlFor={`qualityMachining-${index}-${subIndex}-${objIndex}`}>{objItem.name}</label>
                                                                             </div>
                                                                         </div>
-                                                                    :
-                                                                        item
+                                                                    );
+                                                                })
                                                             }
                                                         </td>
-                                                    :
-                                                        ""
-                                                ))
+                                                    )
+                                                )
                                             }
                                         </tr>
                                     ))
@@ -325,6 +392,15 @@ function TableIssue() {
                             </tbody>
                         </table>
                     </div>
+                </div>
+
+                <div className='py-2 flex justify-around'>
+                    <button type="button" class="text-white bg-green-700 hover:bg-green-800 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-green-600 dark:hover:bg-green-700">
+                        Xác nhận
+                    </button>
+                    <button type="button" class="text-white bg-red-700 hover:bg-red-800 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-red-600 dark:hover:bg-red-700" onClick={handleCloseModalMachining}>
+                        Thoát
+                    </button>
                 </div>
             </div>
         </Modal>
