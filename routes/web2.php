@@ -25,6 +25,20 @@ Route::middleware('verifyMes')->group(function () {
             return Inertia::render('InsertInfoKaizen');
         })->name('insertKaizen');
     });
+
+    Route::prefix('KPIBoard')->group(function() {
+        Route::get('/detail-issue', function() {
+            return Inertia::render('DetailIssue');
+        })->name('detailIssue');
+
+        Route::get('/review-meeting', function() {
+            return Inertia::render('ReviewMeeting');
+        })->name('reviewMeeting');
+
+        Route::get('/follow-meeting', function() {
+            return Inertia::render('FollowMeeting');
+        })->name('followMeeting');
+    });
 });
 
 Route::get('/test', function () {
