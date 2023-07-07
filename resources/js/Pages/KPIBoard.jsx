@@ -4,27 +4,24 @@ import axios from "axios";
 import React, { useEffect, useMemo, useState } from "react";
 
 export default function KPIBoard() {
-    const [actual, setActual] = useState([]);
-    const [target, setTarget] = useState([]);
+    const [actual, setActual] = useState([32, 55, 66, 44, 56, 33, 23, 12]);
+    const [target, setTarget] = useState([32, 43, 54, 65, 76, 87, 89, 90]);
     const [listDepartment, setListDepartment] = useState([]);
     const [department, setDepartment] = useState("APL01");
 
     useEffect(() => {
-        setTarget(new Array(8).fill(100));
-
-        function ListenHandle(e) {
-            console.log(e);
-            setActual(() => e.data.result);
-        }
-
-        window.Echo.channel("department.4001" + department).listen(
-            "RealTimeChart",
-            ListenHandle
-        );
-
-        return function () {
-            window.Echo.leaveChannel("department.4001" + department);
-        };
+        // setTarget(new Array(8).fill(100));
+        // function ListenHandle(e) {
+        //     console.log(e);
+        //     setActual(() => e.data.result);
+        // }
+        // window.Echo.channel("department.4001" + department).listen(
+        //     "RealTimeChart",
+        //     ListenHandle
+        // );
+        // return function () {
+        //     window.Echo.leaveChannel("department.4001" + department);
+        // };
     }, [department]);
 
     useEffect(() => {
