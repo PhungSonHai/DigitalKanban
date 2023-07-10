@@ -45,7 +45,7 @@ class MonitorAndBroadcast extends Command
             FROM
                 sfc_trackout_list
             WHERE
-                scan_date BETWEEN TO_DATE('2023/06/30 07:30:00', 'yyyy/mm/dd HH24:MI:SS') AND TO_DATE('2023/06/30 16:30:00', 'yyyy/mm/dd HH24:MI:SS')
+                scan_date BETWEEN TO_DATE('" . date('Y/m/d') . " 07:30:00', 'yyyy/mm/dd HH24:MI:SS') AND TO_DATE('" . date('Y/m/d') . " 16:30:00', 'yyyy/mm/dd HH24:MI:SS')
                 AND scan_detpt = '$department'
         ) q
         RIGHT JOIN (
@@ -85,6 +85,15 @@ class MonitorAndBroadcast extends Command
         return $data;
     }
 
+    function getTarget($department)
+    {
+        $data = DB::select("select work_qty from sjqdms_worktarget where work_day = TO_DATE('" . date('Y/m/d') . "', 'yyyy/mm/dd') and grt_dept = '$department'");
+
+        if(count($data) == 0)
+            return 0;
+        return $data[0]->work_qty; 
+    }
+
     public function handle()
     {
         $pusher = new Pusher(env('PUSHER_APP_KEY'), env('PUSHER_APP_SECRET'), env('PUSHER_APP_ID'), [
@@ -98,7 +107,7 @@ class MonitorAndBroadcast extends Command
             foreach ($channels as $key => $value) {
                 if ($pusher->getChannelInfo($key)->subscription_count) {
                     $department = explode('.', $key)[1];
-                    event(new RealTimeChart(["department" => $department, "result" => $this->getData($department)]));
+                    event(new RealTimeChart(["department" => $department, "result" => $this->getData($department), "target" => $this->getTarget($department)]));
                 }
             }
 

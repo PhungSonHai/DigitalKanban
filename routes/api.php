@@ -40,7 +40,7 @@ Route::post("test2", function (Request $request) {
 });
 
 Route::get("get-department", function () {
-    return Base005m::query()->where(['factory_sap' => 4001])->get("DEP_SAP");
+    return Base005m::query()->where(['factory_sap' => 4001])->orderBy('DEP_SAP')->get("DEP_SAP");
 });
 
 Route::get("get-test", function () {
