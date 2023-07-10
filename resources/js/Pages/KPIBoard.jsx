@@ -6,10 +6,22 @@ import React, { useEffect, useMemo, useState } from "react";
 export default function KPIBoard() {
     const [actual, setActual] = useState([]);
     const [target, setTarget] = useState([]);
+    const [targetQuality, setTargetQuality] = useState([]);
     const [listDepartment, setListDepartment] = useState([]);
     const [department, setDepartment] = useState("APL01");
 
+    const handleSetTargetQuality = (dept) => {
+        if(dept.includes("S")) {
+            setTargetQuality(new Array(8).fill(90))
+        } else if(dept.includes("L")) {
+            setTargetQuality(new Array(8).fill(88))
+        } else {
+            setTargetQuality([])
+        }
+    }
+
     useEffect(() => {
+        handleSetTargetQuality(department);
         setTarget(new Array(8).fill(100));
 
         function ListenHandle(e) {
@@ -157,7 +169,7 @@ export default function KPIBoard() {
                             <ChartTwoColumn
                                 name="Bảng biểu chất lượng"
                                 actual={actual}
-                                target={target}
+                                target={targetQuality}
                             />
                         </div>
                     </div>
