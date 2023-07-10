@@ -29,9 +29,10 @@ const labels = [
     "13:30-14:30",
     "14:30-15:30",
     "15:30-16:30",
+    // "16:30-17:30",
 ];
 
-export default function ChartTwoColumn({ name, actual = [], target = [] }) {
+export default function ChartTwoColumn({ name, nameActual = '1', nameTarget = '2', actual = [], target = [] }) {
     const options = {
         responsive: true,
         plugins: {
@@ -61,12 +62,12 @@ export default function ChartTwoColumn({ name, actual = [], target = [] }) {
         labels,
         datasets: [
             {
-                label: "Sản lượng thực tế",
+                label: nameActual,
                 data: actual,
                 backgroundColor: "#1d4ed8",
             },
             {
-                label: "Mục tiêu sản lượng",
+                label: nameTarget,
                 data: target,
                 backgroundColor: "orange",
             },
