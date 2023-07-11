@@ -28,6 +28,15 @@ export default function KPIBoard() {
 
     const [actualQuality, setActualQuality] = useState([]);
     const [targetQuality, setTargetQuality] = useState([]);
+
+    const [actualAllQuality, setActualAllQuality] = useState(0);
+    const [targetAllQuality, setTargetAllQuality] = useState(100);
+
+    const isQualityPassed = useMemo(() => {
+        if (targetAllQuality == 0) return false;
+
+        return (actualAllQuality / targetAllQuality) * 100 >= 90;
+    }, [actualAllQuality]);
     
     const [listDepartment, setListDepartment] = useState([]);
 
@@ -51,8 +60,10 @@ export default function KPIBoard() {
         setLoading(true);
         function ListenHandle(e) {
             console.log(e);
-            setActualQuantity(() => e.data.result);
+            setActualQuantity(() => e.data.result[0]);
             setTargetQuantity(() => e.data.target);
+            setActualQuality(() => e.data.result[1]);
+            setActualAllQuality(() => e.data.actualAllRFT)
             setLoading(false);
         }
         window.Echo.channel("department.4001" + department).listen(
@@ -182,7 +193,7 @@ export default function KPIBoard() {
                             className="flex-1 bg-white rounded-xl shadow flex flex-col"
                         >
                             <div className="px-2 py-3 bg-gray-500 rounded-xl text-xl font-bold text-center text-white shadow-lg shadow-gray-400">
-                                Phẩm chất
+                                Giao hàng
                             </div>
                             <div
                                 className={`text-5xl font-bold flex flex-1 justify-center items-center ${
@@ -196,10 +207,10 @@ export default function KPIBoard() {
                         </div>
                         <div className="flex-1 bg-white rounded-xl shadow flex flex-col">
                             <div className="px-2 py-3 bg-gray-500 rounded-xl text-xl font-bold text-center text-white shadow-lg shadow-gray-400">
-                                Giao hàng
+                                Phẩm chất
                             </div>
-                            <div className="text-5xl font-bold flex flex-1 justify-center items-center">
-                                100/100
+                            <div className={`text-5xl font-bold flex flex-1 justify-center items-center ${isQualityPassed ? "text-green-500" : "text-red-500"}`}>
+                                {actualAllQuality}/{targetAllQuality}
                             </div>
                         </div>
                     </div>
