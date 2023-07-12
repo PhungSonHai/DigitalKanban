@@ -1,7 +1,22 @@
 import React, { useEffect, useState } from 'react'
 import { evaluateData } from '@/Data/EvaluateData'
 
-function TableEvaluate({hideMainPoints = false, disableCheckbox = false, hidePoints = false, hideTotalPoints = false, scollTable = false}) {
+function TableEvaluate({
+    hideMainPoints = false, 
+    disableCheckbox = false, 
+    hidePoints = false, 
+    hideTotalPoints = false, 
+    scollTable = false,
+    checkboxValue,
+    onCheckboxChange,
+    totalPoint
+}) {
+    const handleCheckboxClick = (index) => {
+        const newValue = !checkboxValue[index]
+
+        onCheckboxChange(index, newValue)
+    }
+
   return (
     <div className={`overflow-x-auto shadow-lg shadow-[lightblue] rounded-lg ${scollTable ? "absolute inset-0" : ""}`}>
         <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -34,7 +49,7 @@ function TableEvaluate({hideMainPoints = false, disableCheckbox = false, hidePoi
                                     ?
                                         <td key={subIndex} scope="row" className="px-6 py-4 font-medium text-gray-900 dark:text-white">
                                             <div className="text-center">
-                                                <input id="default-checkbox" type="checkbox" value="" className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600" disabled={disableCheckbox} />
+                                                <input id={`check-point-${index}`} type="checkbox" value="" className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600" disabled={disableCheckbox} checked={checkboxValue[index]} onChange={() => handleCheckboxClick(index)} />
                                             </div>
                                         </td>
                                     :
@@ -62,7 +77,7 @@ function TableEvaluate({hideMainPoints = false, disableCheckbox = false, hidePoi
                         Tổng số điểm / Total points
                     </td>
                     <td scope="row" className={`px-6 py-4 font-medium text-gray-900 dark:text-white text-center text-lg ${!scollTable ? "border-l-2 dark:border-sky-500 border-sky-400" : "border-none"}`}>
-                        0
+                        {totalPoint}
                     </td>
                 </tr>
             </tbody>

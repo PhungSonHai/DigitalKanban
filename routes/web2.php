@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Web\EvaluateMeetingController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -31,13 +32,17 @@ Route::middleware('verifyMes')->group(function () {
             return Inertia::render('DetailIssue');
         })->name('detailIssue');
 
-        Route::get('/review-meeting', function() {
-            return Inertia::render('ReviewMeeting');
-        })->name('reviewMeeting');
-
         Route::get('/follow-meeting', function() {
             return Inertia::render('FollowMeeting');
         })->name('followMeeting');
+
+        Route::prefix('review-meeting')->group(function() {
+            Route::get('/', function() {
+                return Inertia::render('ReviewMeeting');
+            })->name('reviewMeeting');
+
+            Route::post('/create-evaluate', [EvaluateMeetingController::class, 'create'])->name('reviewMeeting');
+        });
     });
 });
 

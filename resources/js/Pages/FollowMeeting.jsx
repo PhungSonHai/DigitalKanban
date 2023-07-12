@@ -1,7 +1,17 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import TableEvaluate from '@/Components/TableEvaluate'
 
 function FollowMeeting() {
+    const [listDepartment, setListDepartment] = useState([]);
+
+    useEffect(() => {
+        axios
+            .get("/api/get-department")
+            .then((res) =>
+                setListDepartment(res.data.map((item) => item.dep_sap))
+            );
+    }, []);
+
   return (
     <React.Fragment>
         <div className='h-screen flex flex-col select-none'>
@@ -71,12 +81,12 @@ function FollowMeeting() {
                                 </thead>
                                 <tbody>
                                     {
-                                        new Array(10).fill(null).map((items, index) => (
+                                        listDepartment.map((items, index) => (
                                             <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                                                 {
                                                     new Array(32).fill(null).map((item, subIndex) => (
                                                         <td scope="row" className={`px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap ${subIndex != 0 ? "border border-gray-700" : ""}`}>
-                                                            {subIndex == 0 ? "4001APS01": ""}
+                                                            {subIndex == 0 ? items: ""}
                                                         </td>
                                                     ))
                                                 }

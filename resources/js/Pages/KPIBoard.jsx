@@ -221,6 +221,8 @@ export default function KPIBoard() {
                                     name="Bảng biểu sản lượng"
                                     actual={actualQuantity}
                                     target={getTargetQuantity}
+                                    nameActual="Sản lượng thực tế"
+                                    nameTarget="Mục tiêu sản lượng"
                                 />
                             </div>
                         </div>
@@ -230,6 +232,8 @@ export default function KPIBoard() {
                                     name="Bảng biểu chất lượng"
                                     actual={actualQuality}
                                     target={targetQuality}
+                                    nameActual="Chất lượng thực tế"
+                                    nameTarget="Mục tiêu chất lượng"
                                 />
                             </div>
                         </div>

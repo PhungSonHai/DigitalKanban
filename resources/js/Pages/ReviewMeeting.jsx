@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import TableEvaluate from '@/Components/TableEvaluate';
+import axios from "axios";
 
 function ReviewMeeting() {
     const [currentTime, setCurrentTime] = useState(new Date());
+    const [points, setPoints] = useState(new Array(10).fill(0));
+    const [totalPoint, setTotalPoint] = useState(0);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -13,6 +16,31 @@ function ReviewMeeting() {
           clearInterval(interval);
         };
     }, []);
+
+    const formatDate = (datetime) => {
+    }
+
+    const handleCheckboxChange = (index, value) => {
+        let temp = [...points]
+        temp[index] = value ? 1 : 0
+        setPoints(temp)
+    };
+
+    useEffect(function() {
+        let temp = 0
+        points.map(item => {
+            temp += item
+        })
+        setTotalPoint(temp)
+    }, [points]);
+
+    const createEvaluate = () => {
+        axios.post('review-meeting/create-evaluate', points)
+            .then(res => {
+                console.log(res)
+            })
+            .catch(err => console.log(err))
+    };
 
   return (
     <React.Fragment>
@@ -47,12 +75,12 @@ function ReviewMeeting() {
                         <span className='font-semibold pl-2'>{currentTime.toLocaleDateString()} {currentTime.toLocaleTimeString()}</span>
                     </div>
                     <div>
-                        <button type="button" className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:hover:bg-gray-700 dark:border-gray-700">Lưu đánh giá</button>
+                        <button type="button" className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:hover:bg-gray-700 dark:border-gray-700" onClick={() => createEvaluate()}>Lưu đánh giá</button>
                     </div>
                 </div>
 
                 <div className='flex-1'>
-                    <TableEvaluate hideMainPoints={true}/>
+                    <TableEvaluate hideMainPoints={true} totalPoint={totalPoint} checkboxValue={points} onCheckboxChange={handleCheckboxChange} />
                 </div>
             </div>
         </div>
