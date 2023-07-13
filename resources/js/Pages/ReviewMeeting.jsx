@@ -17,7 +17,12 @@ function ReviewMeeting() {
         };
     }, []);
 
-    const formatDate = (datetime) => {
+    function formatDate(datetime) {
+        const day = String(datetime.getDate()).padStart(2, '0');
+        const month = String(datetime.getMonth() + 1).padStart(2, '0');
+        const year = datetime.getFullYear();
+      
+        return `${year}-${month}-${day}`;
     }
 
     const handleCheckboxChange = (index, value) => {
@@ -35,7 +40,18 @@ function ReviewMeeting() {
     }, [points]);
 
     const createEvaluate = () => {
-        axios.post('review-meeting/create-evaluate', points)
+        const data = {
+            line_code: "APL01",
+            evaluate_date: formatDate(currentTime),
+            total_point: totalPoint,
+        }
+
+        points.map((point, index) => {
+            var pointKey = `point_${index + 1}`
+            data[pointKey] = point
+        })
+
+        axios.post('review-meeting/create-evaluate', data)
             .then(res => {
                 console.log(res)
             })

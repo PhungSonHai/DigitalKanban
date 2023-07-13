@@ -36,12 +36,22 @@ Route::middleware('verifyMes')->group(function () {
             return Inertia::render('FollowMeeting');
         })->name('followMeeting');
 
+        Route::prefix('/follow-meeting')->group(function() {
+            Route::get('/', function() {
+                return Inertia::render('FollowMeeting');
+            })->name('followMeeting');
+
+            Route::get('/getall-evaluate', [EvaluateMeetingController::class, 'getAllEvaluate'])->name('getAllEvaluate');
+
+            Route::post('/getlist-point', [EvaluateMeetingController::class, 'getListPoint'])->name('getListPoint');
+        });
+
         Route::prefix('review-meeting')->group(function() {
             Route::get('/', function() {
                 return Inertia::render('ReviewMeeting');
             })->name('reviewMeeting');
 
-            Route::post('/create-evaluate', [EvaluateMeetingController::class, 'create'])->name('reviewMeeting');
+            Route::post('/create-evaluate', [EvaluateMeetingController::class, 'create'])->name('createEvaluate');
         });
     });
 });

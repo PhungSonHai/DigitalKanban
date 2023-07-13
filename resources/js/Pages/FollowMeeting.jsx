@@ -1,8 +1,15 @@
-import React, { useEffect, useState } from 'react'
-import TableEvaluate from '@/Components/TableEvaluate'
+import React, { useEffect, useState } from 'react';
+import TableEvaluate from '@/Components/TableEvaluate';
+import axios from 'axios';
 
 function FollowMeeting() {
+    const today = new Date();
     const [listDepartment, setListDepartment] = useState([]);
+    const [listPoints, setListPoints] = useState(new Array(10).fill(0));
+    const [totalPoint, setTotalPoint] = useState(0);
+    const [selectedMonth, setSelectedMonth] = useState(`${String(today.getFullYear())}-${String(today.getMonth() + 1).padStart(2, '0')}`);
+    const [dayOfMonth, setDayOfMonth] = useState(Number(31));
+    const [allEvaluate, setAllEvaluate] = useState([]);
 
     useEffect(() => {
         axios
@@ -11,6 +18,47 @@ function FollowMeeting() {
                 setListDepartment(res.data.map((item) => item.dep_sap))
             );
     }, []);
+
+    const handleDayOfMonth = (e) => {
+        setSelectedMonth(e.target.value)
+    }
+
+    useEffect(function() {
+        let arrMonthYear = selectedMonth.split("-")
+        let month = arrMonthYear[1]
+        let year = arrMonthYear[0]
+
+        setDayOfMonth(new Date(year, month, 0).getDate())
+    }, [selectedMonth])
+
+    useEffect(function() {
+        axios.get('follow-meeting/getall-evaluate')
+            .then(res => {
+                setAllEvaluate(res.data.data)
+            })
+            .catch(err => console.log(err))
+    }, [selectedMonth])
+
+    const handleGetListPoint = (evaluate_date, line_code) => {
+        if(evaluate_date && line_code) {
+            const data = {
+                evaluate_date: evaluate_date,
+                line_code: line_code
+            }
+    
+            axios.post('follow-meeting/getlist-point', data)
+                .then(res => {
+                    let temp = [...listPoints]
+                    temp.map((item, index) => {
+                        temp[index] = Number(res.data.data[`point_${index + 1}`])
+                    })
+
+                    setTotalPoint(res.data.data.total_point)
+                    setListPoints(temp)
+                })
+                .catch(err => console.log(err))
+        }
+    }
 
   return (
     <React.Fragment>
@@ -44,7 +92,7 @@ function FollowMeeting() {
                         <span className="flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md dark:bg-gray-600 dark:text-gray-300 dark:border-gray-600 whitespace-nowrap w-20 text-center">
                             <span className='flex-1'>Tháng</span>
                         </span>
-                        <input type="month" id="website-admin" className="rounded-none rounded-r-lg bg-gray-50 border text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm border-gray-300 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="elonmusk" />
+                        <input type="month" id="website-admin" className="rounded-none rounded-r-lg bg-gray-50 border text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm border-gray-300 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="elonmusk" value={selectedMonth} onChange={handleDayOfMonth}/>
                     </div>
                     <div>
                         <button type="button" className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:hover:bg-gray-700 dark:border-gray-700">
@@ -61,7 +109,7 @@ function FollowMeeting() {
                                     <tr className=''>
                                         <th scope="col" className="px-6 py-3 text-center">
                                         </th>
-                                        <th scope="col" colSpan={31} className="px-6 py-3 text-center">
+                                        <th scope="col" colSpan={dayOfMonth} className="px-6 py-3 text-center">
                                             Ngày trong tháng
                                         </th>
                                     </tr>
@@ -71,7 +119,7 @@ function FollowMeeting() {
                                         </th>
 
                                         {
-                                            new Array(31).fill(null).map((item, index) => (
+                                            new Array(dayOfMonth).fill(null).map((item, index) => (
                                                 <th scope="col" className="px-6 py-3 whitespace-nowrap">
                                                     {index + 1}
                                                 </th>
@@ -84,11 +132,22 @@ function FollowMeeting() {
                                         listDepartment.map((items, index) => (
                                             <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                                                 {
-                                                    new Array(32).fill(null).map((item, subIndex) => (
-                                                        <td scope="row" className={`px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap ${subIndex != 0 ? "border border-gray-700" : ""}`}>
-                                                            {subIndex == 0 ? items: ""}
-                                                        </td>
-                                                    ))
+                                                    new Array(dayOfMonth + 1).fill(null).map((item, subIndex) => {
+                                                        const matching = allEvaluate.find(
+                                                            data => data.line_code == items && 
+                                                            new Date(data.evaluate_date).getDate() == subIndex && 
+                                                            new Date(data.evaluate_date).getMonth() + 1 == selectedMonth.split('-')[1]
+                                                        );
+                                                        const isMatching = matching && subIndex > 0;
+                                                        return (
+                                                            <td scope="row" className={`px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap ${subIndex != 0 ? (isMatching ? "border border-gray-700 bg-blue-500 hover:bg-blue-500/80 cursor-pointer" : "border border-gray-700") : ""}`} onClick={() => handleGetListPoint(
+                                                                isMatching ? matching.evaluate_date : "", 
+                                                                isMatching ? matching.line_code : "")
+                                                            }>
+                                                                {subIndex == 0 ? items : (isMatching ? matching.total_point : "")}
+                                                            </td>
+                                                        )
+                                                    })
                                                 }
                                             </tr>
                                         ))
@@ -98,7 +157,7 @@ function FollowMeeting() {
                         </div>
                     </div>
                     <div className='h-[400px] relative mt-2'>
-                        <TableEvaluate hidePoints={true} disableCheckbox={true} scollTable={true}/>
+                        <TableEvaluate hidePoints={true} disableCheckbox={true} checkboxValue={listPoints} totalPoint={totalPoint} scollTable={true}/>
                     </div>
                 </div>
             </div>
