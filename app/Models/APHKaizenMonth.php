@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -9,33 +10,45 @@ class APHKaizenMonth extends Model
 {
     use HasFactory;
 
-    protected $table = 'aph_kaizen_month';
-    protected $primaryKey = 'id';
+    protected $table = 'APH_KAIZEN_MONTH';
+    protected $primaryKey = 'ID';
 
     protected $fillable = [
-        'kaizen_order',
-        'kaizen_year',
-        'kaizen_month',
-        'path_avatar',
-        'name',
-        'msnv',
-        'department',
-        'plant',
-        'after_image',
-        'after_description',
-        'current_image',
-        'current_description',
-        'benefit',
-        'upgrade_0',
-        'upgrade_1',
-        'upgrade_2',
-        'upgrade_3',
-        'upgrade_4',
-        'upgrade_5',
-        'upgrade_6',
-        'line_at',
-        'plant_at',
-        'process_at',
-        'start_at'
+        'KAIZEN_ORDER',
+        'KAIZEN_YEAR',
+        'KAIZEN_MONTH',
+        'PATH_AVATAR',
+        'NAME',
+        'MSNV',
+        'DEPARTMENT',
+        'PLANT',
+        'AFTER_IMAGE',
+        'AFTER_DESCRIPTION',
+        'CURRENT_IMAGE',
+        'CURRENT_DESCRIPTION',
+        'BENEFIT',
+        'UPGRADE_0',
+        'UPGRADE_1',
+        'UPGRADE_2',
+        'UPGRADE_3',
+        'UPGRADE_4',
+        'UPGRADE_5',
+        'UPGRADE_6',
+        'LINE_AT',
+        'PLANT_AT',
+        'PROCESS_AT',
+        'START_AT',
+        'CREATED_AT',
+        'UPDATED_AT',
     ];
+
+    public function setCreatedAtAttribute($date)
+    {
+        return Carbon::createFromFormat('Y-m-d H:i:s', $date)->format('Y/m/d');
+    }
+
+    public function setUpdatedAtAttribute($date)
+    {
+        return Carbon::createFromFormat('Y-m-d H:i:s', $date)->format('Y/m/d');
+    }
 }

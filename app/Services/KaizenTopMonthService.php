@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\APHKaizenMonth;
+use Carbon\Carbon;
 use Exception;
 
 class KaizenTopMonthService implements IKaizenTopMonthService
@@ -13,62 +14,51 @@ class KaizenTopMonthService implements IKaizenTopMonthService
 
     function add($order, $month, $year, $avatar, $name, $msnv, $derpartment, $plant, $after_image, $after_description, $current_image, $current_description, $benefit, $upgrade_0, $upgrade_1, $upgrade_2, $upgrade_3, $upgrade_4, $upgrade_5, $upgrade_6, $line_at, $plant_at, $process_at, $start_at): array
     {
+        $avatarName = md5(time() . uniqid()) . "." . $avatar->getClientOriginalExtension();
+        $afterName = md5(time() . uniqid()) . "." . $after_image->getClientOriginalExtension();
+        $currentName = md5(time() . uniqid()) . "." . $current_image->getClientOriginalExtension();
         try {
             // check order, month, year exist
-            $exist = $this->APHKaizenMonth::query()->where(['order' => $order, 'month' => $month, 'year' => $year]);
+            $exist = $this->APHKaizenMonth::query()->where(['kaizen_order' => $order, 'kaizen_month' => $month, 'kaizen_year' => $year]);
 
-            if ($exist) {
+            if ($exist->first()) {
                 throw new \Exception("Lỗi! Vị trí {$order} đã có trong tháng {$month} của năm {$year}, vui lòng chọn vị trí khác");
             }
 
-            if (file_exists(public_path('uploads') . "/" . $avatar->getClientOriginalName())) {
-                throw new Exception("Tệp tin hình ảnh của \"nhân viên\" đã trùng tên với ảnh trước đây, vui lòng đổi tên của ảnh lại rồi tiếp tục thực hiện");
-            }
-
-            $avatar->move(public_path('uploads'), $avatar->getClientOriginalName());
-
-            if (file_exists(public_path('uploads') . "/" . $after_image->getClientOriginalName())) {
-                @unlink(public_path('uploads') . "/" . $avatar->getClientOriginalName());
-                throw new Exception("Tệp tin hình ảnh của \"hình ảnh trước đây\" đã trùng tên với ảnh trước đây, vui lòng đổi tên của ảnh lại rồi tiếp tục thực hiện");
-            }
-
-            $after_image->move(public_path('uploads'), $after_image->getClientOriginalName());
-
-            if (file_exists(public_path('uploads') . "/" . $current_image->getClientOriginalName())) {
-                @unlink(public_path('uploads') . "/" . $avatar->getClientOriginalName());
-                @unlink(public_path('uploads') . "/" . $after_image->getClientOriginalName());
-                throw new Exception("Tệp tin hình ảnh của \"ảnh hiện tại\" đã trùng tên với ảnh trước đây, vui lòng đổi tên của ảnh lại rồi tiếp tục thực hiện");
-            }
-
-            $current_image->move(public_path('uploads'), $current_image->getClientOriginalName());
+            $avatar->move(public_path('uploads'), $avatarName);
+            $after_image->move(public_path('uploads'), $afterName);
+            $current_image->move(public_path('uploads'), $currentName);
 
             $this->APHKaizenMonth::query()->create([
-                'kaizen_order' => $order,
-                'kaizen_year' => $year,
-                'kaizen_month' => $month,
-                'path_avatar' => $avatar->getClientOriginalName(),
-                'name' => $name,
-                'msnv' => $msnv,
-                'department' => $derpartment,
-                'plant' => $plant,
-                'after_image' => $after_image->getClientOriginalName(),
-                'after_description' => $after_description,
-                'current_image' => $current_image->getClientOriginalName(),
-                'current_description' => $current_description,
-                'benefit' => $benefit,
-                'upgrade_0' => $upgrade_0,
-                'upgrade_1' => $upgrade_1,
-                'upgrade_2' => $upgrade_2,
-                'upgrade_3' => $upgrade_3,
-                'upgrade_4' => $upgrade_4,
-                'upgrade_5' => $upgrade_5,
-                'upgrade_6' => $upgrade_6,
-                'line_at' => $line_at,
-                'plant_at' => $plant_at,
-                'process_at' => $process_at,
-                'start_at' => $start_at
+                'KAIZEN_ORDER' => $order,
+                'KAIZEN_YEAR' => $year,
+                'KAIZEN_MONTH' => $month,
+                'PATH_AVATAR' => $avatarName,
+                'NAME' => $name,
+                'MSNV' => $msnv,
+                'DEPARTMENT' => $derpartment,
+                'PLANT' => $plant,
+                'AFTER_IMAGE' => $afterName,
+                'AFTER_DESCRIPTION' => $after_description,
+                'CURRENT_IMAGE' => $currentName,
+                'CURRENT_DESCRIPTION' => $current_description,
+                'BENEFIT' => $benefit,
+                'UPGRADE_0' => $upgrade_0,
+                'UPGRADE_1' => $upgrade_1,
+                'UPGRADE_2' => $upgrade_2,
+                'UPGRADE_3' => $upgrade_3,
+                'UPGRADE_4' => $upgrade_4,
+                'UPGRADE_5' => $upgrade_5,
+                'UPGRADE_6' => $upgrade_6,
+                'LINE_AT' => $line_at,
+                'PLANT_AT' => $plant_at,
+                'PROCESS_AT' => $process_at,
+                'START_AT' => Carbon::createFromFormat('Y-m-d', $start_at)->format('Y/m/d')
             ]);
         } catch (Exception $e) {
+            @unlink(public_path('uploads') . "/" . $avatarName);
+            @unlink(public_path('uploads') . "/" . $afterName);
+            @unlink(public_path('uploads') . "/" . $currentName);
             return ["status" => false, "message" => $e->getMessage()];
         }
 

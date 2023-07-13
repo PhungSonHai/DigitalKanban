@@ -89,14 +89,14 @@ class MonitorAndBroadcast extends Command
     {
         $data = DB::select("select work_qty from sjqdms_worktarget where work_day = TO_DATE('" . date('Y/m/d') . "', 'yyyy/mm/dd') and grt_dept = '$department'");
 
-        if(count($data) == 0)
+        if (count($data) == 0)
             return 0;
-        return $data[0]->work_qty; 
+        return $data[0]->work_qty;
     }
 
-    private function getActualRFT($department) 
+    private function getActualRFT($department)
     {
-        
+
         $data = [];
 
         $result = DB::select("
@@ -193,7 +193,7 @@ class MonitorAndBroadcast extends Command
                 FROM
                     tqc_task_m m
                 WHERE
-                    to_date(m.createdate, 'yyyy-mm-dd') = to_date('". date('Y/m/d') ."', 'yyyy-mm-dd') and m.production_line_code = '$department'
+                    to_date(m.createdate, 'yyyy-mm-dd') = to_date('" . date('Y/m/d') . "', 'yyyy-mm-dd') and m.production_line_code = '$department'
                 GROUP BY
                     m.production_line_code,
                     m.createdate
@@ -202,7 +202,7 @@ class MonitorAndBroadcast extends Command
             ) statics
         ");
 
-        if(count($result) == 0)
+        if (count($result) == 0)
             return 0;
         return $result[0]->rft;
     }
@@ -215,13 +215,17 @@ class MonitorAndBroadcast extends Command
         ]);
 
         while (true) {
-            $channels = $pusher->getChannels()->channels;
+            try {
+                $channels = $pusher->getChannels()->channels;
 
-            foreach ($channels as $key => $value) {
-                if ($pusher->getChannelInfo($key)->subscription_count) {
-                    $department = explode('.', $key)[1];
-                    event(new RealTimeChart(["department" => $department, "result" => [$this->getData($department), $this->getActualRFT($department)], "target" => $this->getTarget($department), "actualAllRFT" => $this->getActualAllRFT($department)]));
+                foreach ($channels as $key => $value) {
+                    if ($pusher->getChannelInfo($key)->subscription_count) {
+                        $department = explode('.', $key)[1];
+                        event(new RealTimeChart(["department" => $department, "result" => [$this->getData($department), $this->getActualRFT($department)], "target" => $this->getTarget($department), "actualAllRFT" => $this->getActualAllRFT($department)]));
+                    }
                 }
+            } catch (\Exception $e) {
+                echo $e->getMessage();
             }
 
             sleep(1);
