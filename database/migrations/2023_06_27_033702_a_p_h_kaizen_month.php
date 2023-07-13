@@ -37,9 +37,9 @@ return new class extends Migration
             $table->boolean("upgrade_5")->comment("true hoặc false, Cải tiến: 6S");
             $table->boolean("upgrade_6")->comment("true hoặc false, Cải tiến: toàn diện");
 
-            $table->date("line_at")->comment("Tại chuyền");
-            $table->date("plant_at")->comment("Tại xưởng");
-            $table->date("process_at")->comment("Tại công đoạn");
+            $table->string("line_at")->comment("Tại chuyền");
+            $table->string("plant_at")->comment("Tại xưởng");
+            $table->string("process_at")->comment("Tại công đoạn");
             $table->date("start_at")->comment("Từ ngày");
         });
     }
