@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('aph_kaizen_month', function (Blueprint $table) {
+        Schema::create('aph_kaizen_month3', function (Blueprint $table) {
             $table->increments('id');
             $table->string("kaizen_order")->comment("Số thứ tự kaizen(1,2,3)");
             $table->integer("kaizen_year")->length(4)->comment("Năm đạt top kaizen");
@@ -41,6 +41,7 @@ return new class extends Migration
             $table->string("plant_at")->comment("Tại xưởng");
             $table->string("process_at")->comment("Tại công đoạn");
             $table->date("start_at")->comment("Từ ngày");
+            $table->nullableTimestamps();
         });
     }
 

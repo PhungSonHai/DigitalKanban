@@ -10,8 +10,10 @@ class APHKaizenMonth extends Model
 {
     use HasFactory;
 
-    protected $table = 'APH_KAIZEN_MONTH';
+    protected $table = 'APH_KAIZEN_MONTH3';
     protected $primaryKey = 'ID';
+    const CREATED_AT = 'CREATED_AT';
+    const UPDATED_AT = 'UPDATED_AT';
 
     protected $fillable = [
         'KAIZEN_ORDER',
@@ -38,9 +40,9 @@ class APHKaizenMonth extends Model
         'PLANT_AT',
         'PROCESS_AT',
         'START_AT',
-        'CREATED_AT',
-        'UPDATED_AT',
     ];
+
+    protected $dateFormat = 'Y/m/d';
 
     public function setCreatedAtAttribute($date)
     {

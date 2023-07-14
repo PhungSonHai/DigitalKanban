@@ -59,6 +59,9 @@ Route::get("get-plant", function () {
 });
 
 Route::post("insert-kaizen", [KaizenTopMonth::class, 'add']);
+Route::get("get-kaizen", [KaizenTopMonth::class, 'get']);
+Route::post("delete-kaizen", [KaizenTopMonth::class, 'delete']);
+Route::post("update-kaizen", [KaizenTopMonth::class, 'update']);
 
 // Route::get("get-test", function () {
 //     return DB::select("SELECT
