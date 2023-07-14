@@ -21,6 +21,8 @@ function FollowMeeting() {
 
     const handleDayOfMonth = (e) => {
         setSelectedMonth(e.target.value)
+        setListPoints(new Array(10).fill(0))
+        setTotalPoint(0)
     }
 
     useEffect(function() {
@@ -94,11 +96,6 @@ function FollowMeeting() {
                         </span>
                         <input type="month" id="website-admin" className="rounded-none rounded-r-lg bg-gray-50 border text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm border-gray-300 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="elonmusk" value={selectedMonth} onChange={handleDayOfMonth}/>
                     </div>
-                    <div>
-                        <button type="button" className="text-white bg-gray-800 hover:bg-gray-900 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:hover:bg-gray-700 dark:border-gray-700">
-                            Truy vấn
-                        </button>
-                    </div>
                 </div>
 
                 <div className='flex-1 py-2 flex flex-col'>
@@ -140,10 +137,22 @@ function FollowMeeting() {
                                                         );
                                                         const isMatching = matching && subIndex > 0;
                                                         return (
-                                                            <td scope="row" className={`px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap ${subIndex != 0 ? (isMatching ? "border border-gray-700 bg-blue-500 hover:bg-blue-500/80 cursor-pointer" : "border border-gray-700") : ""}`} onClick={() => handleGetListPoint(
-                                                                isMatching ? matching.evaluate_date : "", 
-                                                                isMatching ? matching.line_code : "")
-                                                            }>
+                                                            <td scope="row" className={`px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap ${subIndex != 0 ? (isMatching ? "border border-gray-700 bg-blue-500 hover:bg-blue-500/80 cursor-pointer cell-evaluated" : "border border-gray-700") : ""}`} onClick={(e) => {
+                                                                handleGetListPoint(
+                                                                    isMatching ? matching.evaluate_date : "", 
+                                                                    isMatching ? matching.line_code : ""
+                                                                )
+
+                                                                let cellsEvaluate = document.querySelectorAll('.cell-evaluated')
+                                                                
+                                                                if(e.target.classList.contains("cell-evaluated")) {
+                                                                    cellsEvaluate.forEach(element => {
+                                                                        element.classList.remove("bg-red-500", "hover:bg-red-500/80")
+                                                                    })
+
+                                                                    e.target.classList.add("bg-red-500", "hover:bg-red-500/80")
+                                                                }
+                                                            }}>
                                                                 {subIndex == 0 ? items : (isMatching ? matching.total_point : "")}
                                                             </td>
                                                         )
