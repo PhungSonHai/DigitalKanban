@@ -17,7 +17,7 @@ const quantityMachining = [
         [{name: "", showCheckbox: false}],
         [{name: "Máy móc", showCheckbox: true}],
         [{name: "Máy hư", showCheckbox: true}, {name: "Thiếu công cụ hỗ trợ", showCheckbox: true}],
-        [{name: "Nhờ bảo trì sửa chữa", showCheckbox: false}, {name: "Lên sinh quản lãnh công cụ / Linh kiện", showCheckbox: true}, {name: "Đặt mua linh kiện / công cụ", showCheckbox: true}],
+        [{name: "Nhờ bảo trì sửa chữa", showCheckbox: true}, {name: "Lên sinh quản lãnh công cụ / Linh kiện", showCheckbox: true}, {name: "Đặt mua linh kiện / công cụ", showCheckbox: true}],
         [{name: "Tổ trưởng", showCheckbox: false}, {name: "Trợ lý", showCheckbox: false}, {name: "6S xưởng", showCheckbox: false}]
     ],
     [

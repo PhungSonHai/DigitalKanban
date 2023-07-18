@@ -1,10 +1,10 @@
 import ChartTwoColumn from "@/Components/ChartTwoColumn";
-import TableIssue from "@/Components/tableIssue";
+import TableIssue from "@/Components/TableIssue";
 import axios from "axios";
 import React, { Fragment, useEffect, useMemo, useState } from "react";
 
 export default function KPIBoard() {
-    const [isLoading, setLoading] = useState(true);
+    const [isLoading, setLoading] = useState(false);
     const [actualQuantity, setActualQuantity] = useState([
         0, 0, 0, 0, 0, 0, 0, 0,
     ]);
@@ -57,9 +57,9 @@ export default function KPIBoard() {
     useEffect(() => {
         handleSetTargetQuality(department);
 
-        setLoading(true);
+        // setLoading(true);
         function ListenHandle(e) {
-            console.log(e);
+            // console.log(e);
             setActualQuantity(() => e.data.result[0]);
             setTargetQuantity(() => e.data.target);
             setActualQuality(() => e.data.result[1]);
@@ -90,7 +90,7 @@ export default function KPIBoard() {
                     <div role="status">
                         <svg
                             aria-hidden="true"
-                            class="w-16 h-16 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                            className="w-16 h-16 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
                             viewBox="0 0 100 101"
                             fill="none"
                             xmlns="http://www.w3.org/2000/svg"
@@ -104,7 +104,7 @@ export default function KPIBoard() {
                                 fill="currentFill"
                             />
                         </svg>
-                        <span class="sr-only">Loading...</span>
+                        <span className="sr-only">Loading...</span>
                     </div>
                 </div>
             )}
