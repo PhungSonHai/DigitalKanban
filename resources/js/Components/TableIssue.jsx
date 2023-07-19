@@ -37,7 +37,6 @@ function TableIssue() {
                 }
 
                 for (let iColumn = column; iColumn >= 1; iColumn--) {
-                    // console.log("Cột "+ iColumn + " hàng "+row+ "đang yêu cầu kiểm tra");
 
                     if (
                         (object[row - diff][iColumn - 1].every(
@@ -62,12 +61,6 @@ function TableIssue() {
                             check[iColumn - 1][2] !== line &&
                             iColumn > 2)
                     ) {
-                        if (row === 0) {
-                            console.log(
-                                "Hải chặn Cột " + iColumn + " hàng " + row,
-                                check
-                            );
-                        }
                         return true;
                     }
                 }
@@ -90,14 +83,26 @@ function TableIssue() {
                 if (check[column].every((item) => item == "")) {
                     temp[column] = [column, row, line];
                 } else {
-                    temp[column] = new Array(3).fill("");
+                    for(let iColumn = column; iColumn<quantityMachining[0].length; iColumn++){
+                        temp[iColumn] = new Array(3).fill("");
+                    }
                 }
                 setCheck(temp);
-                console.log(temp);
             };
         },
         [check]
     );
+
+    const isSelected = useCallback(function([column, row, line]){
+        const value = [column, row, line];
+        const valid = check[column].every((item, index) => {
+            console.log(value[index], item, index);
+            return item === value[index]
+        });
+        console.log(valid)
+        if(check.length === 0) return false;
+        return valid;
+    }, [check])
 
     // Hanlde show & close modal stitching
     const [showModalStitching, setShowModalStitching] = useState(false);
@@ -541,6 +546,7 @@ function TableIssue() {
                                                                             disabled={
                                                                                 isDisabled
                                                                             }
+                                                                            checked={isSelected([subIndex, index, objIndex])}
                                                                             id={`quantityMachining-${index}-${subIndex}-${objIndex}`}
                                                                             onChange={handleCheck(
                                                                                 [
@@ -558,7 +564,7 @@ function TableIssue() {
                                                                         <label
                                                                             className={`${
                                                                                 isDisabled
-                                                                                    ? "text-gray-900/50 dark:text-white/50"
+                                                                                    ? "text-gray-900/50 dark:text-white/50 line-through"
                                                                                     : "text-gray-900 dark:text-white"
                                                                             }`}
                                                                             htmlFor={`quantityMachining-${index}-${subIndex}-${objIndex}`}
@@ -640,7 +646,7 @@ function TableIssue() {
                                                                         <label
                                                                             className={`${
                                                                                 isDisabled
-                                                                                    ? "text-gray-900/50 dark:text-white/50"
+                                                                                    ? "text-gray-900/50 dark:text-white/50 line-through"
                                                                                     : "text-gray-900 dark:text-white"
                                                                             }`}
                                                                             htmlFor={`qualityMachining-${index}-${subIndex}-${objIndex}`}
