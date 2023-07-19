@@ -63,6 +63,14 @@ Route::get("get-kaizen", [KaizenTopMonth::class, 'get']);
 Route::post("delete-kaizen", [KaizenTopMonth::class, 'delete']);
 Route::post("update-kaizen", [KaizenTopMonth::class, 'update']);
 
+
+Route::get("get-user", function(Request $request) {
+    $token = $request->header("access_token");
+    // return $token;
+    if($token === "") return ["a"=>"c"];
+    return UserToken::query()->where('UserToken', $token)->first();
+});
+
 // Route::get("get-test", function () {
 //     return DB::select("SELECT
 //     time_from,
