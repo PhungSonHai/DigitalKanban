@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('evaluate_meeting', function (Blueprint $table) {
+        Schema::create('aph_evaluate_meeting', function (Blueprint $table) {
             $table->increments('id');
             $table->string('line_code', 20)->comment("Mã chuyền");
             $table->date('evaluate_date')->nullable()->comment("Ngày thực hiện đánh giá");
