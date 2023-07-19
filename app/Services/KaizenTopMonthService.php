@@ -67,7 +67,7 @@ class KaizenTopMonthService implements IKaizenTopMonthService
 
     function get($month, $year)
     {
-        return $this->APHKaizenMonth::query()->where([['KAIZEN_MONTH', $month], ['KAIZEN_YEAR', $year]])->get()->toArray();
+        return $this->APHKaizenMonth::query()->where([['KAIZEN_MONTH', $month], ['KAIZEN_YEAR', $year]])->orderBy('KAIZEN_ORDER', 'asc')->get()->toArray();
     }
 
     function delete($id): array

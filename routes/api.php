@@ -5,6 +5,7 @@ use App\Http\Controllers\TestController;
 use App\Models\Base005m;
 use App\Models\Base099m;
 use App\Models\Base24m;
+use App\Models\Hr001m;
 use App\Models\UserToken;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -67,8 +68,13 @@ Route::post("update-kaizen", [KaizenTopMonth::class, 'update']);
 Route::get("get-user", function(Request $request) {
     $token = $request->header("access_token");
     // return $token;
-    if($token === "") return ["a"=>"c"];
-    return UserToken::query()->where('UserToken', $token)->first();
+    if($token === "") return [];
+    $data = UserToken::query()->where('UserToken', $token)->first();
+    $userCode = $data->UserCode;
+    $hr001m = Hr001m::query()->where("STAFF_NO", $userCode)->first();
+    $udf01 = $hr001m->udf01;
+    $staffDepartment = $hr001m->staff_department;
+    return ["info" => $data, "permission" => $udf01, "staff_department" => $staffDepartment];
 });
 
 // Route::get("get-test", function () {

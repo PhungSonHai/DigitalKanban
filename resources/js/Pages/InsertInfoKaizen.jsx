@@ -547,7 +547,7 @@ function InsertInfoKaizen() {
                                         <div role="status">
                                             <svg
                                                 aria-hidden="true"
-                                                class="w-5 h-5 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                                                className="w-5 h-5 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
                                                 viewBox="0 0 100 101"
                                                 fill="none"
                                                 xmlns="http://www.w3.org/2000/svg"
@@ -561,7 +561,7 @@ function InsertInfoKaizen() {
                                                     fill="currentFill"
                                                 />
                                             </svg>
-                                            <span class="sr-only">
+                                            <span className="sr-only">
                                                 Loading...
                                             </span>
                                         </div>
@@ -578,7 +578,7 @@ function InsertInfoKaizen() {
                         <div role="status">
                             <svg
                                 aria-hidden="true"
-                                class="w-16 h-16 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                                className="w-16 h-16 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
                                 viewBox="0 0 100 101"
                                 fill="none"
                                 xmlns="http://www.w3.org/2000/svg"
@@ -592,7 +592,7 @@ function InsertInfoKaizen() {
                                     fill="currentFill"
                                 />
                             </svg>
-                            <span class="sr-only">Loading...</span>
+                            <span className="sr-only">Loading...</span>
                         </div>
                     </div>
                 )}
@@ -606,7 +606,7 @@ function InsertInfoKaizen() {
 
                         <div className="flex me-4 items-center">
                             <div className="me-10">
-                                <button className="focus:outline-none text-white bg-red-700 hover:bg-red-800 font-medium rounded-lg text-sm px-7 py-2.5 dark:bg-red-600 dark:hover:bg-red-700 shadow-xl shadow-[lightblue]">
+                                <button className="focus:outline-none text-white bg-red-700 hover:bg-red-800 font-medium rounded-lg text-sm px-7 py-2.5 dark:bg-red-600 dark:hover:bg-red-700 shadow-xl shadow-[lightblue]" onClick={() => { window.history.back() }}>
                                     Trở về
                                 </button>
                             </div>
@@ -782,7 +782,7 @@ function InsertInfoKaizen() {
                                                 <div role="status">
                                                     <svg
                                                         aria-hidden="true"
-                                                        class="w-5 h-5 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                                                        className="w-5 h-5 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
                                                         viewBox="0 0 100 101"
                                                         fill="none"
                                                         xmlns="http://www.w3.org/2000/svg"
@@ -796,7 +796,7 @@ function InsertInfoKaizen() {
                                                             fill="currentFill"
                                                         />
                                                     </svg>
-                                                    <span class="sr-only">
+                                                    <span className="sr-only">
                                                         Loading...
                                                     </span>
                                                 </div>
@@ -817,7 +817,7 @@ function InsertInfoKaizen() {
                                             <div role="status">
                                                 <svg
                                                     aria-hidden="true"
-                                                    class="w-5 h-5 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                                                    className="w-5 h-5 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
                                                     viewBox="0 0 100 101"
                                                     fill="none"
                                                     xmlns="http://www.w3.org/2000/svg"
@@ -831,7 +831,7 @@ function InsertInfoKaizen() {
                                                         fill="currentFill"
                                                     />
                                                 </svg>
-                                                <span class="sr-only">
+                                                <span className="sr-only">
                                                     Loading...
                                                 </span>
                                             </div>
@@ -1455,7 +1455,7 @@ function InsertInfoKaizen() {
                                         <div role="status">
                                             <svg
                                                 aria-hidden="true"
-                                                class="w-16 h-16 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+                                                className="w-16 h-16 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
                                                 viewBox="0 0 100 101"
                                                 fill="none"
                                                 xmlns="http://www.w3.org/2000/svg"
@@ -1469,7 +1469,7 @@ function InsertInfoKaizen() {
                                                     fill="currentFill"
                                                 />
                                             </svg>
-                                            <span class="sr-only">
+                                            <span className="sr-only">
                                                 Loading...
                                             </span>
                                         </div>
@@ -1633,7 +1633,7 @@ function InsertInfoKaizen() {
                                                             )}
                                                         >
                                                             <svg
-                                                                class="w-6 h-6"
+                                                                className="w-6 h-6"
                                                                 aria-hidden="true"
                                                                 xmlns="http://www.w3.org/2000/svg"
                                                                 fill="currentColor"
