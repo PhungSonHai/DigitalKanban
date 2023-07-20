@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Web\EvaluateMeetingController;
+use App\Http\Controllers\Web\IssueProductionController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -31,6 +32,8 @@ Route::middleware('verifyMes')->group(function () {
         Route::get('/detail-issue', function() {
             return Inertia::render('DetailIssue');
         })->name('detailIssue');
+
+        Route::post('/add-issue', [IssueProductionController::class, 'addIssue'])->name('addIssue');
 
         Route::get('/follow-meeting', function() {
             return Inertia::render('FollowMeeting');

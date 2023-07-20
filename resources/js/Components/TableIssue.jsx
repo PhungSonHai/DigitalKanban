@@ -3,16 +3,33 @@ import Modal from "./Modal";
 import { Link } from "@inertiajs/react";
 import { quantityStitching, qualityStitching } from "@/Data/IssueStitching";
 import { quantityMachining, qualityMachining } from "@/Data/IssueMachining";
+import axios from "axios";
+import { closeSnackbar, enqueueSnackbar } from "notistack";
 
 function TableIssue() {
     const [check, setCheck] = useState([]);
+    const [checkStitching, setCheckStitching] = useState([]);
+    const [username, setUsername] = useState('khách');
+    const [staffDepartment, setStaffDepartment] = useState('');
 
     useEffect(function () {
         setCheck(() =>
             new Array(quantityMachining[0].length).fill(new Array(3).fill(""))
         );
+
+        setCheckStitching(() =>
+            new Array(quantityStitching[0].length).fill(new Array(3).fill(""))
+        );
+
+        axios
+            .get("/api/get-user")
+            .then((res) => {
+                setUsername(res.data.info.UserCode)
+                setStaffDepartment(res.data.staff_department)
+            });
     }, []);
 
+    //BEGIN: HANDLE ISSUE MACHINING
     const isDisable = useCallback(
         function ([column, row, line]) {
             if (column == 0 || check.length == 0) {
@@ -87,7 +104,7 @@ function TableIssue() {
                         temp[iColumn] = new Array(3).fill("");
                     }
                 }
-                setCheck(temp);
+                setCheck(() => temp);
             };
         },
         [check]
@@ -95,14 +112,297 @@ function TableIssue() {
 
     const isSelected = useCallback(function([column, row, line]){
         const value = [column, row, line];
+        if(check.length === 0) return false;
         const valid = check[column].every((item, index) => {
-            console.log(value[index], item, index);
             return item === value[index]
         });
-        console.log(valid)
-        if(check.length === 0) return false;
         return valid;
     }, [check])
+
+    const getDataIssue = useCallback(function() {
+        if(check.length === 0) {
+            return ""
+        }
+        const valid = check[1].every(item => item !== "") 
+        let data = [];
+        if(valid) {
+            const [column, row, line] = check[1]
+            let diff = 0
+            let object = quantityMachining
+            
+            if (row >= 6) {
+                diff = 6;
+                object = qualityMachining;
+            }
+
+            data = new Array(object[row - diff].length).fill("")
+
+            let iLine = 0;
+
+            for(let iColumn = 0; iColumn < object[row - diff].length; iColumn++) {
+                if(object[row - diff][iColumn].every(item => item.showCheckbox) && check[iColumn].every(item => item === "")) {
+                    break
+                }
+                if(object[iColumn === 0 ? 0 : row - diff][iColumn].every(item => item.showCheckbox)) {
+                    iLine = check[iColumn][2]
+                }
+                data[iColumn] = object[iColumn === 0 ? 0 : row - diff][iColumn][iLine].name
+                // if(object[row - diff][iColumn].every(item => !item.showCheckbox)) {
+                //     data[iColumn] = object[row - diff][iColumn][line].name 
+                // }
+            }
+        }
+
+        return data
+    }, [check])
+
+    const handleAddIssueMachining = () => {
+        const dataIssue = getDataIssue()
+        if(dataIssue.some(item => item === "")) {
+            const key = enqueueSnackbar("Dữ liệu không hợp lệ, vui lòng chọn đầy đủ", {
+                variant: "error",
+                anchorOrigin: {
+                    vertical: "top",
+                    horizontal: "center",
+                },
+                action: (
+                    <div
+                        className="text-white cursor-pointer hover:text-gray-100 active:text-gray-200"
+                        onClick={() => closeSnackbar(key)}
+                    >
+                        <svg
+                            className="w-4 h-4"
+                            fill="currentColor"
+                            viewBox="-80 0 512 512"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z" />
+                        </svg>
+                    </div>
+                ),
+            });
+        } else {
+            if(staffDepartment != "") {
+                var data = {}
+                data.line_code = staffDepartment
+                data.affect = dataIssue[0]
+                data.reason = dataIssue[1]
+                data.description_reason = dataIssue[2]
+                data.action_resolve = dataIssue[3]
+                data.responsible = dataIssue[4]
+
+                axios.post('KPIBoard/add-issue', data)
+                    .then(res => {
+                        if(res.status === 200) {
+                            const key = enqueueSnackbar(res.data.message, {
+                                variant: "info",
+                                anchorOrigin: {
+                                    vertical: "top",
+                                    horizontal: "center",
+                                },
+                                action: (
+                                    <div
+                                        className="text-white cursor-pointer hover:text-gray-100 active:text-gray-200"
+                                        onClick={() => closeSnackbar(key)}
+                                    >
+                                        <svg
+                                            className="w-4 h-4"
+                                            fill="currentColor"
+                                            viewBox="-80 0 512 512"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                            <path d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z" />
+                                        </svg>
+                                    </div>
+                                ),
+                            });
+                        }
+                    })
+                    .catch(err => {
+                        const key = enqueueSnackbar(err.response.data.error, {
+                            variant: "error",
+                            anchorOrigin: {
+                                vertical: "top",
+                                horizontal: "center",
+                            },
+                            action: (
+                                <div
+                                    className="text-white cursor-pointer hover:text-gray-100 active:text-gray-200"
+                                    onClick={() => closeSnackbar(key)}
+                                >
+                                    <svg
+                                        className="w-4 h-4"
+                                        fill="currentColor"
+                                        viewBox="-80 0 512 512"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <path d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z" />
+                                    </svg>
+                                </div>
+                            ),
+                        });
+                    })
+            } else {
+                const key = enqueueSnackbar("Xảy ra lỗi không thể thêm vấn đề", {
+                    variant: "error",
+                    anchorOrigin: {
+                        vertical: "top",
+                        horizontal: "center",
+                    },
+                    action: (
+                        <div
+                            className="text-white cursor-pointer hover:text-gray-100 active:text-gray-200"
+                            onClick={() => closeSnackbar(key)}
+                        >
+                            <svg
+                                className="w-4 h-4"
+                                fill="currentColor"
+                                viewBox="-80 0 512 512"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z" />
+                            </svg>
+                        </div>
+                    ),
+                });
+            }
+        }
+    }
+    //END: HANDLE ISSUE MACHINING
+
+
+    //BEGIN: HANDLE ISSUE STITCHING
+    const isDisableStitching = useCallback(
+        function ([column, row, line]) {
+            if (column == 0 || checkStitching.length == 0) {
+                return false;
+            }
+
+            if (column == 1) {
+                if (
+                    checkStitching[column].every((item) => item !== "") &&
+                    checkStitching[column][1] != row
+                ) {
+                    return true;
+                }
+            }
+
+            if (column > 1) {
+                let diff = 0;
+                let object = quantityStitching;
+                if (row >= 6) {
+                    diff = 6;
+                    object = qualityStitching;
+                }
+
+                for (let iColumn = column; iColumn >= 1; iColumn--) {
+
+                    if (
+                        (object[row - diff][iColumn - 1].every(
+                            (item) => !item.showCheckbox
+                        ) ||
+                            object[row - diff][iColumn - 1].some(
+                                (item) => !item.showCheckbox
+                            )) &&
+                        checkStitching[iColumn - 1].every((item) => item === "")
+                    ) {
+                        continue;
+                    }
+
+                    if (
+                        checkStitching[iColumn - 1].every((item) => item === "") ||
+                        checkStitching[iColumn - 1][1] !== row ||
+                        (checkStitching[column].every((item) => item !== "") &&
+                            checkStitching[column][2] !== line) ||
+                        (object[row - diff][iColumn].every(
+                            (item) => !item.showCheckbox
+                        ) &&
+                            checkStitching[iColumn - 1][2] !== line &&
+                            iColumn > 2)
+                    ) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        },
+        [checkStitching]
+    );
+
+    const handleCheckStitching = useCallback(
+        function ([column, row, line]) {
+            return () => {
+                let diff = 0;
+                if (row >= 6) {
+                    diff = 6;
+                }
+
+                let temp = [...checkStitching];
+                if (checkStitching[column].every((item) => item == "")) {
+                    temp[column] = [column, row, line];
+                } else {
+                    for(let iColumn = column; iColumn < quantityStitching[0].length; iColumn++){
+                        temp[iColumn] = new Array(3).fill("");
+                    }
+                }
+                setCheckStitching(() => temp);
+            };
+        },
+        [checkStitching]
+    );
+
+    const isSelectedStitching = useCallback(function([column, row, line]){
+        const value = [column, row, line];
+        if(checkStitching.length === 0) return false;
+        const valid = checkStitching[column].every((item, index) => {
+            return item === value[index]
+        });
+        return valid;
+    }, [checkStitching])
+
+    const getDataIssueStitching = useCallback(function() {
+        if(checkStitching.length === 0) {
+            return ""
+        }
+        const valid = checkStitching[1].every(item => item !== "") 
+        let data = [];
+        if(valid) {
+            const [column, row, line] = checkStitching[1]
+            let diff = 0
+            let object = quantityStitching
+            
+            if (row >= 6) {
+                diff = 6;
+                object = qualityStitching;
+            }
+
+            data = new Array(object[row - diff].length).fill("")
+
+            let iLine = 0;
+
+            for(let iColumn = 0; iColumn < object[row - diff].length; iColumn++) {
+                if(object[row - diff][iColumn].every(item => item.showCheckbox) && checkStitching[iColumn].every(item => item === "")) {
+                    break
+                }
+                if(object[iColumn === 0 ? 0 : row - diff][iColumn].every(item => item.showCheckbox)) {
+                    iLine = checkStitching[iColumn][2]
+                }
+                data[iColumn] = object[iColumn === 0 ? 0 : row - diff][iColumn][iLine].name
+                // if(object[row - diff][iColumn].every(item => !item.showCheckbox)) {
+                //     data[iColumn] = object[row - diff][iColumn][line].name 
+                // }
+            }
+        }
+
+        return data
+    }, [checkStitching])
+
+    const handleAddIssueStitching = () => {
+        console.log(getDataIssueStitching())
+    }
+    //END: HANDLE ISSUE STITCHING
+
 
     // Hanlde show & close modal stitching
     const [showModalStitching, setShowModalStitching] = useState(false);
@@ -222,195 +522,160 @@ function TableIssue() {
                                             key={index}
                                             className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
                                         >
-                                            {items.map((item, subIndex) =>
-                                                item != "" ? (
-                                                    <td
-                                                        key={subIndex}
-                                                        scope="row"
-                                                        rowSpan={
-                                                            index == 0 &&
-                                                            subIndex == 0
-                                                                ? quantityStitching.length
-                                                                : ""
-                                                        }
-                                                        className={`px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap ${
-                                                            index == 0 &&
-                                                            subIndex == 0
-                                                                ? "uppercase"
-                                                                : ""
-                                                        }`}
-                                                    >
-                                                        {item.indexOf("/n") >
-                                                        -1 ? (
-                                                            item
-                                                                .split("/n")
-                                                                .map(
-                                                                    (
-                                                                        str,
-                                                                        strIndex
-                                                                    ) => (
-                                                                        <div
-                                                                            key={
-                                                                                strIndex
+                                            {items.map((item, subIndex) => (
+                                                <td
+                                                    key={subIndex}
+                                                    scope="row"
+                                                    rowSpan={
+                                                        index == 0 &&
+                                                        subIndex == 0
+                                                            ? quantityStitching.length
+                                                            : ""
+                                                    }
+                                                    className="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap"
+                                                    hidden={
+                                                        item[0].name == ""
+                                                            ? true
+                                                            : false
+                                                    }
+                                                >
+                                                    {item.map(
+                                                        (objItem, objIndex) => {
+                                                            var isDisabledStitching =
+                                                                isDisableStitching([
+                                                                    subIndex,
+                                                                    index,
+                                                                    objIndex,
+                                                                ]);
+
+                                                            return (
+                                                                <div
+                                                                    key={
+                                                                        objIndex
+                                                                    }
+                                                                    className="flex mt-1.5"
+                                                                >
+                                                                    {objItem.showCheckbox && (
+                                                                        <input
+                                                                            disabled={
+                                                                                isDisabledStitching
                                                                             }
-                                                                            className="mt-1.5"
-                                                                        >
-                                                                            {str.indexOf(
-                                                                                "/checkbox/"
-                                                                            ) >
-                                                                            -1 ? (
-                                                                                <div className="flex">
-                                                                                    <input
-                                                                                        id={`quantityStitching-${index}-${subIndex}-${strIndex}`}
-                                                                                        type="checkbox"
-                                                                                        value=""
-                                                                                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 mr-2 mt-0.5"
-                                                                                    />
-                                                                                    <div>
-                                                                                        <label
-                                                                                            htmlFor={`quantityStitching-${index}-${subIndex}-${strIndex}`}
-                                                                                        >
-                                                                                            {str.replace(
-                                                                                                "/checkbox/",
-                                                                                                ""
-                                                                                            )}
-                                                                                        </label>
-                                                                                    </div>
-                                                                                </div>
-                                                                            ) : (
-                                                                                str
+                                                                            checked={isSelectedStitching([subIndex, index, objIndex])}
+                                                                            id={`quantityStitching-${index}-${subIndex}-${objIndex}`}
+                                                                            onChange={handleCheckStitching(
+                                                                                [
+                                                                                    subIndex,
+                                                                                    index,
+                                                                                    objIndex,
+                                                                                ]
                                                                             )}
-                                                                        </div>
-                                                                    )
-                                                                )
-                                                        ) : item.indexOf(
-                                                              "/checkbox/"
-                                                          ) > -1 ? (
-                                                            <div className="flex">
-                                                                <input
-                                                                    id={`quantityStitching-${index}-${subIndex}`}
-                                                                    type="checkbox"
-                                                                    value=""
-                                                                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 mr-2 mt-0.5"
-                                                                />
-                                                                <div>
-                                                                    <label
-                                                                        htmlFor={`quantityStitching-${index}-${subIndex}`}
-                                                                    >
-                                                                        {item.replace(
-                                                                            "/checkbox/",
-                                                                            ""
-                                                                        )}
-                                                                    </label>
+                                                                            type="checkbox"
+                                                                            value=""
+                                                                            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 mr-2 mt-0.5"
+                                                                        />
+                                                                    )}
+                                                                    <div>
+                                                                        <label
+                                                                            className={`${
+                                                                                isDisabledStitching
+                                                                                    ? "text-gray-900/50 dark:text-white/50 line-through"
+                                                                                    : "text-gray-900 dark:text-white"
+                                                                            }`}
+                                                                            htmlFor={`quantityStitching-${index}-${subIndex}-${objIndex}`}
+                                                                        >
+                                                                            {
+                                                                                objItem.name
+                                                                            }
+                                                                        </label>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        ) : (
-                                                            item
-                                                        )}
-                                                    </td>
-                                                ) : (
-                                                    ""
-                                                )
-                                            )}
+                                                            );
+                                                        }
+                                                    )}
+                                                </td>
+                                            ))}
                                         </tr>
                                     ))}
-
                                     {/* Chất lượng */}
                                     {qualityStitching.map((items, index) => (
                                         <tr
                                             key={index}
                                             className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
                                         >
-                                            {items.map((item, subIndex) =>
-                                                item != "" ? (
-                                                    <td
-                                                        key={subIndex}
-                                                        scope="row"
-                                                        rowSpan={
-                                                            index == 0 &&
-                                                            subIndex == 0
-                                                                ? qualityStitching.length
-                                                                : ""
-                                                        }
-                                                        className={`px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap ${
-                                                            index == 0 &&
-                                                            subIndex == 0
-                                                                ? "uppercase"
-                                                                : ""
-                                                        }`}
-                                                    >
-                                                        {item.indexOf("/n") >
-                                                        -1 ? (
-                                                            item
-                                                                .split("/n")
-                                                                .map(
-                                                                    (
-                                                                        str,
-                                                                        strIndex
-                                                                    ) => (
-                                                                        <div
-                                                                            key={
-                                                                                strIndex
+                                            {items.map((item, subIndex) => (
+                                                <td
+                                                    key={subIndex}
+                                                    scope="row"
+                                                    rowSpan={
+                                                        index == 0 &&
+                                                        subIndex == 0
+                                                            ? qualityStitching.length
+                                                            : ""
+                                                    }
+                                                    className={
+                                                        "px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap"
+                                                    }
+                                                    hidden={
+                                                        item[0].name == ""
+                                                            ? true
+                                                            : false
+                                                    }
+                                                >
+                                                    {item.map(
+                                                        (objItem, objIndex) => {
+                                                            var isDisabledStitching =
+                                                                isDisableStitching([
+                                                                    subIndex,
+                                                                    index + 6,
+                                                                    objIndex,
+                                                                ]);
+
+                                                            return (
+                                                                <div
+                                                                    key={
+                                                                        objIndex
+                                                                    }
+                                                                    className="flex mt-1.5"
+                                                                >
+                                                                    {objItem.showCheckbox && (
+                                                                        <input
+                                                                            disabled={
+                                                                                isDisabledStitching
                                                                             }
-                                                                            className="mt-1.5"
-                                                                        >
-                                                                            {str.indexOf(
-                                                                                "/checkbox/"
-                                                                            ) >
-                                                                            -1 ? (
-                                                                                <div className="flex">
-                                                                                    <input
-                                                                                        id={`qualityStitching-${index}-${subIndex}-${strIndex}`}
-                                                                                        type="checkbox"
-                                                                                        value=""
-                                                                                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 mr-2 mt-0.5"
-                                                                                    />
-                                                                                    <div>
-                                                                                        <label
-                                                                                            htmlFor={`qualityStitching-${index}-${subIndex}-${strIndex}`}
-                                                                                        >
-                                                                                            {str.replace(
-                                                                                                "/checkbox/",
-                                                                                                ""
-                                                                                            )}
-                                                                                        </label>
-                                                                                    </div>
-                                                                                </div>
-                                                                            ) : (
-                                                                                str
+                                                                            id={`qualityStitching-${index}-${subIndex}-${objIndex}`}
+                                                                            onChange={handleCheckStitching(
+                                                                                [
+                                                                                    subIndex,
+                                                                                    index +
+                                                                                        6,
+                                                                                    objIndex,
+                                                                                ]
                                                                             )}
-                                                                        </div>
-                                                                    )
-                                                                )
-                                                        ) : item.indexOf(
-                                                              "/checkbox/"
-                                                          ) > -1 ? (
-                                                            <div className="flex">
-                                                                <input
-                                                                    id={`qualityStitching-${index}-${subIndex}`}
-                                                                    type="checkbox"
-                                                                    value=""
-                                                                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 mr-2 mt-0.5"
-                                                                />
-                                                                <div>
-                                                                    <label
-                                                                        htmlFor={`qualityStitching-${index}-${subIndex}`}
-                                                                    >
-                                                                        {item.replace(
-                                                                            "/checkbox/",
-                                                                            ""
-                                                                        )}
-                                                                    </label>
+                                                                            type="checkbox"
+                                                                            value=""
+                                                                            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 mr-2 mt-0.5"
+                                                                        />
+                                                                    )}
+                                                                    <div>
+                                                                        <label
+                                                                            className={`${
+                                                                                isDisabledStitching
+                                                                                    ? "text-gray-900/50 dark:text-white/50 line-through"
+                                                                                    : "text-gray-900 dark:text-white"
+                                                                            }`}
+                                                                            htmlFor={`qualityStitching-${index}-${subIndex}-${objIndex}`}
+                                                                        >
+                                                                            {
+                                                                                objItem.name
+                                                                            }
+                                                                        </label>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        ) : (
-                                                            item
-                                                        )}
-                                                    </td>
-                                                ) : (
-                                                    ""
-                                                )
-                                            )}
+                                                            );
+                                                        }
+                                                    )}
+                                                </td>
+                                            ))}
                                         </tr>
                                     ))}
                                 </tbody>
@@ -422,6 +687,7 @@ function TableIssue() {
                         <button
                             type="button"
                             className="text-white bg-green-700 hover:bg-green-800 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-green-600 dark:hover:bg-green-700"
+                            onClick={() => handleAddIssueStitching()}
                         >
                             Xác nhận
                         </button>
@@ -673,6 +939,7 @@ function TableIssue() {
                         <button
                             type="button"
                             className="text-white bg-green-700 hover:bg-green-800 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-green-600 dark:hover:bg-green-700"
+                            onClick={() => handleAddIssueMachining()}
                         >
                             Xác nhận
                         </button>
@@ -819,9 +1086,9 @@ function TableIssue() {
                             </div>
                             <div className="bg-gray-400 flex-1"></div>
                         </div>
-                        <div className="flex flex-col justify-between">
+                        <div className="flex flex-col justify-between items-center">
                             <span className="font-semibold text-gray-500 text-lg">
-                                Tài khoản 4001APS01
+                                Tài khoản {username}
                             </span>
                             <Link href={route("reviewMeeting")}>
                                 <button
