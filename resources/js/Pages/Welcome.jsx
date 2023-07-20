@@ -1,11 +1,45 @@
 import { Link, Head } from "@inertiajs/react";
+import axios from "axios";
+import { enqueueSnackbar } from "notistack";
+import { closeSnackbar } from "notistack";
+import { useEffect, useState } from "react";
 
 export default function Welcome() {
+    const [permission, setPermission] = useState("");
     const list = [
         { route: "ListDirectory", name: "HƯỚNG DẪN HỌP CẤP BẬC" },
         { route: "KPIBoard", name: "BẢNG HIỂN THỊ CUỘC HỌP CẤP BẬC" },
         { route: "KaizenTop", name: "KAIZEN CỦA THÁNG" },
     ];
+
+    useEffect(() => {
+        axios
+            .get("/api/get-user")
+            .then((res) => setPermission(res.data.permission));
+
+        const key = enqueueSnackbar("Chào mừng bạn đã quay lại Cuộc họp cấp bậc 1", {
+            variant: "info",
+            anchorOrigin: {
+                vertical: "top",
+                horizontal: "center",
+            },
+            action: (
+                <div
+                    className="text-white cursor-pointer hover:text-gray-100 active:text-gray-200"
+                    onClick={() => closeSnackbar(key)}
+                >
+                    <svg
+                        className="w-4 h-4"
+                        fill="currentColor"
+                        viewBox="-80 0 512 512"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z" />
+                    </svg>
+                </div>
+            ),
+        });
+    }, []);
 
     return (
         <div className='bg-[url("/images/background-kanban.jpg")] bg-cover h-screen w-full bg-no-repeat select-none'>
@@ -18,12 +52,14 @@ export default function Welcome() {
                             </div>
                         </div>
                         <div className="pb-10 lg:pb-20 pr-10">
-                            <Link
-                                className="bg-orange-600/90 p-5 lg:p-10 text-2xl lg:text-4xl font-bold shadow-xl cursor-pointer hover:bg-orange-700/90 block rounded-r-3xl"
-                                href={route('insertKaizen')}
-                            >
-                                QUẢN LÝ DANH SÁCH KAIZEN
-                            </Link>
+                            {permission === "ME" && (
+                                <Link
+                                    className="bg-orange-600/90 p-5 lg:p-10 text-2xl lg:text-4xl font-bold shadow-xl cursor-pointer hover:bg-orange-700/90 block rounded-r-3xl"
+                                    href={route("insertKaizen")}
+                                >
+                                    QUẢN LÝ DANH SÁCH KAIZEN
+                                </Link>
+                            )}
                         </div>
                     </div>
                     <div className="flex-1 flex flex-col-reverse pb-10 lg:pb-20 justify-between">
