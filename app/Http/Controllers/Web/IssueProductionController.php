@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\APHIssueProduction;
+use App\Models\EvaluateMeeting;
 
 class IssueProductionController extends Controller
 {
@@ -12,10 +13,12 @@ class IssueProductionController extends Controller
      * Display a listing of the resource.
      */
     protected $issueProduction;
+    protected $evaluateMeeting;
 
-    public function __construct(APHIssueProduction $issueProduction)
+    public function __construct(APHIssueProduction $issueProduction, EvaluateMeeting $evaluateMeeting)
     {
         $this->issueProduction = $issueProduction;
+        $this->evaluateMeeting = $evaluateMeeting;
     }
 
     public function index()
@@ -33,6 +36,50 @@ class IssueProductionController extends Controller
         catch (\Throwable $th) 
         {
             return response()->json(["error" => "Lấy vấn đề theo chuyền không thành công"], 400);
+        }
+    }
+
+    public function getAllIssue()
+    {
+        try 
+        {
+            $data = $this->issueProduction->orderBy('created_at', 'DESC')->get();
+            return response()->json(["message" => "Thành công", "data" => $data], 200);
+        } 
+        catch (\Throwable $th) 
+        {
+            return response()->json(["error" => "Xảy ra lỗi"], 400);
+        }
+    }
+
+    public function fillIssue(Request $request)
+    {
+        try 
+        {
+            if(!$request->created_at && !$request->line_code && !$request->affect && !$request->is_solved) {
+                $data = $this->issueProduction->orderBy('created_at', 'DESC')->get();
+                return response()->json(["message" => "Thành công", "data" => $data], 200);
+            } else {
+                $data = $this->issueProduction->when($request->created_at, function($q) use($request) {
+                    return $q->whereDate("created_at", $request->created_at);
+                })
+                ->when($request->line_code, function($q) use($request) {
+                    return $q->where("line_code", $request->line_code);
+                })
+                ->when($request->affect, function($q) use($request) {
+                    return $q->where("affect", $request->affect);
+                })
+                ->when($request->is_solved, function($q) use($request) {
+                    return $q->where("is_solved", $request->is_solved);
+                })
+                ->get();
+
+                return response()->json(["message" => "Thành công", "data" => $data], 200);
+            }
+        } 
+        catch (\Throwable $th) 
+        {
+            return response()->json(["error" => "Tìm kiếm thất bại"], 400);
         }
     }
 
@@ -141,6 +188,23 @@ class IssueProductionController extends Controller
 
                 return response()->json(["message" => "Thành công", "data" => $data], 200);
             }
+        } 
+        catch (\Throwable $th) 
+        {
+            return response()->json(["error" => "Xảy ra lỗi"], 400);
+        }
+    }
+
+    public function scoreEvaluate(Request $request)
+    {
+        try 
+        {
+            if(!$request->line_code || !$request->evaluate_date) {
+                return response()->json(["error" => "Xảy ra lỗi"], 400);
+            }
+
+            $data = $this->evaluateMeeting->select("total_point")->where([["line_code", $request->line_code], ["evaluate_date", $request->evaluate_date]])->first();
+            return response()->json(["message" => "Thành công", "score" => $data], 200);
         } 
         catch (\Throwable $th) 
         {
