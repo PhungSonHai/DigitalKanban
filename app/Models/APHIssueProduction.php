@@ -19,6 +19,7 @@ class APHIssueProduction extends Model
         'description_reason',
         'action_resolve',
         'responsible',
-        'is_solved'
+        'is_solved',
+        'issue_of'
     ];
 }

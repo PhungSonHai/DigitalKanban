@@ -34,6 +34,10 @@ Route::middleware('verifyMes')->group(function () {
         })->name('detailIssue');
 
         Route::post('/add-issue', [IssueProductionController::class, 'addIssue'])->name('addIssue');
+        Route::post('/get-issue-of-line', [IssueProductionController::class, 'getIssueOfLine'])->name('getIssueOfLine');
+        Route::post('/complete-issue', [IssueProductionController::class, 'completeIssue'])->name('completeIssue');
+        Route::post('/cancel-issue', [IssueProductionController::class, 'cancelIssue'])->name('cancelIssue');
+        Route::post('/statistic-issue', [IssueProductionController::class, 'statisticIssue'])->name('statisticIssue');
 
         Route::get('/follow-meeting', function() {
             return Inertia::render('FollowMeeting');

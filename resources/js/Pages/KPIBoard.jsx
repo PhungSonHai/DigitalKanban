@@ -109,7 +109,7 @@ export default function KPIBoard() {
                 </div>
             )}
             <div className="h-screen flex flex-col select-none">
-                <div className="flex justify-between pt-3 mb-3 flex-row items-center">
+                <div className="flex justify-between pt-3 pb-3 flex-row items-center">
                     <div className="bg-gray-500/90 px-5 py-2 rounded-r-full shadow-xl shadow-[lightblue]">
                         <p className="text-3xl uppercase font-bold text-white">
                             Bảng KPI dữ liệu
@@ -186,6 +186,7 @@ export default function KPIBoard() {
                         </div>
                     </div>
                 </div>
+
                 <div className="flex flex-1 bg-gray-100">
                     <div className="w-2/12 flex flex-col p-5 justify-around gap-5">
                         <div

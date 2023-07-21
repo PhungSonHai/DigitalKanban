@@ -100,7 +100,7 @@ function DetailIssue() {
                                         Người chịu trách nhiệm
                                     </th>
                                     <th scope="col" className="px-6 py-3 whitespace-nowrap">
-                                        Hoàn thành hoặc hủy
+                                        Trạng thái
                                     </th>
                                 </tr>
                             </thead>
