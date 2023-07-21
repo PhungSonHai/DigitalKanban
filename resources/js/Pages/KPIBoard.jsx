@@ -1,10 +1,13 @@
 import ChartTwoColumn from "@/Components/ChartTwoColumn";
 import TableIssue from "@/Components/TableIssue";
 import axios from "axios";
+import { closeSnackbar } from "notistack";
+import { enqueueSnackbar } from "notistack";
 import React, { Fragment, useEffect, useMemo, useState } from "react";
 
 export default function KPIBoard() {
     const [isLoading, setLoading] = useState(false);
+    const [timeRefresh, setTimeRefresh] = useState(0);
     const [actualQuantity, setActualQuantity] = useState([
         0, 0, 0, 0, 0, 0, 0, 0,
     ]);
@@ -37,43 +40,83 @@ export default function KPIBoard() {
 
         return (actualAllQuality / targetAllQuality) * 100 >= 90;
     }, [actualAllQuality]);
-    
+
     const [listDepartment, setListDepartment] = useState([]);
 
     const [department, setDepartment] = useState("APL01");
     const [from, setFrom] = useState("");
     const [to, setTo] = useState("");
 
-    const handleSetTargetQuality = (dept) => {
-        if(dept.includes("S")) {
-            setTargetQuality(new Array(8).fill(90))
-        } else if(dept.includes("L")) {
-            setTargetQuality(new Array(8).fill(88))
-        } else {
-            setTargetQuality([])
+    const isValid = useMemo(() => {
+        if (from === "" && to === "") {
+            return true;
         }
-    }
+        const fromDate = new Date(from);
+        const toDate = new Date(to);
+        if (Math.floor((toDate - fromDate) / (1000 * 60 * 60 * 24)) <= 7) {
+            return true;
+        }
+
+        return false;
+    }, [from, to]);
+
+    const handleSetTargetQuality = (dept) => {
+        if (dept.includes("S")) {
+            setTargetQuality(new Array(8).fill(90));
+        } else if (dept.includes("L")) {
+            setTargetQuality(new Array(8).fill(88));
+        } else {
+            setTargetQuality([]);
+        }
+    };
 
     useEffect(() => {
         handleSetTargetQuality(department);
 
-        // setLoading(true);
         function ListenHandle(e) {
-            // console.log(e);
+            console.log(e);
             setActualQuantity(() => e.data.result[0]);
             setTargetQuantity(() => e.data.target);
             setActualQuality(() => e.data.result[1]);
-            setActualAllQuality(() => e.data.actualAllRFT)
+            setActualAllQuality(() => e.data.actualAllRFT);
             setLoading(false);
         }
-        window.Echo.channel("department.4001" + department).listen(
-            "RealTimeChart",
-            ListenHandle
-        );
+
+        if (from === to) {
+            setLoading(true);
+            window.Echo.channel("department.4001" + department).listen(
+                "RealTimeChart",
+                ListenHandle
+            );
+        } else {
+            if (isValid) {
+
+                setLoading(true);
+                axios
+                    .get(
+                        "/api/query?department=4001" +
+                            department +
+                            "&from=" +
+                            from +
+                            "&to=" +
+                            to
+                    )
+                    .then((res) => {
+                        setActualQuantity(() => res.data[0]);
+                        setTargetQuantity(() => res.data[2]);
+                        setActualQuality(() => res.data[1]);
+                        setActualAllQuality(() => res.data[3]);
+                        setLoading(false);
+                    });
+            }
+        }
+
         return function () {
-            window.Echo.leaveChannel("department.4001" + department);
+            if (from === to) {
+                window.Echo.leaveChannel("department.4001" + department);
+            }
         };
-    }, [department]);
+    }, [timeRefresh]);
 
     useEffect(() => {
         axios
@@ -82,6 +125,67 @@ export default function KPIBoard() {
                 setListDepartment(res.data.map((item) => item.dep_sap))
             );
     }, []);
+
+    const handleSearch = () => {
+        if ((from && !to) || (!from && to)) {
+            const key = enqueueSnackbar(
+                "Không truy vấn được, phải chọn cả 2 ngày, hoặc để trống cả 2 ngày",
+                {
+                    variant: "warning",
+                    anchorOrigin: {
+                        vertical: "top",
+                        horizontal: "center",
+                    },
+                    action: (
+                        <div
+                            className="text-white cursor-pointer hover:text-gray-100 active:text-gray-200"
+                            onClick={() => closeSnackbar(key)}
+                        >
+                            <svg
+                                className="w-4 h-4"
+                                fill="currentColor"
+                                viewBox="-80 0 512 512"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z" />
+                            </svg>
+                        </div>
+                    ),
+                }
+            );
+            return;
+        }
+
+        if (!isValid) {
+            const key = enqueueSnackbar(
+                "Lỗi ngày cách nhau hơn 7 ngày, không thể truy vấn như vậy được",
+                {
+                    variant: "warning",
+                    anchorOrigin: {
+                        vertical: "top",
+                        horizontal: "center",
+                    },
+                    action: (
+                        <div
+                            className="text-white cursor-pointer hover:text-gray-100 active:text-gray-200"
+                            onClick={() => closeSnackbar(key)}
+                        >
+                            <svg
+                                className="w-4 h-4"
+                                fill="currentColor"
+                                viewBox="-80 0 512 512"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z" />
+                            </svg>
+                        </div>
+                    ),
+                }
+            );
+        }
+
+        if (!isLoading) setTimeRefresh(Date.now());
+    };
 
     return (
         <Fragment>
@@ -143,7 +247,10 @@ export default function KPIBoard() {
                                 type="date"
                                 id="website-admin"
                                 className="rounded-none rounded-r-lg bg-gray-50 border text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm border-gray-300 px-2.5 py-1.5   dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                placeholder="elonmusk"
+                                value={from}
+                                onChange={(e) => {
+                                    setFrom(e.target.value);
+                                }}
                             />
                         </div>
                         <div className="flex flex-1 w-[220px]">
@@ -154,13 +261,17 @@ export default function KPIBoard() {
                                 type="date"
                                 id="website-admin"
                                 className="rounded-none rounded-r-lg bg-gray-50 border text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm border-gray-300 px-2.5 py-1.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                placeholder="elonmusk"
+                                value={to}
+                                onChange={(e) => {
+                                    setTo(e.target.value);
+                                }}
                             />
                         </div>
                         <div>
                             <button
                                 type="button"
                                 className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-1.5 mr-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                                onClick={handleSearch}
                             >
                                 Tìm kiếm
                             </button>
@@ -210,7 +321,13 @@ export default function KPIBoard() {
                             <div className="px-2 py-3 bg-gray-500 rounded-xl text-xl font-bold text-center text-white shadow-lg shadow-gray-400">
                                 Phẩm chất
                             </div>
-                            <div className={`text-5xl font-bold flex flex-1 justify-center items-center ${isQualityPassed ? "text-green-500" : "text-red-500"}`}>
+                            <div
+                                className={`text-5xl font-bold flex flex-1 justify-center items-center ${
+                                    isQualityPassed
+                                        ? "text-green-500"
+                                        : "text-red-500"
+                                }`}
+                            >
                                 {actualAllQuality}/{targetAllQuality}
                             </div>
                         </div>
