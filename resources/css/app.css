@@ -10,17 +10,35 @@
 
 /* Track */
 ::-webkit-scrollbar-track {
-    background: #f1f1f1; 
+    background: #f1f1f1;
     border-radius: 50px;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-    background: #888; 
+    background: #888;
     border-radius: 50px;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-    background: #555; 
+    background: #555;
+}
+
+.zoom-50 {
+    zoom: 0.5;
+}
+
+.zoom-60 {
+    zoom: 0.6;
+}
+
+.zoom-70 {
+    zoom: 0.7;
+}
+
+@media (min-width: 1280px) {
+    .xl\:zoom-100 {
+        zoom: 1;
+    }
 }

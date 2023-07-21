@@ -697,7 +697,7 @@ function TableIssue() {
                 maxWidth="6xl"
                 onClose={handleCloseModalStitching}
             >
-                <div className="flex flex-col bg-white dark:bg-gray-800">
+                <div className="flex flex-col bg-white dark:bg-gray-800 zoom-60 xl:zoom-100">
                     <div className="">
                         <div className="overflow-x-auto rounded-lg">
                             <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 select-none">
@@ -950,7 +950,7 @@ function TableIssue() {
                 maxWidth="6xl"
                 onClose={handleCloseModalMachining}
             >
-                <div className="flex flex-col bg-white dark:bg-gray-800">
+                <div className="flex flex-col bg-white dark:bg-gray-800 zoom-60 xl:zoom-100">
                     <div className="">
                         <div className="overflow-x-auto rounded-lg">
                             <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 select-none">
@@ -1262,54 +1262,54 @@ function TableIssue() {
 
             <div className="flex-1 h-full flex flex-col">
                 {/* nav table */}
-                <div className="flex flex-col 2xl:flex-row pt-1 gap-8 px-5 xl:px-0">
-                    <div className="flex-1 flex justify-between lg:justify-evenly">
-                        <div className="flex gap-6">
-                            <div className="flex flex-col justify-between">
-                                <span className="font-bold bg-sky-600 text-white px-4 py-1 rounded-md text-center mb-1">
+                <div className="flex flex-col 2xl:flex-row pt-1 gap-2 xl:gap-8 px-0">
+                    <div className="flex-1 flex justify-between lg:justify-evenly gap-2">
+                        <div className="flex gap-6 flex-1 xl:flex-none">
+                            <div className="flex flex-row xl:flex-col justify-between items-center gap-1">
+                                <span className="font-bold bg-sky-600 text-white px-2 py-0.5 xl:px-4 xl:py-1 rounded-md text-center">
                                     Cấp bậc 1
                                 </span>
                                 <Link href={route("detailIssue")}>
                                     <button
                                         type="button"
-                                        className="focus:outline-none text-white bg-red-700 hover:bg-red-800 font-medium rounded-lg text-sm px-5 py-1.5 dark:bg-red-600 dark:hover:bg-red-700"
+                                        className="focus:outline-none text-white bg-red-700 hover:bg-red-800 font-medium rounded-lg text-sm px-2 py-1 xl:px-4 xl:py-1.5 dark:bg-red-600 dark:hover:bg-red-700"
                                     >
                                         Xem chi tiết
                                     </button>
                                 </Link>
                             </div>
-                            <div className="flex flex-col justify-between">
-                                <div className="w-full flex shadow-lg">
-                                    <span className="font-bold bg-sky-600 text-white px-4 py-1 text-center rounded-l-md">
+                            <div className="flex flex-row xl:flex-col justify-between items-center flex-1 gap-1">
+                                <div className="w-full flex shadow-lg flex-1">
+                                    <span className="font-bold bg-sky-600 text-white px-2 py-0.5 xl:px-4 xl:py-1 text-center rounded-l-md">
                                         Điểm
                                     </span>
-                                    <span className="bg-white px-5 py-0.5 rounded-r-md font-bold">
+                                    <span className="bg-white px-2 py-0.5 xl:px-4 xl:py-1 rounded-r-md font-bold text-center w-full">
                                         09
                                     </span>
                                 </div>
-                                <Link href={route("followMeeting")}>
+                                <Link href={route("followMeeting")} className="flex-1">
                                     <button
                                         type="button"
-                                        className="focus:outline-none text-white bg-red-700 hover:bg-red-800 font-medium rounded-lg text-sm px-5 py-1.5 dark:bg-red-600 dark:hover:bg-red-700"
+                                        className="focus:outline-none text-white bg-red-700 hover:bg-red-800 font-medium rounded-lg text-sm px-2 py-1 xl:px-4 xl:py-1.5 dark:bg-red-600 dark:hover:bg-red-700"
                                     >
                                         Bảng theo dõi
                                     </button>
                                 </Link>
                             </div>
                         </div>
-                        <div className="w-48 flex flex-col shadow-md">
-                            <div className="bg-white w-full text-center text-sm py-[2px] font-semibold">
+                        <div className="xl:w-48 flex flex-col shadow-md">
+                            <div className="px-2 xl:px-0 bg-white w-full text-center text-sm py-[2px] font-semibold">
                                 Vấn đề sản lượng
                             </div>
-                            <div className="bg-gray-400 flex-1 flex items-center justify-center text-xl font-bold text-cyan-300">
+                            <div className="bg-gray-400 flex-1 flex items-center justify-center xl:text-xl font-bold text-cyan-300">
                                 {statisticIssue.quantity_issue}
                             </div>
                         </div>
-                        <div className="w-48 flex flex-col shadow-md">
-                            <div className="bg-white w-full text-center text-sm py-[2px] font-semibold">
+                        <div className="xl:w-48 flex flex-col shadow-md">
+                            <div className="px-2 xl:px-0 bg-white w-full text-center text-sm py-[2px] font-semibold">
                                 Vấn đề phẩm chất
                             </div>
-                            <div className="bg-gray-400 flex-1 flex items-center justify-center text-xl font-bold text-cyan-300">
+                            <div className="bg-gray-400 flex-1 flex items-center justify-center xl:text-xl font-bold text-cyan-300">
                                 {statisticIssue.quality_issue}
                             </div>
                         </div>
@@ -1341,13 +1341,13 @@ function TableIssue() {
                             </div>
                         </div>
                         <div className="flex flex-col justify-between items-center">
-                            <span className="font-semibold text-gray-500 text-lg">
+                            <span className="font-semibold text-gray-500 xl:text-lg">
                                 Tài khoản {username}
                             </span>
                             <Link href={route("reviewMeeting")}>
                                 <button
                                     type="button"
-                                    className="focus:outline-none text-white bg-red-700 hover:bg-red-800 font-medium rounded-lg text-sm px-5 py-1.5 dark:bg-red-600 dark:hover:bg-red-700"
+                                    className="focus:outline-none text-white bg-red-700 hover:bg-red-800 font-medium rounded-lg text-sm px-3 py-1 xl:px-5 xl:py-1.5 dark:bg-red-600 dark:hover:bg-red-700"
                                 >
                                     Đánh giá cuộc họp
                                 </button>

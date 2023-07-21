@@ -24,15 +24,15 @@ const labels = [
     "07:30-08:30",
     "08:30-09:30",
     "09:30-10:30",
-    "10:30-11:30",
-    "12:30-13:30",
+    "10:30-12:00",
+    "12:00-13:30",
     "13:30-14:30",
     "14:30-15:30",
     "15:30-16:30",
     // "16:30-17:30",
 ];
 
-export default function ChartTwoColumn({ name, nameActual = '1', nameTarget = '2', actual = [], target = [] }) {
+export default function ChartTwoColumn({ name, nameActual = '1', nameTarget = '2', actual = [], target = [], isSmall = false }) {
     const options = {
         responsive: true,
         plugins: {
@@ -40,20 +40,41 @@ export default function ChartTwoColumn({ name, nameActual = '1', nameTarget = '2
                 position: "bottom",
                 display: true,
                 labels: {
-                    padding: 10
+                    padding: 10,
+                    font: {
+                        size: isSmall ? 8 : 14
+                    }
                 }
             },
             title: {
                 display: true,
-                text: name,
+                text: name
             },
             datalabels: {
                 anchor: "end",
                 align: "end",
                 padding: {
                     bottom: -20
+                },
+                labels: {
+                    font: {
+                        size: isSmall ? 8 : 14
+                    }
                 }
-            },
+            }
+        },
+        scales: {
+            x: {
+                ticks: {
+                    font: {
+                        size: isSmall ? 8 : 14,
+                    },
+                    // Include a dollar sign in the ticks
+                    callback: function(value, index, ticks) {
+                        return labels[index];
+                    }
+                }
+            }
         },
         maintainAspectRatio: false,
     };
@@ -64,15 +85,15 @@ export default function ChartTwoColumn({ name, nameActual = '1', nameTarget = '2
             {
                 label: nameActual,
                 data: actual,
-                backgroundColor: "#1d4ed8",
+                backgroundColor: "#1d4ed8"
             },
             {
                 label: nameTarget,
                 data: target,
-                backgroundColor: "orange",
+                backgroundColor: "orange"
             },
         ],
     };
 
-    return <Bar options={options} data={data} width={"auto"} height={"auto"} />;
+    return <Bar options={options} data={data} width={"auto"} height={"auto"}  />;
 }
