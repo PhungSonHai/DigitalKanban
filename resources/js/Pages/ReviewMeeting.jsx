@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import TableEvaluate from '@/Components/TableEvaluate';
 import axios from "axios";
 import { closeSnackbar, enqueueSnackbar } from 'notistack';
@@ -8,11 +8,18 @@ function ReviewMeeting() {
     const [points, setPoints] = useState(new Array(10).fill(0));
     const [totalPoint, setTotalPoint] = useState(0);
     const [isPostEvaluate, setIsPostEvaluate] = useState(false);
+    const [lineCode, setLineCode] = useState('');
 
     useEffect(() => {
         const interval = setInterval(() => {
           setCurrentTime(new Date());
         }, 1000);
+
+        axios
+            .get("/api/get-user")
+            .then((res) => {
+                setLineCode(res.data.staff_department)
+            });
     
         return () => {
           clearInterval(interval);
@@ -41,11 +48,11 @@ function ReviewMeeting() {
         setTotalPoint(temp)
     }, [points]);
 
-    const createEvaluate = () => {
+    const createEvaluate = useCallback(() => {
         setIsPostEvaluate(true)
         const data = {
-            line_code: "APS07",
-            evaluate_date: formatDate(currentTime),
+            line_code: lineCode,
+            evaluate_date: formatDate(new Date()),
             total_point: totalPoint,
         }
 
@@ -109,7 +116,7 @@ function ReviewMeeting() {
 
                 setIsPostEvaluate(false)
             })
-    };
+    }, [lineCode, totalPoint]);
 
   return (
     <React.Fragment>

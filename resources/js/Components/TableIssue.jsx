@@ -22,6 +22,7 @@ function TableIssue() {
         solved_issue: 0,
         not_solved_issue: 0
     });
+    const [scoreEvaluate, setScoreEvaluate] = useState(0);
 
     useEffect(function () {
         setCheck(() =>
@@ -38,6 +39,21 @@ function TableIssue() {
                 setUsername(res.data.info.UserCode)
                 setStaffDepartment(res.data.staff_department)
                 handleGetAllIssueOfLine(res.data.staff_department)
+
+                const data = {
+                    line_code: res.data.staff_department,
+                    evaluate_date: formatDate(new Date())
+                }
+
+                axios.post('KPIBoard/score-evaluate', data)
+                    .then(res => {
+                        if(res.status === 200) {
+                            setScoreEvaluate(Number(res.data.score.total_point))
+                        }
+                    })
+                    .catch(err => {
+                        console.log(err.response.data.error)
+                    })
             });
     }, []);
 
@@ -1284,7 +1300,7 @@ function TableIssue() {
                                         Điểm
                                     </span>
                                     <span className="bg-white px-2 py-0.5 xl:px-4 xl:py-1 rounded-r-md font-bold text-center w-full">
-                                        09
+                                        {scoreEvaluate}
                                     </span>
                                 </div>
                                 <Link href={route("followMeeting")} className="flex-1">

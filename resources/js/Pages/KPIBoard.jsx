@@ -80,7 +80,7 @@ export default function KPIBoard() {
         handleSetTargetQuality(department);
 
         function ListenHandle(e) {
-            console.log(e);
+            // console.log(e);
             setActualQuantity(() => e.data.result[0]);
             setTargetQuantity(() => e.data.target);
             setActualQuality(() => e.data.result[1]);

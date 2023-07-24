@@ -204,11 +204,15 @@ class IssueProductionController extends Controller
             }
 
             $data = $this->evaluateMeeting->select("total_point")->where([["line_code", $request->line_code], ["evaluate_date", $request->evaluate_date]])->first();
-            return response()->json(["message" => "Thành công", "score" => $data], 200);
+            if($data) {
+                return response()->json(["message" => "Thành công", "score" => $data], 200);
+            } else {
+                return response()->json(["message" => "Thành công", "score" => (object)["total_point" => 0]], 200);
+            }
         } 
         catch (\Throwable $th) 
         {
-            return response()->json(["error" => "Xảy ra lỗi"], 400);
+            return response()->json(["error" => "Xảy ra lỗi".$th->getMessage()], 400);
         }
     }
 
