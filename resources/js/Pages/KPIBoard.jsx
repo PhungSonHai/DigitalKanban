@@ -45,7 +45,7 @@ export default function KPIBoard() {
 
     const [listDepartment, setListDepartment] = useState([]);
 
-    const [department, setDepartment] = useState("APL01");
+    const [department, setDepartment] = useState("4001APL01");
     const [from, setFrom] = useState("");
     const [to, setTo] = useState("");
 
@@ -80,7 +80,7 @@ export default function KPIBoard() {
         handleSetTargetQuality(department);
 
         function ListenHandle(e) {
-            // console.log(e);
+            console.log(e);
             setActualQuantity(() => e.data.result[0]);
             setTargetQuantity(() => e.data.target);
             setActualQuality(() => e.data.result[1]);
