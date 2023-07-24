@@ -10,7 +10,7 @@ class APHKaizenMonth extends Model
 {
     use HasFactory;
 
-    protected $table = 'APH_KAIZEN_MONTH3';
+    protected $table = 'APH_KAIZEN_MONTH';
     protected $primaryKey = 'ID';
     const CREATED_AT = 'CREATED_AT';
     const UPDATED_AT = 'UPDATED_AT';

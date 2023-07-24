@@ -340,19 +340,25 @@ export default function KaizenTop() {
                             Trước đây
                         </div>
                         <div className="flex gap-2 flex-1">
-                            <div className="w-4/12 border-2 border-border border-gray-800 rounded-lg overflow-hidden">
-                                {getCurrentDataKaizen?.after_image && <img
-                                    src={
-                                        "/uploads/" +
-                                        getCurrentDataKaizen?.after_image
-                                    }
-                                    alt=""
-                                    className="w-full h-full object-cover"
-                                />}
+                            <div className="w-4/12 border-2 border-border border-gray-800 rounded-lg overflow-hidden relative">
+                                {getCurrentDataKaizen?.after_image && (
+                                    <img
+                                        src={
+                                            "/uploads/" +
+                                            getCurrentDataKaizen?.after_image
+                                        }
+                                        alt=""
+                                        className="w-full h-full object-cover absolute inset-0"
+                                    />
+                                )}
                             </div>
                             <div className="flex-1 border-2 border-border border-gray-800 rounded-lg">
-                                <div className="p-5 text-2xl">
-                                    {getCurrentDataKaizen?.after_description}
+                                <div className="w-full h-full relative">
+                                    <div className="p-5 text-2xl absolute inset-0 break-words overflow-auto">
+                                        {
+                                            getCurrentDataKaizen?.after_description
+                                        }
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -360,19 +366,25 @@ export default function KaizenTop() {
                             Hiện tại
                         </div>
                         <div className="flex gap-2 flex-1">
-                            <div className="w-4/12 border-2 border-border border-gray-800 rounded-lg overflow-hidden">
-                                {getCurrentDataKaizen?.current_image && <img
-                                    src={
-                                        "/uploads/" +
-                                        getCurrentDataKaizen?.current_image
-                                    }
-                                    alt=""
-                                    className="w-full h-full object-cover"
-                                />}
+                            <div className="w-4/12 border-2 border-border border-gray-800 rounded-lg overflow-hidden relative">
+                                {getCurrentDataKaizen?.current_image && (
+                                    <img
+                                        src={
+                                            "/uploads/" +
+                                            getCurrentDataKaizen?.current_image
+                                        }
+                                        alt=""
+                                        className="w-full h-full object-cover absolute inset-0"
+                                    />
+                                )}
                             </div>
                             <div className="flex-1 border-2 border-border border-gray-800 rounded-lg">
-                                <div className="p-5 text-2xl">
-                                    {getCurrentDataKaizen?.current_description}
+                                <div className="w-full h-full relative">
+                                    <div className="p-5 text-2xl absolute inset-0 break-words overflow-auto">
+                                        {
+                                            getCurrentDataKaizen?.current_description
+                                        }
+                                    </div>
                                 </div>
                             </div>
                         </div>
