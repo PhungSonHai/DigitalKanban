@@ -392,8 +392,8 @@ export default function KaizenTop() {
                             <div className="bg-gray-500 min-w-[200px] px-3 py-2 rounded-lg text-white text-xl font-bold min-h-[100px] flex justify-center items-center">
                                 Lợi ích
                             </div>
-                            <div className="rounded-lg border-2 border-gray-900 border-solid flex-grow">
-                                <div className="p-2 text-2xl">
+                            <div className="rounded-lg border-2 border-gray-900 border-solid flex-grow relative">
+                                <div className="p-2 text-2xl absolute inset-0 break-words overflow-auto">
                                     {getCurrentDataKaizen?.benefit}
                                 </div>
                             </div>
