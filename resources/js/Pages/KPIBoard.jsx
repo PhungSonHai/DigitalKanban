@@ -88,7 +88,14 @@ export default function KPIBoard() {
             setLoading(false);
         }
 
-        if (from === to) {
+        const today = new Date();
+        const dd = today.getDate();
+        let mm = today.getMonth() + 1; // Months start at 0!
+        const yyyy = today.getFullYear();
+
+        const formattedToday = yyyy + "-" + mm + "-" + dd;
+
+        if (from === to && (from === formattedToday || from === "")) {
             setLoading(true);
             window.Echo.channel("department." + department).listen(
                 "RealTimeChart",
@@ -124,16 +131,14 @@ export default function KPIBoard() {
     }, [timeRefresh]);
 
     useEffect(() => {
-        axios
-            .get("/api/get-department")
-            .then((res) =>
-                setListDepartment(
-                    res.data.map((item) => ({
-                        value: item.department_code,
-                        name: item.dep_sap,
-                    }))
-                )
-            );
+        axios.get("/api/get-department").then((res) =>
+            setListDepartment(
+                res.data.map((item) => ({
+                    value: item.department_code,
+                    name: item.dep_sap,
+                }))
+            )
+        );
     }, []);
 
     const handleSearch = () => {
@@ -227,6 +232,10 @@ export default function KPIBoard() {
         if (!isLoading) setTimeRefresh(Date.now());
     };
 
+    useEffect(() => {
+        console.log(from);
+    }, [from]);
+
     return (
         <Fragment>
             {isLoading && (
@@ -262,7 +271,7 @@ export default function KPIBoard() {
                     <div className="flex items-center flex-wrap w-1/2 xl:w-auto">
                         <div className="flex w-1/2 text-xs xl:text-sm xl:w-[220px] pr-1 mb-1 xl:mb-0">
                             <span className="flex items-center px-1 xl:px-3 text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md dark:bg-gray-600 dark:text-gray-300 dark:border-gray-600 whitespace-nowrap text-center">
-                            <span className="flex-1">Chuyền</span>
+                                <span className="flex-1">Chuyền</span>
                             </span>
                             <select
                                 id="countries"
@@ -273,10 +282,7 @@ export default function KPIBoard() {
                                 }}
                             >
                                 {listDepartment.map((item, index) => (
-                                    <option
-                                        key={index}
-                                        value={item.value}
-                                    >
+                                    <option key={index} value={item.value}>
                                         {item.value}
                                     </option>
                                 ))}
