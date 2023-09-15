@@ -92,6 +92,13 @@ const qualityStitching = [
         [{name: "In ấn lệch khuôn", showCheckbox: false}],
         [{name: "Nhờ QC hỗ trợ", showCheckbox: false}],
         [{name: "Tổ trưởng", showCheckbox: false}]
+    ],
+    [
+        [{name: "", showCheckbox: false}],
+        [{name: "Mặt giày", showCheckbox: true}],
+        [{name: "Méo gót, méo mũi, méo ô dê", showCheckbox: false}],
+        [{name: "Kiểm tra vô phom, kiểm tra may labang", showCheckbox: false}],
+        [{name: "Tổ trưởng", showCheckbox: false}]
     ]
 ]
 

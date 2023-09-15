@@ -101,7 +101,7 @@ FROM
         FROM
             sfc_trackout_list
         WHERE
-            scan_date BETWEEN TO_DATE('" . $from->format('Y/m/d') . " 07:30:00', 'yyyy/mm/dd HH24:MI:SS') AND TO_DATE('" . $to->format('Y/m/d') . " 16:30:00', 'yyyy/mm/dd HH24:MI:SS')
+            scan_date BETWEEN TO_DATE('" . $from->format('Y/m/d') . " 07:30:00', 'yyyy/mm/dd HH24:MI:SS') AND TO_DATE('" . $to->format('Y/m/d') . " 20:00:00', 'yyyy/mm/dd HH24:MI:SS')
             AND scan_detpt = '{$department}'
     ) q
     RIGHT JOIN (
@@ -119,11 +119,11 @@ FROM
         FROM
             dual
         CONNECT BY
-            level <= 3
+            level <= 6
         UNION ALL
         SELECT
-            to_char(TO_DATE('15:30', 'hh24:mi'), 'hh24:mi') AS time_from,
-            to_char(TO_DATE('16:30', 'hh24:mi'), 'hh24:mi') AS time_to
+            to_char(TO_DATE('18:30', 'hh24:mi'), 'hh24:mi') AS time_from,
+            to_char(TO_DATE('20:00', 'hh24:mi'), 'hh24:mi') AS time_to
         FROM
             dual
     ) t ON q.time_scan >= t.time_from
@@ -168,11 +168,11 @@ FROM
         FROM
             dual
         CONNECT BY
-            level <= 3
+            level <= 6
         UNION ALL
         SELECT
-            to_char(TO_DATE('15:30', 'hh24:mi'), 'hh24:mi') AS time_from,
-            to_char(TO_DATE('16:30', 'hh24:mi'), 'hh24:mi') AS time_to
+            to_char(TO_DATE('18:30', 'hh24:mi'), 'hh24:mi') AS time_from,
+            to_char(TO_DATE('20:00', 'hh24:mi'), 'hh24:mi') AS time_to
         FROM
             dual
     ) t ON q.createtime >= t.time_from AND q.createtime <= time_to
