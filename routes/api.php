@@ -67,8 +67,8 @@ Route::post("update-kaizen", [KaizenTopMonth::class, 'update']);
 
 
 Route::get("get-user", function (Request $request) {
-    $token = $request->header("access_token");
-    $token = "d9fd7b9b-f4c3-464d-b491-42e0faaca752";
+    $token = $request->header("authorization");
+    // $token = "d9fd7b9b-f4c3-464d-b491-42e0faaca752";
     if ($token === "") return [];
     $data = UserToken::query()->where('UserToken', $token)->first();
     $userCode = $data->UserCode;
