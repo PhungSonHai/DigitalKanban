@@ -26,7 +26,7 @@ export default function KPIBoard() {
     const isQuantityPassed = useMemo(() => {
         if (targetQuantity == 0) return false;
 
-        return (getActualQuantity / targetQuantity) * 100 >= 90;
+        return (getActualQuantity / targetQuantity) * 100 >= 100;
     }, [getActualQuantity]);
 
     const [actualQuality, setActualQuality] = useState([]);
@@ -40,7 +40,10 @@ export default function KPIBoard() {
     const isQualityPassed = useMemo(() => {
         if (targetAllQuality == 0) return false;
 
-        return (actualAllQuality / targetAllQuality) * 100 >= 90;
+        console.log((actualAllQuality / targetQuality[0]) * 100, targetQuality[0]);
+        
+        // return (actualAllQuality / targetQuality[0]) * 100 >= targetQuality[0];
+        return actualAllQuality >= targetQuality[0];
     }, [actualAllQuality]);
 
     const [listDepartment, setListDepartment] = useState([]);
@@ -392,7 +395,7 @@ export default function KPIBoard() {
                                         : "text-red-500"
                                 }`}
                             >
-                                {actualAllQuality}/{targetAllQuality}
+                                {actualAllQuality}/{targetQuality[0]}
                             </div>
                         </div>
                     </div>
