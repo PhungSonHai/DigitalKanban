@@ -63,11 +63,11 @@ class MonitorAndBroadcast extends Command
             FROM
                 dual
             CONNECT BY
-                level <= 3
+                level <= 6
             UNION ALL
             SELECT
-                to_char(TO_DATE('15:30', 'hh24:mi'), 'hh24:mi') AS time_from,
-                to_char(TO_DATE('16:30', 'hh24:mi'), 'hh24:mi') AS time_to
+                to_char(TO_DATE('18:30', 'hh24:mi'), 'hh24:mi') AS time_from,
+                to_char(TO_DATE('20:00', 'hh24:mi'), 'hh24:mi') AS time_to
             FROM
                 dual
         ) t ON q.time_scan >= t.time_from
@@ -78,7 +78,7 @@ class MonitorAndBroadcast extends Command
     ORDER BY
         time_from");
 
-        for ($i = 0; $i < 8; $i++) {
+        for ($i = 0; $i < 11; $i++) {
             array_push($data, $result[$i]->qty);
         }
 
@@ -135,11 +135,11 @@ class MonitorAndBroadcast extends Command
                 FROM
                     dual
                 CONNECT BY
-                    level <= 3
+                    level <= 6
                 UNION ALL
                 SELECT
-                    to_char(TO_DATE('15:30', 'hh24:mi'), 'hh24:mi') AS time_from,
-                    to_char(TO_DATE('16:30', 'hh24:mi'), 'hh24:mi') AS time_to
+                    to_char(TO_DATE('18:30', 'hh24:mi'), 'hh24:mi') AS time_from,
+                    to_char(TO_DATE('20:00', 'hh24:mi'), 'hh24:mi') AS time_to
                 FROM
                     dual
             ) t ON q.createtime >= t.time_from AND q.createtime <= time_to
@@ -150,7 +150,7 @@ class MonitorAndBroadcast extends Command
             time_from
         ");
 
-        for ($i = 0; $i < 8; $i++) {
+        for ($i = 0; $i < 11; $i++) {
             array_push($data, $result[$i]->rft);
         }
 

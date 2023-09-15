@@ -49,6 +49,8 @@ export default function KPIBoard() {
     const [from, setFrom] = useState("");
     const [to, setTo] = useState("");
 
+    const [staffDepartment, setStaffDepartment] = useState("");
+
     const isValid = useMemo(() => {
         if (from === "" && to === "") {
             return 1;
@@ -66,11 +68,21 @@ export default function KPIBoard() {
         return 0;
     }, [from, to]);
 
+    useEffect(() => {
+        const index = listDepartment.findIndex(
+            (item) => item.value === staffDepartment
+        );
+        if (index > -1) {
+            setDepartment(staffDepartment);
+            setTimeRefresh(Date.now());
+        }
+    }, [staffDepartment, listDepartment]);
+
     const handleSetTargetQuality = (dept) => {
         if (dept.includes("S")) {
-            setTargetQuality(new Array(8).fill(90));
+            setTargetQuality(new Array(11).fill(90));
         } else if (dept.includes("L")) {
-            setTargetQuality(new Array(8).fill(88));
+            setTargetQuality(new Array(11).fill(88));
         } else {
             setTargetQuality([]);
         }
@@ -139,6 +151,9 @@ export default function KPIBoard() {
                 }))
             )
         );
+        axios.get("/api/get-user").then((res) => {
+            setStaffDepartment(res.data.staff_department);
+        });
     }, []);
 
     const handleSearch = () => {

@@ -29,7 +29,9 @@ const labels = [
     "13:30-14:30",
     "14:30-15:30",
     "15:30-16:30",
-    // "16:30-17:30",
+    "16:30-17:30",
+    "17:30-18:30",
+    "18:30-20:00",
 ];
 
 export default function ChartTwoColumn({ name, nameActual = '1', nameTarget = '2', actual = [], target = [], isSmall = false }) {

@@ -68,7 +68,7 @@ Route::post("update-kaizen", [KaizenTopMonth::class, 'update']);
 
 Route::get("get-user", function (Request $request) {
     $token = $request->header("access_token");
-    // $token = "ec70d70b-caff-40c6-b5fc-491a61fa4dea";
+    $token = "d9fd7b9b-f4c3-464d-b491-42e0faaca752";
     if ($token === "") return [];
     $data = UserToken::query()->where('UserToken', $token)->first();
     $userCode = $data->UserCode;
@@ -224,7 +224,7 @@ FROM
             m.createdate DESC
     ) statics");
 
-    for ($i = 0; $i < 8; $i++) {
+    for ($i = 0; $i < 11; $i++) {
         array_push($data, (int)$result[$i]->qty);
         array_push($data2, (int)$result2[$i]->rft);
     }
