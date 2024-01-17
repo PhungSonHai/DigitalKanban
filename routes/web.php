@@ -51,6 +51,8 @@ Route::middleware('verifyMes')->group(function () {
         return Inertia::render('KaizenTop');
     })->name('KaizenTop');
 
+    
+
     Route::prefix('KPIBoard')->group(function() {
         Route::get('/', function () {
             return Inertia::render('KPIBoard');
@@ -87,6 +89,49 @@ Route::middleware('verifyMes')->group(function () {
             Route::post('/create-evaluate', [EvaluateMeetingController::class, 'create'])->name('createEvaluate');
         });
     });
+
+    Route::prefix('KPIBoardGrid')->group(function() {
+        Route::get('/', function () {
+            return Inertia::render('KPIBoardGrid');
+        })->name('KPIBoardGrid');
+
+        Route::get('/detail-issue', function() {
+            return Inertia::render('DetailIssue');
+        })->name('detailIssue');
+
+        Route::post('/add-issue', [IssueProductionController::class, 'addIssue'])->name('addIssue');
+        Route::post('/get-issue-of-line', [IssueProductionController::class, 'getIssueOfLine'])->name('getIssueOfLine');
+        Route::get('/getall-issue', [IssueProductionController::class, 'getAllIssue'])->name('getAllIssue');
+        Route::post('/complete-issue', [IssueProductionController::class, 'completeIssue'])->name('completeIssue');
+        Route::post('/cancel-issue', [IssueProductionController::class, 'cancelIssue'])->name('cancelIssue');
+        Route::post('/statistic-issue', [IssueProductionController::class, 'statisticIssue'])->name('statisticIssue');
+        Route::post('/fill-issue', [IssueProductionController::class, 'fillIssue'])->name('fillIssue');
+        Route::post('/score-evaluate', [IssueProductionController::class, 'scoreEvaluate'])->name('scoreEvaluate');
+
+        Route::prefix('/follow-meeting')->group(function() {
+            Route::get('/', function() {
+                return Inertia::render('FollowMeeting');
+            })->name('followMeeting');
+
+            Route::get('/getall-evaluate', [EvaluateMeetingController::class, 'getAllEvaluate'])->name('getAllEvaluate');
+
+            Route::post('/getlist-point', [EvaluateMeetingController::class, 'getListPoint'])->name('getListPoint');
+        });
+
+        Route::prefix('review-meeting')->group(function() {
+            Route::get('/', function() {
+                return Inertia::render('ReviewMeeting');
+            })->name('reviewMeeting');
+
+            Route::post('/create-evaluate', [EvaluateMeetingController::class, 'create'])->name('createEvaluate');
+        });
+    });
+
+    // Route::prefix('KPIBoardGridChild')->group(function() {
+    //     Route::get('/', function () {
+    //         return Inertia::render('KPIBoardGridChild');
+    //     })->name('KPIBoardGridChild');
+    // });
 });
 
 
