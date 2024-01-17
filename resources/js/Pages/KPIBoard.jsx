@@ -4,6 +4,7 @@ import axios from "axios";
 import { closeSnackbar } from "notistack";
 import { enqueueSnackbar } from "notistack";
 import React, { Fragment, useEffect, useMemo, useState } from "react";
+import { Link } from "@inertiajs/react";
 
 export default function KPIBoard() {
     const [isLoading, setLoading] = useState(false);
@@ -41,7 +42,7 @@ export default function KPIBoard() {
         if (targetAllQuality == 0) return false;
 
         console.log((actualAllQuality / targetQuality[0]) * 100, targetQuality[0]);
-        
+
         // return (actualAllQuality / targetQuality[0]) * 100 >= targetQuality[0];
         return actualAllQuality >= targetQuality[0];
     }, [actualAllQuality]);
@@ -122,11 +123,11 @@ export default function KPIBoard() {
                 axios
                     .get(
                         "/api/query?department=" +
-                            department +
-                            "&from=" +
-                            from +
-                            "&to=" +
-                            to
+                        department +
+                        "&from=" +
+                        from +
+                        "&to=" +
+                        to
                     )
                     .then((res) => {
                         setActualQuantity(() => res.data[0]);
@@ -346,6 +347,16 @@ export default function KPIBoard() {
                     </div>
                     <div className="flex flex-row items-center">
                         <div className="me-5">
+                            <Link href={route("KPIBoardGrid")}>
+                                <button
+                                    type="button"
+                                    className="focus:outline-none text-white bg-red-700 hover:bg-red-800 font-medium rounded-lg text-sm  px-3 py-0.5 xl:px-7 xl:py-1.5 dark:bg-red-600 dark:hover:bg-red-700 shadow-xl shadow-[lightblue]"
+                                >
+                                    Xem nhiều bảng
+                                </button>
+                            </Link>
+                        </div>
+                        <div className="me-5">
                             <button
                                 onClick={() => {
                                     window.history.back();
@@ -375,11 +386,10 @@ export default function KPIBoard() {
                                 Giao hàng
                             </div>
                             <div
-                                className={`text-3xl xl:text-5xl font-bold flex flex-1 justify-center items-center ${
-                                    isQuantityPassed
-                                        ? "text-green-500"
-                                        : "text-red-500"
-                                }`}
+                                className={`text-3xl xl:text-5xl font-bold flex flex-1 justify-center items-center ${isQuantityPassed
+                                    ? "text-green-500"
+                                    : "text-red-500"
+                                    }`}
                             >
                                 {getActualQuantity}/{targetQuantity}
                             </div>
@@ -389,11 +399,10 @@ export default function KPIBoard() {
                                 Phẩm chất
                             </div>
                             <div
-                                className={`text-3xl xl:text-5xl font-bold flex flex-1 justify-center items-center ${
-                                    isQualityPassed
-                                        ? "text-green-500"
-                                        : "text-red-500"
-                                }`}
+                                className={`text-3xl xl:text-5xl font-bold flex flex-1 justify-center items-center ${isQualityPassed
+                                    ? "text-green-500"
+                                    : "text-red-500"
+                                    }`}
                             >
                                 {actualAllQuality}/{targetQuality[0]}
                             </div>
