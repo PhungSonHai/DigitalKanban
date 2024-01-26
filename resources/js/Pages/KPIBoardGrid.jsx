@@ -322,7 +322,7 @@ export default function KPIBoardGrid() {
                     </div>
                 </div>
                 {/* Main content divided into a 2x2 grid */}
-                <div className="flex-1 bg-gray-100 grid grid-cols-2 grid-rows-2 gap-4 gap-y-4 transform zoom-70">
+                <div className="flex-1 bg-gray-100 grid grid-cols-2 grid-rows-2 gap-4 gap-y-4 [zoom:_0.75]">
                     {/* First cell */}
                     <div className="col-span-1 row-span-1 w-full flex flex-col space-y-2 xl:space-y-5 border-2 border-red-400">
                         {/* ... (Giao hàng content) */}
