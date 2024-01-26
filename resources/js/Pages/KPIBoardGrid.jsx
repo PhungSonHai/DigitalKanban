@@ -235,7 +235,7 @@ export default function KPIBoardGrid() {
                     </div>
                 </div>
             )}
-            <div className="h-screen flex flex-col select-none zoom-70  xl:zoom-100">
+            <div className="h-screen flex flex-col select-none zoom-70 xl:zoom-100">
                 {/* ... (Header section) */}
                 <div className="flex justify-between pt-1 pb-1 xl:pt-3 xl:pb-3 flex-row items-center gap-2">
                     <div className="bg-gray-500/90 px-3 py-1 xl:px-5 xl:py-2 rounded-r-full shadow-xl shadow-[lightblue]">
@@ -322,7 +322,7 @@ export default function KPIBoardGrid() {
                     </div>
                 </div>
                 {/* Main content divided into a 2x2 grid */}
-                <div className="flex-1 bg-gray-100 grid grid-cols-2 grid-rows-2 gap-4 gap-y-4">
+                <div className="flex-1 bg-gray-100 grid grid-cols-2 grid-rows-2 gap-4 gap-y-4 transform zoom-70">
                     {/* First cell */}
                     <div className="col-span-1 row-span-1 w-full flex flex-col space-y-2 xl:space-y-5 border-2 border-red-400">
                         {/* ... (Giao hàng content) */}
