@@ -74,12 +74,13 @@ function InsertInfoKaizen() {
     const getDeparment = () => {
         return axios.get("/api/get-department").then((res) =>
             setListLine(() => {
-                let listDept = [...res.data];
+                let listDept = [...res.data, { dep_sap: "Other", department_code: "Other", department_name: "Khác" }];
                 listDept.unshift({
                     dep_sap: "",
                     department_code: "",
                     department_name: "",
                 });
+                console.log(listDept);
                 return listDept;
             })
         );
@@ -100,8 +101,9 @@ function InsertInfoKaizen() {
     const getProcess = () => {
         return axios.get("/api/get-process").then((res) =>
             setListProcess(() => {
-                let listDept = [...res.data];
+                let listDept = [...res.data, { rout_no: "Other", rout_name_z: "Khác" }];
                 listDept.unshift({ rout_name_z: "", rout_no: "" });
+                console.log(listDept);
                 return listDept;
             })
         );
@@ -110,7 +112,7 @@ function InsertInfoKaizen() {
     const getPlant = () => {
         return axios.get("/api/get-plant").then((res) =>
             setListPlant(() => {
-                let listDept = [...res.data];
+                let listDept = [...res.data, { costcenter_name: "Khác" }];
                 listDept.unshift({ costcenter_name: "" });
                 return listDept;
             })
@@ -943,11 +945,12 @@ function InsertInfoKaizen() {
                                                     }
                                                 >
                                                     {listDepartment.map(
-                                                        (item) => (
+                                                        (item, index) => (
                                                             <option
                                                                 value={
                                                                     item.costcenter_name
                                                                 }
+                                                                key={index}
                                                             >
                                                                 {
                                                                     item.costcenter_name
@@ -974,11 +977,12 @@ function InsertInfoKaizen() {
                                                         setPlant(e.target.value)
                                                     }
                                                 >
-                                                    {listPlant.map((item) => (
+                                                    {listPlant.map((item, index) => (
                                                         <option
                                                             value={
                                                                 item.costcenter_name
                                                             }
+                                                            key={index}
                                                         >
                                                             {
                                                                 item.costcenter_name
@@ -1203,11 +1207,12 @@ function InsertInfoKaizen() {
                                                             }
                                                         >
                                                             {listLine.map(
-                                                                (item) => (
+                                                                (item, index) => (
                                                                     <option
                                                                         value={
                                                                             item.department_code
                                                                         }
+                                                                        key={index}
                                                                     >
                                                                         {
                                                                             item.department_code
@@ -1238,11 +1243,12 @@ function InsertInfoKaizen() {
                                                             }
                                                         >
                                                             {listProcess.map(
-                                                                (item) => (
+                                                                (item, index) => (
                                                                     <option
                                                                         value={
                                                                             item.rout_name_z
                                                                         }
+                                                                        key={index}
                                                                     >
                                                                         {
                                                                             item.rout_name_z
@@ -1272,11 +1278,12 @@ function InsertInfoKaizen() {
                                                         }
                                                     >
                                                         {listPlant.map(
-                                                            (item) => (
+                                                            (item, index) => (
                                                                 <option
                                                                     value={
                                                                         item.costcenter_name
                                                                     }
+                                                                    key={index}
                                                                 >
                                                                     {
                                                                         item.costcenter_name
@@ -1557,8 +1564,8 @@ function InsertInfoKaizen() {
                                 <div className="flex-1 relative">
                                     <div className="absolute inset-0 overflow-auto space-y-3">
                                         {listKaizen.length > 0 ? (
-                                            listKaizen.map((item) => (
-                                                <div className="dark:bg-[#374151] bg-white w-full rounded-lg py-2 px-4 flex flex-col lg:flex-row justify-between items-center gap-3">
+                                            listKaizen.map((item, index) => (
+                                                <div key={index} className="dark:bg-[#374151] bg-white w-full rounded-lg py-2 px-4 flex flex-col lg:flex-row justify-between items-center gap-3">
                                                     <div>
                                                         <div className="w-16 h-16">
                                                             <img
