@@ -37,7 +37,7 @@ class MonitorAndBroadcast extends Command
         time_from,
         time_to,
         nvl(SUM(label_qty), '0') AS qty
-    FROM
+        FROM
         (
             SELECT
                 label_qty,
@@ -207,6 +207,93 @@ class MonitorAndBroadcast extends Command
         return $result[0]->rft;
     }
 
+    private function getActualStitchingQuanlity($department)
+    {
+        $result = DB::select("
+            SELECT
+                a.*,
+                CASE
+                    WHEN ( (
+                        SELECT
+                            COUNT(1)
+                        FROM
+                            rqc_task_detail_t
+                        WHERE
+                            task_no = a.task_no
+                    ) > 0 ) THEN
+                        to_char(round(((
+                            SELECT
+                                COUNT(1)
+                            FROM
+                                rqc_task_detail_t
+                            WHERE
+                                    task_no = a.task_no
+                                AND commit_type = '0'
+                        ) /(
+                            SELECT
+                                COUNT(1)
+                            FROM
+                                rqc_task_detail_t
+                            WHERE
+                                task_no = a.task_no
+                        )), 4) * 100)
+                        || '%'
+                    ELSE
+                        '0%'
+                END AS qty_percent_rft
+            FROM
+                (
+                    SELECT
+                        m.task_no,
+                        m.workshop_section_no,
+                        m.prod_no,
+                        m.mer_po,
+                        m.production_line_code,
+                        m.createdate,
+                        m.modifydate,
+                        m.modifytime,
+                        m.department,
+                        (
+                            CASE
+                                WHEN task_state = '0' THEN
+                                    'Progress'
+                                WHEN task_state = '1' THEN
+                                    'Stop'
+                                WHEN task_state = '2' THEN
+                                    'End'
+                            END
+                        ) AS task_state,
+            -- (case  
+                --	when check_type='0' then '抽检' 
+                --	when check_type='1' then '巡线'
+                -- end) as check_type,
+                        (
+                            CASE
+                                WHEN result = '0' THEN
+                                    'PASS'
+                                WHEN result = '1' THEN
+                                    'FAIL'
+                            END
+                        ) AS result
+                    FROM
+                        rqc_task_m   m
+                        LEFT JOIN bdm_rd_style r ON m.shoe_no = r.shoe_no
+                    WHERE
+                            1 = 1
+                        AND m.workshop_section_no LIKE '%S%'
+                        AND m.modifydate = to_char(sysdate, 'yyyy-mm-dd')
+                        AND m.production_line_code = '". $department ."'
+                    ORDER BY 
+                        m.modifytime DESC
+                    FETCH FIRST ROW ONLY
+                ) a
+        ");
+
+        if (count($result) == 0)
+            return [0];
+        return $result[0]->qty_percent_rft;
+    }
+
     public function handle()
     {
         $pusher = new Pusher(env('PUSHER_APP_KEY'), env('PUSHER_APP_SECRET'), env('PUSHER_APP_ID'), [
@@ -221,7 +308,7 @@ class MonitorAndBroadcast extends Command
                 foreach ($channels as $key => $value) {
                     if ($pusher->getChannelInfo($key)->subscription_count) {
                         $department = explode('.', $key)[1];
-                        event(new RealTimeChart(["department" => $department, "result" => [$this->getData($department), $this->getActualRFT($department)], "target" => $this->getTarget($department), "actualAllRFT" => $this->getActualAllRFT($department)]));
+                        event(new RealTimeChart(["department" => $department, "result" => [$this->getData($department), $this->getActualRFT($department)], "target" => $this->getTarget($department), "actualAllRFT" => $this->getActualAllRFT($department), "actualStitchingQuanlity" => $this->getActualStitchingQuanlity($department)]));
                     }
                 }
             } catch (\Exception $e) {

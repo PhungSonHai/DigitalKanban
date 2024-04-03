@@ -1,4 +1,5 @@
 import ChartTwoColumn from "@/Components/ChartTwoColumn";
+import ChartStitchingQuanlity from "@/Components/ChartStitchingQuanlity";
 import TableIssue from "@/Components/TableIssue";
 import axios from "axios";
 import { closeSnackbar } from "notistack";
@@ -33,6 +34,8 @@ export default function KPIBoard() {
     const [actualQuality, setActualQuality] = useState([]);
     const [targetQuality, setTargetQuality] = useState([]);
 
+    const [actualStitchingQuanlity, setActualStitchingQuanlity] = useState("")
+
     const [actualAllQuality, setActualAllQuality] = useState(0);
     const [targetAllQuality, setTargetAllQuality] = useState(100);
 
@@ -41,10 +44,8 @@ export default function KPIBoard() {
     const isQualityPassed = useMemo(() => {
         if (targetAllQuality == 0) return false;
 
-        console.log((actualAllQuality / targetQuality[0]) * 100, targetQuality[0]);
-
         // return (actualAllQuality / targetQuality[0]) * 100 >= targetQuality[0];
-        return actualAllQuality >= targetQuality[0];
+        return actualAllQuality >= targetQuality[0] || actualStitchingQuanlity >= targetQuality[0];
     }, [actualAllQuality]);
 
     const [listDepartment, setListDepartment] = useState([]);
@@ -101,6 +102,7 @@ export default function KPIBoard() {
             setTargetQuantity(() => e.data.target);
             setActualQuality(() => e.data.result[1]);
             setActualAllQuality(() => e.data.actualAllRFT);
+            setActualStitchingQuanlity(() => [parseInt(String(e.data.actualStitchingQuanlity).replace("%", ""))])
             setLoading(false);
         }
 
@@ -134,6 +136,7 @@ export default function KPIBoard() {
                         setTargetQuantity(() => res.data[2]);
                         setActualQuality(() => res.data[1]);
                         setActualAllQuality(() => res.data[3]);
+                        setActualStitchingQuanlity(() => res.data[4])
                         setLoading(false);
                     });
             }
@@ -144,7 +147,7 @@ export default function KPIBoard() {
                 window.Echo.leaveChannel("department." + department);
             }
         };
-    }, [timeRefresh]);
+    }, [timeRefresh, isValid]);
 
     useEffect(() => {
         axios.get("/api/get-department").then((res) =>
@@ -251,9 +254,9 @@ export default function KPIBoard() {
         if (!isLoading) setTimeRefresh(Date.now());
     };
 
-    useEffect(() => {
-        console.log(from);
-    }, [from]);
+    // useEffect(() => {
+    //     console.log(from);
+    // }, [from]);
 
     return (
         <Fragment>
@@ -404,7 +407,7 @@ export default function KPIBoard() {
                                     : "text-red-500"
                                     }`}
                             >
-                                {actualAllQuality}/{targetQuality[0]}
+                                {department.includes("S") ? actualStitchingQuanlity : actualAllQuality}/{targetQuality[0]}
                             </div>
                         </div>
                     </div>
@@ -423,14 +426,27 @@ export default function KPIBoard() {
                         </div>
                         <div className="flex-1 flex">
                             <div className="[&_canvas]:h-full flex-1 pr-5">
-                                <ChartTwoColumn
-                                    name="Bảng biểu chất lượng"
-                                    actual={actualQuality}
-                                    target={targetQuality}
-                                    nameActual="Chất lượng thực tế"
-                                    nameTarget="Mục tiêu chất lượng"
-                                    isSmall={width <= 800}
-                                />
+                                {
+                                    department.includes("L")
+                                    ?
+                                        <ChartTwoColumn
+                                            name="Bảng biểu chất lượng"
+                                            actual={actualQuality}
+                                            target={targetQuality}
+                                            nameActual="Chất lượng thực tế"
+                                            nameTarget="Mục tiêu chất lượng"
+                                            isSmall={width <= 800}
+                                        />
+                                    :
+                                        <ChartStitchingQuanlity
+                                            name="Bảng biểu chất lượng"
+                                            actual={actualStitchingQuanlity}
+                                            target={targetQuality}
+                                            nameActual="Chất lượng thực tế"
+                                            nameTarget="Mục tiêu chất lượng"
+                                            isSmall={width <= 800}
+                                        />
+                                }
                             </div>
                         </div>
                     </div>
