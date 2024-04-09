@@ -97,7 +97,7 @@ export default function KPIBoard() {
         handleSetTargetQuality(department);
 
         function ListenHandle(e) {
-            console.log(e);
+            // console.log(e);
             setActualQuantity(() => e.data.result[0]);
             setTargetQuantity(() => e.data.target);
             setActualQuality(() => e.data.result[1]);
@@ -136,7 +136,7 @@ export default function KPIBoard() {
                         setTargetQuantity(() => res.data[2]);
                         setActualQuality(() => res.data[1]);
                         setActualAllQuality(() => res.data[3]);
-                        setActualStitchingQuanlity(() => res.data[4])
+                        setActualStitchingQuanlity(() => res.data[4] ? res.data[4] : 0)
                         setLoading(false);
                     });
             }
@@ -255,8 +255,8 @@ export default function KPIBoard() {
     };
 
     // useEffect(() => {
-    //     console.log(from);
-    // }, [from]);
+    //     console.log(actualStitchingQuanlity);
+    // }, [actualStitchingQuanlity]);
 
     return (
         <Fragment>

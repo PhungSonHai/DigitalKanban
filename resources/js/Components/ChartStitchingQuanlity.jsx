@@ -24,7 +24,7 @@ const labels = [
     "07:30-20:00",
 ];
 
-export default function ChartStitchingQuanlity({ name, nameActual = '1', nameTarget = '2', actual = [80], target = "", isSmall = false }) {
+export default function ChartStitchingQuanlity({ name, nameActual = '1', nameTarget = '2', actual = "", target = "", isSmall = false }) {
     const options = {
         responsive: true,
         plugins: {
@@ -76,7 +76,7 @@ export default function ChartStitchingQuanlity({ name, nameActual = '1', nameTar
         datasets: [
             {
                 label: nameActual,
-                data: actual,
+                data: [actual],
                 backgroundColor: "#1d4ed8"
             },
             {

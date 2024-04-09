@@ -68,7 +68,7 @@ Route::post("update-kaizen", [KaizenTopMonth::class, 'update']);
 
 Route::get("get-user", function (Request $request) {
     $token = $request->header("authorization");
-    $token = "5e70746e-d0df-4381-89c9-f9c5459cd58f";
+    $token = "0d8164c9-745e-4bf4-937c-6882d9ffc115";
     if ($token === "") return [];
     $data = UserToken::query()->where('UserToken', $token)->first();
     $userCode = $data->UserCode;
@@ -239,40 +239,123 @@ Route::get("query", function (Request $request) {
             ) statics"
     );
 
+    // $result5 = DB::select("
+    //     SELECT
+    //         a.*,
+    //         CASE
+    //             WHEN ( (
+    //                 SELECT
+    //                     COUNT(1)
+    //                 FROM
+    //                     rqc_task_detail_t
+    //                 WHERE
+    //                     task_no = a.task_no
+    //             ) > 0 ) THEN
+    //                 to_char(round(((
+    //                     SELECT
+    //                         COUNT(1)
+    //                     FROM
+    //                         rqc_task_detail_t
+    //                     WHERE
+    //                             task_no = a.task_no
+    //                         AND commit_type = '0'
+    //                 ) /(
+    //                     SELECT
+    //                         COUNT(1)
+    //                     FROM
+    //                         rqc_task_detail_t
+    //                     WHERE
+    //                         task_no = a.task_no
+    //                 )), 4) * 100)
+    //                 || '%'
+    //             ELSE
+    //                 '0%'
+    //         END AS qty_percent_rft
+    //     FROM
+    //         (
+    //             SELECT
+    //                 m.task_no,
+    //                 m.workshop_section_no,
+    //                 m.prod_no,
+    //                 m.mer_po,
+    //                 m.production_line_code,
+    //                 m.createdate,
+    //                 m.modifydate,
+    //                 m.modifytime,
+    //                 m.department,
+    //                 (
+    //                     CASE
+    //                         WHEN task_state = '0' THEN
+    //                             'Progress'
+    //                         WHEN task_state = '1' THEN
+    //                             'Stop'
+    //                         WHEN task_state = '2' THEN
+    //                             'End'
+    //                     END
+    //                 ) AS task_state,
+    //     -- (case  
+    //         --	when check_type='0' then '抽检' 
+    //         --	when check_type='1' then '巡线'
+    //         -- end) as check_type,
+    //                 (
+    //                     CASE
+    //                         WHEN result = '0' THEN
+    //                             'PASS'
+    //                         WHEN result = '1' THEN
+    //                             'FAIL'
+    //                     END
+    //                 ) AS result
+    //             FROM
+    //                 rqc_task_m   m
+    //                 LEFT JOIN bdm_rd_style r ON m.shoe_no = r.shoe_no
+    //             WHERE
+    //                     1 = 1
+    //                 AND m.workshop_section_no LIKE '%S%'
+    //                 AND m.modifydate = to_char(sysdate, 'yyyy-mm-dd')
+    //                 AND m.production_line_code = '". $department ."'
+    //             ORDER BY 
+    //                 m.modifytime DESC
+    //             FETCH FIRST ROW ONLY
+    //         ) a
+    // ");
+
     $result5 = DB::select("
-        SELECT
-            a.*,
-            CASE
-                WHEN ( (
-                    SELECT
-                        COUNT(1)
-                    FROM
-                        rqc_task_detail_t
-                    WHERE
-                        task_no = a.task_no
-                ) > 0 ) THEN
-                    to_char(round(((
-                        SELECT
-                            COUNT(1)
-                        FROM
-                            rqc_task_detail_t
-                        WHERE
-                                task_no = a.task_no
-                            AND commit_type = '0'
-                    ) /(
-                        SELECT
-                            COUNT(1)
-                        FROM
-                            rqc_task_detail_t
-                        WHERE
-                            task_no = a.task_no
-                    )), 4) * 100)
-                    || '%'
-                ELSE
-                    '0%'
-            END AS qty_percent_rft
-        FROM
-            (
+        SELECT 
+            FLOOR(
+                AVG(CAST(REPLACE(qty_percent_rft, '%', '') AS DECIMAL))
+            ) AS avg_qty_percent_rft
+        FROM (
+            -- Đoạn mã query gốc
+            SELECT
+                a.*,
+                CASE
+                    WHEN (
+                        (
+                            SELECT COUNT(1)
+                            FROM rqc_task_detail_t
+                            WHERE task_no = a.task_no
+                        ) > 0
+                    ) THEN
+                        to_char(
+                            round(
+                                (
+                                    (
+                                        SELECT COUNT(1)
+                                        FROM rqc_task_detail_t
+                                        WHERE task_no = a.task_no
+                                        AND commit_type = '0'
+                                    ) / (
+                                        SELECT COUNT(1)
+                                        FROM rqc_task_detail_t
+                                        WHERE task_no = a.task_no
+                                    )
+                                ), 4
+                            ) * 100
+                        ) || '%'
+                    ELSE
+                        '0%'
+                END AS qty_percent_rft
+            FROM (
                 SELECT
                     m.task_no,
                     m.workshop_section_no,
@@ -293,10 +376,6 @@ Route::get("query", function (Request $request) {
                                 'End'
                         END
                     ) AS task_state,
-        -- (case  
-            --	when check_type='0' then '抽检' 
-            --	when check_type='1' then '巡线'
-            -- end) as check_type,
                     (
                         CASE
                             WHEN result = '0' THEN
@@ -304,19 +383,20 @@ Route::get("query", function (Request $request) {
                             WHEN result = '1' THEN
                                 'FAIL'
                         END
-                    ) AS result
+                    ) AS result,
+                    ROW_NUMBER() OVER (PARTITION BY m.createdate ORDER BY m.modifytime DESC) AS rn
                 FROM
                     rqc_task_m   m
                     LEFT JOIN bdm_rd_style r ON m.shoe_no = r.shoe_no
                 WHERE
-                        1 = 1
+                    1 = 1
                     AND m.workshop_section_no LIKE '%S%'
-                    AND m.modifydate = to_char(sysdate, 'yyyy-mm-dd')
+                    AND to_date(m.createdate, 'yyyy-MM-dd') BETWEEN TO_DATE('". $from->format("Y-m-d") ."', 'yyyy-MM-dd') AND TO_DATE('". $to->format("Y-m-d") ."', 'yyyy-MM-dd')
                     AND m.production_line_code = '". $department ."'
-                ORDER BY 
-                    m.modifytime DESC
-                FETCH FIRST ROW ONLY
             ) a
+            WHERE
+                a.rn = 1
+        ) subquery
     ");
 
     for ($i = 0; $i < 11; $i++) {
@@ -324,7 +404,8 @@ Route::get("query", function (Request $request) {
         array_push($data2, (int)$result2[$i]->rft);
     }
 
-    return [$data, $data2, (int)$result3[0]->qty, (int)$result4[0]->rft, empty($result5) ? [] : [(int)str_replace('%', '', $result5[0]->qty_percent_rft)]];
+    // return [$data, $data2, (int)$result3[0]->qty, (int)$result4[0]->rft, empty($result5) ? [] : [(int)str_replace('%', '', $result5[0]->qty_percent_rft)]];
+    return [$data, $data2, (int)$result3[0]->qty, (int)$result4[0]->rft, $result5[0]->avg_qty_percent_rft];
 });
 
 // Route::get("get-test", function () {
