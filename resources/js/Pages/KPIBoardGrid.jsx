@@ -7,18 +7,15 @@ import React, { Fragment, useEffect, useMemo, useState } from "react";
 import KPIBoardGridChild from "./KPIBoardGridChild";
 
 export default function KPIBoardGrid() {
-
     const [isLoading, setLoading] = useState(false);
     const [timeRefresh, setTimeRefresh] = useState(0);
     const width = document.body.clientWidth;
-
-
+    const [username, setUsername] = useState("")
     const [listDepartment, setListDepartment] = useState([]);
-
-    const [department, setDepartment] = useState("4001APL01");
-    const [department2, setDepartment2] = useState("4001APL02");
-    const [department3, setDepartment3] = useState("4001APL03");
-    const [department4, setDepartment4] = useState("4001APL05");
+    const [department, setDepartment] = useState("");
+    const [department2, setDepartment2] = useState("");
+    const [department3, setDepartment3] = useState("");
+    const [department4, setDepartment4] = useState("");
     const [from, setFrom] = useState("");
     const [to, setTo] = useState("");
     const [searchTrigger, setSearchTrigger] = useState(false);
@@ -52,13 +49,9 @@ export default function KPIBoardGrid() {
         }
     }, [staffDepartment, listDepartment]);
 
-
-
     useEffect(() => {
-
         function ListenHandle(e) {
-            console.log(e);
-            setLoading(false);
+            // setLoading(false);
         }
 
         const today = new Date();
@@ -69,7 +62,7 @@ export default function KPIBoardGrid() {
         const formattedToday = yyyy + "-" + mm + "-" + dd;
 
         if (from === to && (from === formattedToday || from === "")) {
-            setLoading(true);
+            // setLoading(true);
             window.Echo.channel("department." + department).listen(
                 "RealTimeChart",
                 ListenHandle
@@ -100,6 +93,7 @@ export default function KPIBoardGrid() {
     }, [timeRefresh]);
 
     useEffect(() => {
+        setLoading(true)
         axios.get("/api/get-department").then((res) =>
             setListDepartment(
                 res.data.map((item) => ({
@@ -109,6 +103,7 @@ export default function KPIBoardGrid() {
             )
         );
         axios.get("/api/get-user").then((res) => {
+            setUsername(res.data.info.UserCode)
             setStaffDepartment(res.data.staff_department);
         });
     }, []);
@@ -207,8 +202,23 @@ export default function KPIBoardGrid() {
     };
 
     useEffect(() => {
-        console.log(from);
-    }, [from]);
+        if(username) {
+            axios.post("api/get-line-display", { username: username })
+                .then(res => {
+                    setDepartment(res.data[0] ? res.data[0].line_code : "")
+                    setDepartment2(res.data[1] ? res.data[1].line_code : "")
+                    setDepartment3(res.data[2] ? res.data[2].line_code : "")
+                    setDepartment4(res.data[3] ? res.data[3].line_code : "")
+                })
+                .finally(() => {
+                    setLoading(false)
+                })
+        }
+    }, [username])
+
+    // useEffect(() => {
+    //     console.log(departmentUser);
+    // }, [departmentUser]);
 
     return (
         <Fragment>

@@ -1,12 +1,15 @@
 <?php
 
 use App\Http\Controllers\Api\KaizenTopMonth;
+use App\Http\Controllers\Api\ConfigDisplayTVController;
 use App\Http\Controllers\TestController;
+use App\Models\APHLineOfAccount;
 use App\Models\Base005m;
 use App\Models\Base099m;
 use App\Models\Base24m;
 use App\Models\Hr001m;
 use App\Models\UserToken;
+use App\Services\ConfigDisplayTVService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -48,6 +51,10 @@ Route::get("get-department", function () {
     return Base005m::query()->where(['factory_sap' => 4001])->orderBy('DEP_SAP')->get(["DEP_SAP", "DEPARTMENT_CODE", "DEPARTMENT_NAME"]);
 });
 
+Route::get("get-list-department", function () {
+    return Base005m::query()->where(['factory_sap' => 4001])->orderBy('DEP_SAP')->get(["DEP_SAP", "DEPARTMENT_CODE", "DEPARTMENT_NAME"]);
+});
+
 Route::get("get-department2", function () {
     return Base099m::query()->get('COSTCENTER_NAME');
 });
@@ -61,14 +68,24 @@ Route::get("get-plant", function () {
 });
 
 Route::post("insert-kaizen", [KaizenTopMonth::class, 'add']);
+Route::post("save-config-display", [ConfigDisplayTVController::class, 'saveChange']);
+Route::get("get-line-of-account", [ConfigDisplayTVController::class, 'getLineOfAccount']);
 Route::get("get-kaizen", [KaizenTopMonth::class, 'get']);
 Route::post("delete-kaizen", [KaizenTopMonth::class, 'delete']);
 Route::post("update-kaizen", [KaizenTopMonth::class, 'update']);
 
+Route::post("get-line-display", function (Request $request) {
+    return APHLineOfAccount::where("USERNAME", $request->username)->orderBy("LINE_CODE", "ASC")->get();
+});
+
+Route::get("get-list-user", function (Request $request) {
+    $data = UserToken::where("CompanyCode", "APHMESTEST02")->get();
+    return $data;
+});
 
 Route::get("get-user", function (Request $request) {
     $token = $request->header("authorization");
-    $token = "0d8164c9-745e-4bf4-937c-6882d9ffc115";
+    $token = "003f7cb1-c568-4e88-8d58-96e25c72ed2a";
     if ($token === "") return [];
     $data = UserToken::query()->where('UserToken', $token)->first();
     $userCode = $data->UserCode;

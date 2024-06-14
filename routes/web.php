@@ -45,6 +45,10 @@ Route::middleware('verifyMes')->group(function () {
         Route::get('/insert-kaizen', function () {
             return Inertia::render('InsertInfoKaizen');
         })->name('insertKaizen');
+
+        Route::get('/config-display-tv', function () {
+            return Inertia::render('ConfigDisplayTV');
+        })->name('configDisplayTV');
     });
 
     Route::get('/KaizenTop', function () {

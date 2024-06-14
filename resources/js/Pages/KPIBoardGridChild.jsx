@@ -40,8 +40,6 @@ export default function KPIBoardGridChild({ departmentTemp, fromDate, toDate, on
     const isQualityPassed = useMemo(() => {
         if (targetAllQuality == 0) return false;
 
-        console.log((actualAllQuality / targetQuality[0]) * 100, targetQuality[0]);
-
         // return (actualAllQuality / targetQuality[0]) * 100 >= targetQuality[0];
         return actualAllQuality >= targetQuality[0];
     }, [actualAllQuality]);
@@ -122,7 +120,6 @@ export default function KPIBoardGridChild({ departmentTemp, fromDate, toDate, on
         handleSetTargetQuality(department);
 
         function ListenHandle(e) {
-            console.log(e);
             setActualQuantity(() => e.data.result[0]);
             setTargetQuantity(() => e.data.target);
             setActualQuality(() => e.data.result[1]);
@@ -277,13 +274,13 @@ export default function KPIBoardGridChild({ departmentTemp, fromDate, toDate, on
         if (!isLoading) setTimeRefresh(Date.now());
     };
 
-    useEffect(() => {
-        console.log(from);
-    }, [from]);
+    // useEffect(() => {
+    //     console.log(from);
+    // }, [from]);
 
     return (
         <Fragment>
-            {isLoading && (
+            {/* {isLoading && (
                 <div className="absolute inset-0 bg-gray-800/30 flex items-center justify-center backdrop-blur-sm z-20">
                     <div role="status">
                         <svg
@@ -305,7 +302,7 @@ export default function KPIBoardGridChild({ departmentTemp, fromDate, toDate, on
                         <span className="sr-only">Loading...</span>
                     </div>
                 </div>
-            )}
+            )} */}
             <div className="flex flex-1 bg-gray-100">
                 <div className="flex flex-1">
                     <div className="w-3/12 xl:w-4/12 flex flex-1 flex-col p-5 justify-around gap-5">
