@@ -84,9 +84,9 @@ Route::get("get-list-user", function (Request $request) {
 });
 
 Route::get("get-user", function (Request $request) {
-    $token = $request->header("authorization");
-    $token = "003f7cb1-c568-4e88-8d58-96e25c72ed2a";
-    if ($token === "") return [];
+    $token = $request->header("access-token");
+    // $token = "003f7cb1-c568-4e88-8d58-96e25c72ed2a";
+    if (!$token) return [];
     $data = UserToken::query()->where('UserToken', $token)->first();
     $userCode = $data->UserCode;
     $hr001m = Hr001m::query()->where("STAFF_NO", $userCode)->first();
