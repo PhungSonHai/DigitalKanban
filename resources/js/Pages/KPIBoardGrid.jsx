@@ -5,6 +5,7 @@ import { closeSnackbar } from "notistack";
 import { enqueueSnackbar } from "notistack";
 import React, { Fragment, useEffect, useMemo, useState } from "react";
 import KPIBoardGridChild from "./KPIBoardGridChild";
+import { Link } from "@inertiajs/react";
 
 export default function KPIBoardGrid() {
     const [isLoading, setLoading] = useState(false);
@@ -104,7 +105,7 @@ export default function KPIBoardGrid() {
         );
         axios.get("/api/get-user").then((res) => {
             setUsername(res.data.info.UserCode)
-            setStaffDepartment(res.data.staff_department);
+            setStaffDepartment(res.data.staff_department)
         });
     }, []);
 
@@ -337,7 +338,7 @@ export default function KPIBoardGrid() {
                     <div className="col-span-1 row-span-1 w-full flex flex-col space-y-2 xl:space-y-5 border-2 border-red-400">
                         {/* ... (Giao hàng content) */}
                         <div className="flex flex-1 flex-col bg-gray-100">
-                            <div className="pl-6 pt-2">
+                            <div className="pl-6 pt-2 flex items-center gap-4">
                                 <div className="flex w-1/2 text-xs xl:text-sm xl:w-[220px] pr-1 mb-1 xl:mb-0">
                                     <span className="flex items-center px-1 xl:px-3 text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md dark:bg-gray-600 dark:text-gray-300 dark:border-gray-600 whitespace-nowrap text-center">
                                         <span className="flex-1">Chuyền</span>
@@ -357,7 +358,16 @@ export default function KPIBoardGrid() {
                                         ))}
                                     </select>
                                 </div>
-                            </div>                           
+                                <div>
+                                    <Link href={route("detailIssue", { department: department })}>
+                                        <button 
+                                            className="bg-red-500 text-white h-[34px] px-8 rounded-md"
+                                        >
+                                            Xem vấn đề
+                                        </button>
+                                    </Link>
+                                </div>
+                            </div>
                             <KPIBoardGridChild
                                 departmentTemp={department}
                                 fromDate={from}
@@ -372,7 +382,7 @@ export default function KPIBoardGrid() {
                     <div className="col-span-1 row-span-1 w-full flex flex-col space-y-2 xl:space-y-5  border-2 border-red-400">
                         {/* ... (ChartTwoColumn for Sản lượng) */}
                         <div className="flex flex-1 flex-col bg-gray-100">
-                            <div className="pl-6 pt-2">
+                            <div className="pl-6 pt-2 flex items-center gap-4">
                                 <div className="flex w-1/2 text-xs xl:text-sm xl:w-[220px] pr-1 mb-1 xl:mb-0">
                                     <span className="flex items-center px-1 xl:px-3 text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md dark:bg-gray-600 dark:text-gray-300 dark:border-gray-600 whitespace-nowrap text-center">
                                         <span className="flex-1">Chuyền</span>
@@ -392,6 +402,15 @@ export default function KPIBoardGrid() {
                                         ))}
                                     </select>
                                 </div>
+                                <div>
+                                    <Link href={route("detailIssue", { department: department2 })}>
+                                        <button 
+                                            className="bg-red-500 text-white h-[34px] px-8 rounded-md"
+                                        >
+                                            Xem vấn đề
+                                        </button>
+                                    </Link>
+                                </div>
                             </div>
                             <KPIBoardGridChild
                                 departmentTemp={department2}
@@ -407,7 +426,7 @@ export default function KPIBoardGrid() {
                     <div className="col-span-1 row-span-1 w-full flex flex-col space-y-2 xl:space-y-5  border-2 border-red-400">
                         {/* ... (ChartTwoColumn for Chất lượng) */}
                         <div className="flex flex-1 flex-col bg-gray-100">
-                            <div className="pl-6 pt-2">
+                            <div className="pl-6 pt-2 flex items-center gap-4">
                                 <div className="flex w-1/2 text-xs xl:text-sm xl:w-[220px] pr-1 mb-1 xl:mb-0">
                                     <span className="flex items-center px-1 xl:px-3 text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md dark:bg-gray-600 dark:text-gray-300 dark:border-gray-600 whitespace-nowrap text-center">
                                         <span className="flex-1">Chuyền</span>
@@ -427,6 +446,15 @@ export default function KPIBoardGrid() {
                                         ))}
                                     </select>
                                 </div>
+                                <div>
+                                    <Link href={route("detailIssue", { department: department3 })}>
+                                        <button 
+                                            className="bg-red-500 text-white h-[34px] px-8 rounded-md"
+                                        >
+                                            Xem vấn đề
+                                        </button>
+                                    </Link>
+                                </div>
                             </div>
                             <KPIBoardGridChild
                                 departmentTemp={department3}
@@ -442,7 +470,7 @@ export default function KPIBoardGrid() {
                     <div className="col-span-1 row-span-1 w-full flex flex-col space-y-2 xl:space-y-5  border-2 border-red-400">
                         {/* ... (TableIssue or other component) */}
                         <div className="flex flex-1 flex-col bg-gray-100">
-                            <div className="pl-6 pt-2">
+                            <div className="pl-6 pt-2 flex items-center gap-4">
                                 <div className="flex w-1/2 text-xs xl:text-sm xl:w-[220px] pr-1 mb-1 xl:mb-0">
                                     <span className="flex items-center px-1 xl:px-3 text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md dark:bg-gray-600 dark:text-gray-300 dark:border-gray-600 whitespace-nowrap text-center">
                                         <span className="flex-1">Chuyền</span>
@@ -461,6 +489,15 @@ export default function KPIBoardGrid() {
                                             </option>
                                         ))}
                                     </select>
+                                </div>
+                                <div>
+                                    <Link href={route("detailIssue", { department: department4 })}>
+                                        <button 
+                                            className="bg-red-500 text-white h-[34px] px-8 rounded-md"
+                                        >
+                                            Xem vấn đề
+                                        </button>
+                                    </Link>
                                 </div>
                             </div>
                             <KPIBoardGridChild

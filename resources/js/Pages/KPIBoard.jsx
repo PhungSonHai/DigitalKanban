@@ -158,6 +158,7 @@ export default function KPIBoard() {
                 }))
             )
         );
+
         axios.get("/api/get-user").then((res) => {
             setStaffDepartment(res.data.staff_department);
         });

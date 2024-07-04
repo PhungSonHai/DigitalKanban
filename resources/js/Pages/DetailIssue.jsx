@@ -1,3 +1,4 @@
+import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 
@@ -9,6 +10,7 @@ function DetailIssue() {
     const [lineCodeFill, setLineCodeFill] = useState("");
     const [affectFill, setAffectFill] = useState("");
     const [statusFill, setStatusFill] = useState("");
+    const { department } = usePage().props;
 
     useEffect(() => {
         axios
@@ -16,16 +18,23 @@ function DetailIssue() {
             .then((res) => {
                 setListLineCode(res.data.map((item) => item.department_code))
             });
-
-        axios
-            .get("getall-issue")
-            .then((res) => {
-                if(res.status === 200) {
-                    setAllIssue(res.data.data)
-                    setIsAllIssue(false)
-                }
-            });
     }, []);
+
+    useEffect(() => {
+        if(!department) {
+            axios
+                .get("getall-issue")
+                .then((res) => {
+                    if(res.status === 200) {
+                        setAllIssue(res.data.data)
+                        setIsAllIssue(false)
+                    }
+                });
+        } else {
+            setLineCodeFill(department)
+            handleFillIssue(department)
+        }
+    }, [department])
 
     function formatDate(datetime, displayTime = false) {
         const date = new Date(datetime);
@@ -42,10 +51,10 @@ function DetailIssue() {
         }
     }
 
-    const handleFillIssue = () => {
+    const handleFillIssue = (lineCode = lineCodeFill) => {
         var data = {
             created_at: dateFill,
-            line_code: lineCodeFill,
+            line_code: lineCode,
             affect: affectFill,
             is_solved: statusFill
         }
@@ -54,6 +63,7 @@ function DetailIssue() {
             .then(res => {
                 if(res.status === 200) {
                     setAllIssue(res.data.data)
+                    setIsAllIssue(false)
                 }
             }) 
             .catch(err => {
@@ -125,11 +135,15 @@ function DetailIssue() {
                         <span className="flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md dark:bg-gray-600 dark:text-gray-300 dark:border-gray-600 whitespace-nowrap w-24 text-center">
                             Chuyền
                         </span>
-                        <select className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-r-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" onChange={(e) => { setLineCodeFill(e.target.value) }}>
-                            <option selected></option>
+                        <select 
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-r-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+                            onChange={(e) => { setLineCodeFill(e.target.value) }}
+                            defaultValue=""
+                        >
+                            <option value=""></option>
                             {
                                 listLineCode.map((item, index) => (
-                                    <option key={index} value={item}>{item}</option>
+                                    <option key={index} value={item} selected={lineCodeFill == item ? true : false}>{item}</option>
                                 ))
                             }
                         </select>
@@ -138,8 +152,12 @@ function DetailIssue() {
                         <span className="flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md dark:bg-gray-600 dark:text-gray-300 dark:border-gray-600 whitespace-nowrap w-24 text-center">
                             Ảnh hưởng
                         </span>
-                        <select className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-r-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" onChange={(e) => { setAffectFill(e.target.value) }}>
-                            <option selected></option>
+                        <select 
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-r-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                            onChange={(e) => { setAffectFill(e.target.value) }}
+                            defaultValue=""
+                        >
+                            <option value=""></option>
                             <option value="Chất lượng">Chất lượng</option>
                             <option value="Sản lượng">Sản lượng</option>
                         </select>
@@ -148,8 +166,12 @@ function DetailIssue() {
                         <span className="flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md dark:bg-gray-600 dark:text-gray-300 dark:border-gray-600 whitespace-nowrap w-24 text-center">
                             Tình trạng
                         </span>
-                        <select className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-r-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" onChange={(e) => { setStatusFill(e.target.value) }}>
-                            <option selected></option>
+                        <select 
+                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-r-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+                            onChange={(e) => { setStatusFill(e.target.value) }}
+                            defaultValue=""
+                        >
+                            <option value=""></option>
                             <option value="1">Hoàn thành</option>
                             <option value="0">Chưa giải quyết</option>
                         </select>
@@ -264,10 +286,12 @@ function DetailIssue() {
                                                     </tr>
                                                 ))
                                             :
-                                                <div className="absolute top-1/2 left-1/2">
-                                                    Không tìm thấy dữ liệu
-                                                </div>
-                                        )  
+                                                <tr>
+                                                    <div className="absolute top-1/2 left-1/2">
+                                                        Không tìm thấy dữ liệu
+                                                    </div>
+                                                </tr>
+                                        )
                                 }
                             </tbody>
                         </table>

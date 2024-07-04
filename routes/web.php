@@ -99,8 +99,11 @@ Route::middleware('verifyMes')->group(function () {
             return Inertia::render('KPIBoardGrid');
         })->name('KPIBoardGrid');
 
-        Route::get('/detail-issue', function() {
-            return Inertia::render('DetailIssue');
+        Route::get('/detail-issue', function(Request $request) {
+            $department = $request->query("department");
+            return Inertia::render('DetailIssue', [
+                'department' => $department
+            ]);
         })->name('detailIssue');
 
         Route::post('/add-issue', [IssueProductionController::class, 'addIssue'])->name('addIssue');
