@@ -80,7 +80,7 @@ function InsertInfoKaizen() {
                     department_code: "",
                     department_name: "",
                 });
-                console.log(listDept);
+                // console.log(listDept);
                 return listDept;
             })
         );
@@ -103,7 +103,7 @@ function InsertInfoKaizen() {
             setListProcess(() => {
                 let listDept = [...res.data, { rout_no: "Other", rout_name_z: "Khác" }];
                 listDept.unshift({ rout_name_z: "", rout_no: "" });
-                console.log(listDept);
+                // console.log(listDept);
                 return listDept;
             })
         );
@@ -141,7 +141,7 @@ function InsertInfoKaizen() {
     };
 
     const setDataEdit = (item) => {
-        console.log(item);
+        // console.log(item);
         setOrder(item.kaizen_order);
         setCurrentMonth(item.kaizen_month);
         setCurrentYear(item.kaizen_year);

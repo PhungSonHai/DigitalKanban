@@ -40,7 +40,7 @@ export default function KPIBoardGrid() {
     const isQualityPassed = useMemo(() => {
         if (targetAllQuality == 0) return false;
 
-        console.log((actualAllQuality / targetQuality[0]) * 100, targetQuality[0]);
+        // console.log((actualAllQuality / targetQuality[0]) * 100, targetQuality[0]);
 
         // return (actualAllQuality / targetQuality[0]) * 100 >= targetQuality[0];
         return actualAllQuality >= targetQuality[0];
@@ -98,7 +98,7 @@ export default function KPIBoardGrid() {
         handleSetTargetQuality(department);
 
         function ListenHandle(e) {
-            console.log(e);
+            // console.log(e);
             setActualQuantity(() => e.data.result[0]);
             setTargetQuantity(() => e.data.target);
             setActualQuality(() => e.data.result[1]);
@@ -253,9 +253,9 @@ export default function KPIBoardGrid() {
         if (!isLoading) setTimeRefresh(Date.now());
     };
 
-    useEffect(() => {
-        console.log(from);
-    }, [from]);
+    // useEffect(() => {
+    //     console.log(from);
+    // }, [from]);
 
     return (
         <Fragment>

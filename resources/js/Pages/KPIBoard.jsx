@@ -5,7 +5,7 @@ import axios from "axios";
 import { closeSnackbar } from "notistack";
 import { enqueueSnackbar } from "notistack";
 import React, { Fragment, useEffect, useMemo, useState } from "react";
-import { Link } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 
 export default function KPIBoard() {
     const [isLoading, setLoading] = useState(false);
@@ -49,12 +49,12 @@ export default function KPIBoard() {
     }, [actualAllQuality]);
 
     const [listDepartment, setListDepartment] = useState([]);
-
+    const { deptBoardChild } = usePage().props;
+    const [staffDepartment, setStaffDepartment] = useState("");
     const [department, setDepartment] = useState("4001APL01");
+
     const [from, setFrom] = useState("");
     const [to, setTo] = useState("");
-
-    const [staffDepartment, setStaffDepartment] = useState("");
 
     const isValid = useMemo(() => {
         if (from === "" && to === "") {
@@ -73,15 +73,15 @@ export default function KPIBoard() {
         return 0;
     }, [from, to]);
 
-    useEffect(() => {
-        const index = listDepartment.findIndex(
-            (item) => item.value === staffDepartment
-        );
-        if (index > -1) {
-            setDepartment(staffDepartment);
-            setTimeRefresh(Date.now());
-        }
-    }, [staffDepartment, listDepartment]);
+    // useEffect(() => {
+    //     const index = listDepartment.findIndex(
+    //         (item) => item.value === staffDepartment
+    //     );
+    //     if (index > -1) {
+    //         setDepartment(staffDepartment);
+    //         setTimeRefresh(Date.now());
+    //     }
+    // }, [staffDepartment, listDepartment]);
 
     const handleSetTargetQuality = (dept) => {
         if (dept.includes("S")) {
@@ -150,6 +150,12 @@ export default function KPIBoard() {
     }, [timeRefresh, isValid]);
 
     useEffect(() => {
+        if(deptBoardChild) {
+            setDepartment(deptBoardChild)
+        }
+    }, [deptBoardChild])
+
+    useEffect(() => {
         axios.get("/api/get-department").then((res) =>
             setListDepartment(
                 res.data.map((item) => ({
@@ -159,9 +165,9 @@ export default function KPIBoard() {
             )
         );
 
-        axios.get("/api/get-user").then((res) => {
-            setStaffDepartment(res.data.staff_department);
-        });
+        // axios.get("/api/get-user").then((res) => {
+        //     setStaffDepartment(res.data.staff_department);
+        // });
     }, []);
 
     const handleSearch = () => {
@@ -409,6 +415,14 @@ export default function KPIBoard() {
                                     }`}
                             >
                                 {department.includes("S") ? actualStitchingQuanlity : actualAllQuality}/{targetQuality[0]}
+                            </div>
+                            <div className="flex items-center justify-center pb-1">
+                                <div className={`text-[24px] xl:text-[30px] font-bold ${isQualityPassed
+                                    ? "text-green-500"
+                                    : "text-red-500"
+                                }`}>
+                                    % RFT
+                                </div>
                             </div>
                         </div>
                     </div>

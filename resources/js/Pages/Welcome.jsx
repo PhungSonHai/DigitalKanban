@@ -8,7 +8,7 @@ export default function Welcome() {
     const [permission, setPermission] = useState("");
     const list = [
         { route: "ListDirectory", name: "HƯỚNG DẪN HỌP CẤP BẬC" },
-        { route: "KPIBoard", name: "BẢNG HIỂN THỊ CUỘC HỌP CẤP BẬC" },
+        { route: "KPIBoardGrid", name: "BẢNG HIỂN THỊ CUỘC HỌP CẤP BẬC" },
         { route: "KaizenTop", name: "KAIZEN CỦA THÁNG" },
     ];
 
@@ -52,7 +52,23 @@ export default function Welcome() {
                             </div>
                         </div>
                         <div className="pb-10 lg:pb-20 pr-10 flex flex-col gap-10">
-                            {permission === "ME" && (
+                            {/* {permission === "ME" && (
+                                <>
+                                    <Link
+                                        className="bg-orange-600/90 p-5 lg:p-10 text-2xl lg:text-4xl font-bold shadow-xl cursor-pointer hover:bg-orange-700/90 block rounded-r-3xl"
+                                        href={route("configDisplayTV")}
+                                    >
+                                        CẤU HÌNH HIỂN THỊ TV
+                                    </Link>
+                                    <Link
+                                        className="bg-orange-600/90 p-5 lg:p-10 text-2xl lg:text-4xl font-bold shadow-xl cursor-pointer hover:bg-orange-700/90 block rounded-r-3xl"
+                                        href={route("insertKaizen")}
+                                    >
+                                        QUẢN LÝ DANH SÁCH KAIZEN
+                                    </Link>
+                                </>
+                            )} */}
+                            {true && (
                                 <>
                                     <Link
                                         className="bg-orange-600/90 p-5 lg:p-10 text-2xl lg:text-4xl font-bold shadow-xl cursor-pointer hover:bg-orange-700/90 block rounded-r-3xl"

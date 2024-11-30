@@ -167,7 +167,7 @@ export default function KPIBoardGridChild({ departmentTemp, fromDate, toDate, on
                 window.Echo.leaveChannel("department." + department);
             }
         };
-    }, [timeRefresh]);
+    }, [timeRefresh, department]);
 
     useEffect(() => {
         axios.get("/api/get-department").then((res) =>
@@ -275,23 +275,23 @@ export default function KPIBoardGridChild({ departmentTemp, fromDate, toDate, on
     };
 
     // useEffect(() => {
-    //     console.log(from);
-    // }, [from]);
+    //     console.log(targetQuality);
+    // }, [targetQuality]);
 
     return (
         <Fragment>
             <div className="flex flex-1 bg-gray-100">
                 <div className="flex flex-1">
-                    <div className="w-3/12 xl:w-4/12 flex flex-1 flex-col p-5 justify-around gap-5">
+                    <div className="flex flex-col p-5 gap-5">
                         <div
                             onClick={null}
-                            className="flex-1 bg-white rounded-xl shadow flex flex-col"
+                            className="flex-1 w-full rounded-xl shadow flex flex-col"
                         >
-                            <div className=" px-2 py-1 xl:px-5 xl:py-3 bg-gray-500 rounded-xl text-base xl:text-xl font-bold text-center text-white shadow-lg shadow-gray-400">
+                            <div className="px-2 py-1 xl:px-5 xl:py-3 bg-gray-500 rounded-t-xl text-base xl:text-xl font-bold text-center text-white shadow-lg shadow-gray-400">
                                 Giao hàng
                             </div>
                             <div
-                                className={` text-xl xl:text-3xl font-bold flex flex-1 justify-center items-center ${isQuantityPassed
+                                className={`bg-white px-2 text-xl xl:text-3xl rounded-b-xl font-bold flex flex-1 justify-center items-center ${isQuantityPassed
                                     ? "text-green-500"
                                     : "text-red-500"
                                 }`}
@@ -299,12 +299,12 @@ export default function KPIBoardGridChild({ departmentTemp, fromDate, toDate, on
                                 {getActualQuantity}/{targetQuantity}
                             </div>
                         </div>
-                        <div className="flex-1 bg-white rounded-xl shadow flex flex-col">
-                            <div className=" px-2 py-1 xl:px-5 xl:py-3 bg-gray-500 rounded-xl text-base xl:text-xl font-bold text-center text-white shadow-lg shadow-gray-400">
+                        <div className="flex-1 rounded-xl shadow flex flex-col">
+                            <div className="!w-full px-2 py-1 xl:px-5 xl:py-3 bg-gray-500 rounded-t-xl text-base xl:text-xl font-bold text-center text-white shadow-lg shadow-gray-400">
                                 Phẩm chất
                             </div>
                             <div
-                                className={` text-xl xl:text-3xl font-bold flex flex-1 justify-center items-center ${isQualityPassed
+                                className={`bg-white px-2 text-xl xl:text-3xl rounded-b-xl font-bold flex flex-1 justify-center items-center ${isQualityPassed
                                     ? "text-green-500"
                                     : "text-red-500"
                                 }`}
@@ -313,7 +313,7 @@ export default function KPIBoardGridChild({ departmentTemp, fromDate, toDate, on
                             </div>
                         </div>
                     </div>
-                    <div className="w-full flex flex-col space-y-2 xl:space-y-5">
+                    <div className="flex-1 flex flex-col space-y-2 xl:space-y-5">
                         <div className="flex-1 flex">
                             <div className="[&_canvas]:h-full flex-1 pr-5">
                                 <ChartTwoColumn
@@ -341,11 +341,6 @@ export default function KPIBoardGridChild({ departmentTemp, fromDate, toDate, on
                     </div>
                 </div>
             </div>
-
-
-
-
-
         </Fragment>
     );
 }

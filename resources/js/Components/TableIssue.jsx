@@ -246,6 +246,8 @@ function TableIssue() {
                 setStatisticIssue(res.data.data)
             })
             .catch(err => {
+                console.log(err);
+                
                 const key = enqueueSnackbar(err.response.data.error, {
                     variant: "error",
                     anchorOrigin: {

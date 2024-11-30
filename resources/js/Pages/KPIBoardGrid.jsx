@@ -44,9 +44,12 @@ export default function KPIBoardGrid() {
         const index = listDepartment.findIndex(
             (item) => item.value === staffDepartment
         );
+        
         if (index > -1) {
             setDepartment(staffDepartment);
             setTimeRefresh(Date.now());
+        } else {
+            setDepartment("4001APL01")
         }
     }, [staffDepartment, listDepartment]);
 
@@ -202,24 +205,21 @@ export default function KPIBoardGrid() {
         setSearchTrigger(true);
     };
 
+    // lấy các chuyền hiển thị ở 4 màn hình nhỏ dựa theo tài khoản đăng nhập
     useEffect(() => {
         if(username) {
             axios.post("api/get-line-display", { username: username })
                 .then(res => {
-                    setDepartment(res.data[0] ? res.data[0].line_code : "")
-                    setDepartment2(res.data[1] ? res.data[1].line_code : "")
-                    setDepartment3(res.data[2] ? res.data[2].line_code : "")
-                    setDepartment4(res.data[3] ? res.data[3].line_code : "")
+                    // setDepartment(res.data[0] ? res.data[0].line_code : "")
+                    setDepartment2(res.data[1] ? res.data[1].line_code : "4001APL02")
+                    setDepartment3(res.data[2] ? res.data[2].line_code : "4001APS01")
+                    setDepartment4(res.data[3] ? res.data[3].line_code : "4001APS02")
                 })
                 .finally(() => {
                     setLoading(false)
                 })
         }
     }, [username])
-
-    // useEffect(() => {
-    //     console.log(departmentUser);
-    // }, [departmentUser]);
 
     return (
         <Fragment>
@@ -333,7 +333,7 @@ export default function KPIBoardGrid() {
                     </div>
                 </div>
                 {/* Main content divided into a 2x2 grid */}
-                <div className="flex-1 bg-gray-100 grid grid-cols-2 grid-rows-2 gap-4 gap-y-4 [zoom:_0.75]">
+                <div className="flex-1 bg-gray-100 grid grid-cols-2 grid-rows-2 gap-4 gap-y-4 [zoom:_0.75] mb-2 px-1">
                     {/* First cell */}
                     <div className="col-span-1 row-span-1 w-full flex flex-col space-y-2 xl:space-y-5 border-2 border-red-400">
                         {/* ... (Giao hàng content) */}
@@ -364,6 +364,15 @@ export default function KPIBoardGrid() {
                                             className="bg-red-500 text-white h-[34px] px-8 rounded-md"
                                         >
                                             Xem vấn đề
+                                        </button>
+                                    </Link>
+                                </div>
+                                <div>
+                                    <Link href={route("KPIBoard", { deptBoardChild: department })}>
+                                        <button 
+                                            className="bg-gray-200 hover:bg-gray-300/70 text-gray-700 h-[34px] px-8 rounded-md font-semibold transition-all"
+                                        >
+                                            Xem chi tiết
                                         </button>
                                     </Link>
                                 </div>
@@ -411,6 +420,16 @@ export default function KPIBoardGrid() {
                                         </button>
                                     </Link>
                                 </div>
+                                
+                                <div>
+                                    <Link href={route("KPIBoard", { deptBoardChild: department2 })}>
+                                        <button 
+                                            className="bg-gray-200 hover:bg-gray-300/70 text-gray-700 h-[34px] px-8 rounded-md font-semibold transition-all"
+                                        >
+                                            Xem chi tiết
+                                        </button>
+                                    </Link>
+                                </div>
                             </div>
                             <KPIBoardGridChild
                                 departmentTemp={department2}
@@ -452,6 +471,15 @@ export default function KPIBoardGrid() {
                                             className="bg-red-500 text-white h-[34px] px-8 rounded-md"
                                         >
                                             Xem vấn đề
+                                        </button>
+                                    </Link>
+                                </div>
+                                <div>
+                                    <Link href={route("KPIBoard", { deptBoardChild: department3 })}>
+                                        <button 
+                                            className="bg-gray-200 hover:bg-gray-300/70 text-gray-700 h-[34px] px-8 rounded-md font-semibold transition-all"
+                                        >
+                                            Xem chi tiết
                                         </button>
                                     </Link>
                                 </div>
@@ -499,6 +527,15 @@ export default function KPIBoardGrid() {
                                         </button>
                                     </Link>
                                 </div>
+                                <div>
+                                    <Link href={route("KPIBoard", { deptBoardChild: department4 })}>
+                                        <button 
+                                            className="bg-gray-200 hover:bg-gray-300/70 text-gray-700 h-[34px] px-8 rounded-md font-semibold transition-all"
+                                        >
+                                            Xem chi tiết
+                                        </button>
+                                    </Link>
+                                </div>
                             </div>
                             <KPIBoardGridChild
                                 departmentTemp={department4}
@@ -511,8 +548,6 @@ export default function KPIBoardGrid() {
                     </div>
                 </div>
             </div>
-
-
         </Fragment>
     );
 }

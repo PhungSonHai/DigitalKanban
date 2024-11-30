@@ -58,8 +58,11 @@ Route::middleware('verifyMes')->group(function () {
     
 
     Route::prefix('KPIBoard')->group(function() {
-        Route::get('/', function () {
-            return Inertia::render('KPIBoard');
+        Route::get('/', function (Request $request) {
+            $deptBoardChild = $request->query("deptBoardChild");
+            return Inertia::render('KPIBoard', [
+                'deptBoardChild' => $deptBoardChild
+            ]);
         })->name('KPIBoard');
 
         Route::get('/detail-issue', function() {
