@@ -9,7 +9,7 @@ class EvaluateMeeting extends Model
 {
     use HasFactory;
 
-    protected $table = 'evaluate_meeting';
+    protected $table = 'aph_evaluate_meeting';
     protected $primaryKey = 'id';
     public $timestamps = false;
 

@@ -86,7 +86,7 @@ Route::get("get-list-user", function (Request $request) {
 Route::get("get-user", function (Request $request) {
     $token = $request->header("access-token");
     // $token = "9f932648-c548-4bdc-996e-0b94224ca5c1";
-    // $token = "7f7af431-dd20-4845-bdcf-838bd06c8556";
+    $token = "ba676cfe-d4c0-45e1-b6b7-b44ac5372b50";
     if (!$token) return [];
     $data = UserToken::query()->where('UserToken', $token)->first();
     $userCode = $data->UserCode;
@@ -107,6 +107,7 @@ Route::get("query", function (Request $request) {
 
     $data = [];
     $data2 = [];
+
     $result = DB::select("
         SELECT
             time_from,
@@ -120,7 +121,7 @@ Route::get("query", function (Request $request) {
                 FROM
                     sfc_trackout_list
                 WHERE
-                    scan_date BETWEEN TO_DATE('" . $from->format('Y/m/d') . " 07:30:00', 'yyyy/mm/dd HH24:MI:SS') AND TO_DATE('" . $to->format('Y/m/d') . " 20:00:00', 'yyyy/mm/dd HH24:MI:SS')
+                    scan_date BETWEEN TO_DATE('" . $from->format('Y/m/d') . " 07:30:00', 'yyyy/mm/dd HH24:MI:SS') AND TO_DATE('" . $to->format('Y/m/d') . " 20:30:00', 'yyyy/mm/dd HH24:MI:SS')
                     AND scan_detpt = '{$department}'
             ) q
             RIGHT JOIN (
@@ -142,7 +143,7 @@ Route::get("query", function (Request $request) {
                 UNION ALL
                 SELECT
                     to_char(TO_DATE('18:30', 'hh24:mi'), 'hh24:mi') AS time_from,
-                    to_char(TO_DATE('20:00', 'hh24:mi'), 'hh24:mi') AS time_to
+                    to_char(TO_DATE('20:30', 'hh24:mi'), 'hh24:mi') AS time_to
                 FROM
                     dual
             ) t ON q.time_scan >= t.time_from
@@ -194,7 +195,7 @@ Route::get("query", function (Request $request) {
                 UNION ALL
                 SELECT
                     to_char(TO_DATE('18:30', 'hh24:mi'), 'hh24:mi') AS time_from,
-                    to_char(TO_DATE('20:00', 'hh24:mi'), 'hh24:mi') AS time_to
+                    to_char(TO_DATE('20:30', 'hh24:mi'), 'hh24:mi') AS time_to
                 FROM
                     dual
             ) t ON q.createtime >= t.time_from AND q.createtime <= time_to

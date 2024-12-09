@@ -29,54 +29,76 @@ class MonitorAndBroadcast extends Command
 
     private $data = [];
 
+    function getWorkHours($department)
+    {
+        $data = DB::select("
+            SELECT
+                D_DEPT,
+                WORK_DAY,
+                DATETYPE,
+                F_HOUR,
+                T_HOUR
+            FROM
+                MES_WORKINGHOURS_02
+            WHERE
+                D_DEPT = '$department' AND
+                WORK_DAY = TO_DATE('".date('d/m/Y')."', 'dd/mm/yyyy')
+        ");
+
+        return $data;
+    }
+
     private function getData($department)
     {
         $data = [];
 
-        $result = DB::select("SELECT
-        time_from,
-        time_to,
-        nvl(SUM(label_qty), '0') AS qty
-        FROM
-        (
+        $result = DB::select("
             SELECT
-                label_qty,
-                to_char(scan_date, 'HH24:MI') time_scan
+                time_from,
+                time_to,
+                nvl(SUM(label_qty), '0') AS qty
             FROM
-                sfc_trackout_list
-            WHERE
-                scan_date BETWEEN TO_DATE('" . date('Y/m/d') . " 07:30:00', 'yyyy/mm/dd HH24:MI:SS') AND TO_DATE('" . date('Y/m/d') . " 16:30:00', 'yyyy/mm/dd HH24:MI:SS')
-                AND scan_detpt = '$department'
-        ) q
-        RIGHT JOIN (
-            SELECT
-                to_char(TO_DATE('06:30', 'hh24:mi') + level / 24, 'hh24:mi') AS time_from,
-                to_char(TO_DATE('07:29', 'hh24:mi') + level / 24, 'hh24:mi') AS time_to
-            FROM
-                dual
-            CONNECT BY
-                level <= 4
-            UNION ALL
-            SELECT
-                to_char(TO_DATE('11:30', 'hh24:mi') + level / 24, 'hh24:mi') AS time_from,
-                to_char(TO_DATE('12:29', 'hh24:mi') + level / 24, 'hh24:mi') AS time_to
-            FROM
-                dual
-            CONNECT BY
-                level <= 6
-            UNION ALL
-            SELECT
-                to_char(TO_DATE('18:30', 'hh24:mi'), 'hh24:mi') AS time_from,
-                to_char(TO_DATE('20:00', 'hh24:mi'), 'hh24:mi') AS time_to
-            FROM
-                dual
-        ) t ON q.time_scan >= t.time_from
-               AND q.time_scan <= t.time_to
-    GROUP BY
-        time_from,
-        time_to
-    ORDER BY
-        time_from");
+                (
+                    SELECT
+                        label_qty,
+                        to_char(scan_date, 'HH24:MI') time_scan
+                    FROM
+                        sfc_trackout_list
+                    WHERE
+                        scan_date BETWEEN TO_DATE('" . date('Y/m/d') . " 07:30:00', 'yyyy/mm/dd HH24:MI:SS') AND TO_DATE('" . date('Y/m/d') . " 16:30:00', 'yyyy/mm/dd HH24:MI:SS')
+                        AND scan_detpt = '$department'
+                ) q
+            RIGHT JOIN 
+                (
+                    SELECT
+                        to_char(TO_DATE('06:30', 'hh24:mi') + level / 24, 'hh24:mi') AS time_from,
+                        to_char(TO_DATE('07:29', 'hh24:mi') + level / 24, 'hh24:mi') AS time_to
+                    FROM
+                        dual
+                    CONNECT BY
+                        level <= 4
+                    UNION ALL
+                    SELECT
+                        to_char(TO_DATE('11:30', 'hh24:mi') + level / 24, 'hh24:mi') AS time_from,
+                        to_char(TO_DATE('12:29', 'hh24:mi') + level / 24, 'hh24:mi') AS time_to
+                    FROM
+                        dual
+                    CONNECT BY
+                        level <= 6
+                    UNION ALL
+                    SELECT
+                        to_char(TO_DATE('18:30', 'hh24:mi'), 'hh24:mi') AS time_from,
+                        to_char(TO_DATE('20:30', 'hh24:mi'), 'hh24:mi') AS time_to
+                    FROM
+                        dual
+                ) t ON q.time_scan >= t.time_from
+                    AND q.time_scan <= t.time_to
+            GROUP BY
+                time_from,
+                time_to
+            ORDER BY
+                time_from"
+        );
 
         for ($i = 0; $i < 11; $i++) {
             array_push($data, $result[$i]->qty);
@@ -139,7 +161,7 @@ class MonitorAndBroadcast extends Command
                 UNION ALL
                 SELECT
                     to_char(TO_DATE('18:30', 'hh24:mi'), 'hh24:mi') AS time_from,
-                    to_char(TO_DATE('20:00', 'hh24:mi'), 'hh24:mi') AS time_to
+                    to_char(TO_DATE('20:30', 'hh24:mi'), 'hh24:mi') AS time_to
                 FROM
                     dual
             ) t ON q.createtime >= t.time_from AND q.createtime <= time_to
@@ -308,7 +330,7 @@ class MonitorAndBroadcast extends Command
                 foreach ($channels as $key => $value) {
                     if ($pusher->getChannelInfo($key)->subscription_count) {
                         $department = explode('.', $key)[1];
-                        event(new RealTimeChart(["department" => $department, "result" => [$this->getData($department), $this->getActualRFT($department)], "target" => $this->getTarget($department), "actualAllRFT" => $this->getActualAllRFT($department), "actualStitchingQuanlity" => $this->getActualStitchingQuanlity($department)]));
+                        event(new RealTimeChart(["department" => $department, "result" => [$this->getData($department), $this->getActualRFT($department)], "target" => $this->getTarget($department), "actualAllRFT" => $this->getActualAllRFT($department), "actualStitchingQuanlity" => $this->getActualStitchingQuanlity($department), "workHours" => $this->getWorkHours($department)]));
                     }
                 }
             } catch (\Exception $e) {

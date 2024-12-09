@@ -73,6 +73,8 @@ export default function KPIBoardGridChild({ departmentTemp, fromDate, toDate, on
 
     useEffect(() => {
         setFrom(fromDate);
+        console.log(fromDate);
+        
     }, [fromDate]);
 
     useEffect(() => {
@@ -120,6 +122,8 @@ export default function KPIBoardGridChild({ departmentTemp, fromDate, toDate, on
         handleSetTargetQuality(department);
 
         function ListenHandle(e) {
+            console.log(e);
+            
             setActualQuantity(() => e.data.result[0]);
             setTargetQuantity(() => e.data.target);
             setActualQuality(() => e.data.result[1]);
@@ -128,9 +132,9 @@ export default function KPIBoardGridChild({ departmentTemp, fromDate, toDate, on
         }
 
         const today = new Date();
-        const dd = today.getDate();
-        let mm = today.getMonth() + 1; // Months start at 0!
         const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
 
         const formattedToday = yyyy + "-" + mm + "-" + dd;
 

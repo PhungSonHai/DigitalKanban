@@ -6,6 +6,7 @@ import { enqueueSnackbar } from "notistack";
 import React, { Fragment, useEffect, useMemo, useState } from "react";
 import KPIBoardGridChild from "./KPIBoardGridChild";
 import { Link } from "@inertiajs/react";
+import getCurrentDate from "../../../utilities/getCurrentDate";
 
 export default function KPIBoardGrid() {
     const [isLoading, setLoading] = useState(false);
@@ -41,6 +42,12 @@ export default function KPIBoardGrid() {
     }, [from, to]);
 
     useEffect(() => {
+        const currentDate = getCurrentDate()
+        setFrom(currentDate)
+        setTo(currentDate)
+    }, [])
+
+    useEffect(() => {
         const index = listDepartment.findIndex(
             (item) => item.value === staffDepartment
         );
@@ -53,48 +60,49 @@ export default function KPIBoardGrid() {
         }
     }, [staffDepartment, listDepartment]);
 
-    useEffect(() => {
-        function ListenHandle(e) {
-            // setLoading(false);
-        }
+    // lấy dữ liệu liên tục của cell đầu tiên (bộ phận của tài khoản)
+    // useEffect(() => {
+    //     function ListenHandle(e) {
+    //         // setLoading(false);
+    //     }
 
-        const today = new Date();
-        const dd = today.getDate();
-        let mm = today.getMonth() + 1; // Months start at 0!
-        const yyyy = today.getFullYear();
+    //     const today = new Date();
+    //     const dd = today.getDate();
+    //     let mm = today.getMonth() + 1; // Months start at 0!
+    //     const yyyy = today.getFullYear();
 
-        const formattedToday = yyyy + "-" + mm + "-" + dd;
+    //     const formattedToday = yyyy + "-" + mm + "-" + dd;
 
-        if (from === to && (from === formattedToday || from === "")) {
-            // setLoading(true);
-            window.Echo.channel("department." + department).listen(
-                "RealTimeChart",
-                ListenHandle
-            );
-        } else {
-            if (isValid === 1) {
-                setLoading(true);
-                axios
-                    .get(
-                        "/api/query?department=" +
-                        department +
-                        "&from=" +
-                        from +
-                        "&to=" +
-                        to
-                    )
-                    .then((res) => {
-                        setLoading(false);
-                    });
-            }
-        }
+    //     if (from === to && (from === formattedToday || from === "")) {
+    //         // setLoading(true);
+    //         window.Echo.channel("department." + department).listen(
+    //             "RealTimeChart",
+    //             ListenHandle
+    //         );
+    //     } else {
+    //         if (isValid === 1) {
+    //             setLoading(true);
+    //             axios
+    //                 .get(
+    //                     "/api/query?department=" +
+    //                     department +
+    //                     "&from=" +
+    //                     from +
+    //                     "&to=" +
+    //                     to
+    //                 )
+    //                 .then((res) => {
+    //                     setLoading(false);
+    //                 });
+    //         }
+    //     }
 
-        return function () {
-            if (from === to) {
-                window.Echo.leaveChannel("department." + department);
-            }
-        };
-    }, [timeRefresh]);
+    //     return function () {
+    //         if (from === to) {
+    //             window.Echo.leaveChannel("department." + department);
+    //         }
+    //     };
+    // }, [timeRefresh]);
 
     useEffect(() => {
         setLoading(true)
@@ -220,6 +228,10 @@ export default function KPIBoardGrid() {
                 })
         }
     }, [username])
+
+    // useEffect(() => {
+    //     console.log(from, to);
+    // }, [from, to])
 
     return (
         <Fragment>

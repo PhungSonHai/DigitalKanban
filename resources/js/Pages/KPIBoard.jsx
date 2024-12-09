@@ -6,6 +6,7 @@ import { closeSnackbar } from "notistack";
 import { enqueueSnackbar } from "notistack";
 import React, { Fragment, useEffect, useMemo, useState } from "react";
 import { Link, usePage } from "@inertiajs/react";
+import getCurrentDate from "../../../utilities/getCurrentDate";
 
 export default function KPIBoard() {
     const [isLoading, setLoading] = useState(false);
@@ -73,6 +74,12 @@ export default function KPIBoard() {
         return 0;
     }, [from, to]);
 
+    useEffect(() => {
+        const currentDate = getCurrentDate()
+        setFrom(currentDate)
+        setTo(currentDate)
+    }, [])
+
     // useEffect(() => {
     //     const index = listDepartment.findIndex(
     //         (item) => item.value === staffDepartment
@@ -97,7 +104,7 @@ export default function KPIBoard() {
         handleSetTargetQuality(department);
 
         function ListenHandle(e) {
-            // console.log(e);
+            console.log(e);
             setActualQuantity(() => e.data.result[0]);
             setTargetQuantity(() => e.data.target);
             setActualQuality(() => e.data.result[1]);
@@ -107,9 +114,9 @@ export default function KPIBoard() {
         }
 
         const today = new Date();
-        const dd = today.getDate();
-        let mm = today.getMonth() + 1; // Months start at 0!
         const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
 
         const formattedToday = yyyy + "-" + mm + "-" + dd;
 
@@ -147,7 +154,7 @@ export default function KPIBoard() {
                 window.Echo.leaveChannel("department." + department);
             }
         };
-    }, [timeRefresh, isValid]);
+    }, [timeRefresh, isValid, department]);
 
     useEffect(() => {
         if(deptBoardChild) {
@@ -260,6 +267,10 @@ export default function KPIBoard() {
 
         if (!isLoading) setTimeRefresh(Date.now());
     };
+
+    useEffect(() => {
+        console.log(department);
+    }, [department])
 
     // useEffect(() => {
     //     console.log(actualStitchingQuanlity);

@@ -21,7 +21,7 @@ ChartJS.register(
 );
 
 const labels = [
-    "07:30-20:00",
+    "07:30-20:30",
 ];
 
 export default function ChartStitchingQuanlity({ name, nameActual = '1', nameTarget = '2', actual = "", target = "", isSmall = false }) {
