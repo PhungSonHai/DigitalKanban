@@ -3,12 +3,17 @@ import TableIssue from "@/Components/TableIssue";
 import axios from "axios";
 import { closeSnackbar } from "notistack";
 import { enqueueSnackbar } from "notistack";
-import React, { Fragment, useEffect, useMemo, useState } from "react";
+import React, { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import KPIBoardGridChild from "./KPIBoardGridChild";
 import { Link } from "@inertiajs/react";
 import getCurrentDate from "../../../utilities/getCurrentDate";
 
 export default function KPIBoardGrid() {
+    // định nghĩa các ref để gọi các hàm bên trong các component ở component cha
+    const childRefFirst = useRef();
+    const childRefSecond = useRef();
+    const childRefThird = useRef();
+    const childRefFour = useRef();
     const [isLoading, setLoading] = useState(false);
     const [timeRefresh, setTimeRefresh] = useState(0);
     const width = document.body.clientWidth;
@@ -45,6 +50,14 @@ export default function KPIBoardGrid() {
         const currentDate = getCurrentDate()
         setFrom(currentDate)
         setTo(currentDate)
+
+        const timeoutId = setTimeout(() => {
+            setLoading(true)
+        }, 5000);
+
+        return () => {
+            clearTimeout(timeoutId);
+        };
     }, [])
 
     useEffect(() => {
@@ -60,52 +73,7 @@ export default function KPIBoardGrid() {
         }
     }, [staffDepartment, listDepartment]);
 
-    // lấy dữ liệu liên tục của cell đầu tiên (bộ phận của tài khoản)
-    // useEffect(() => {
-    //     function ListenHandle(e) {
-    //         // setLoading(false);
-    //     }
-
-    //     const today = new Date();
-    //     const dd = today.getDate();
-    //     let mm = today.getMonth() + 1; // Months start at 0!
-    //     const yyyy = today.getFullYear();
-
-    //     const formattedToday = yyyy + "-" + mm + "-" + dd;
-
-    //     if (from === to && (from === formattedToday || from === "")) {
-    //         // setLoading(true);
-    //         window.Echo.channel("department." + department).listen(
-    //             "RealTimeChart",
-    //             ListenHandle
-    //         );
-    //     } else {
-    //         if (isValid === 1) {
-    //             setLoading(true);
-    //             axios
-    //                 .get(
-    //                     "/api/query?department=" +
-    //                     department +
-    //                     "&from=" +
-    //                     from +
-    //                     "&to=" +
-    //                     to
-    //                 )
-    //                 .then((res) => {
-    //                     setLoading(false);
-    //                 });
-    //         }
-    //     }
-
-    //     return function () {
-    //         if (from === to) {
-    //             window.Echo.leaveChannel("department." + department);
-    //         }
-    //     };
-    // }, [timeRefresh]);
-
     useEffect(() => {
-        setLoading(true)
         axios.get("/api/get-department").then((res) =>
             setListDepartment(
                 res.data.map((item) => ({
@@ -121,7 +89,6 @@ export default function KPIBoardGrid() {
     }, []);
 
     const handleSearch = () => {
-
         if ((from && !to) || (!from && to)) {
             const key = enqueueSnackbar(
                 "Không truy vấn được, phải chọn cả 2 ngày, hoặc để trống cả 2 ngày",
@@ -209,8 +176,18 @@ export default function KPIBoardGrid() {
             return;
         }
 
-        if (!isLoading) setTimeRefresh(Date.now());
-        setSearchTrigger(true);
+        if (childRefFirst.current) {
+            childRefFirst.current.triggerChildFunction();
+        }
+        if (childRefSecond.current) {
+            childRefSecond.current.triggerChildFunction();
+        }
+        if (childRefThird.current) {
+            childRefThird.current.triggerChildFunction();
+        }
+        if (childRefFour.current) {
+            childRefFour.current.triggerChildFunction();
+        }
     };
 
     // lấy các chuyền hiển thị ở 4 màn hình nhỏ dựa theo tài khoản đăng nhập
@@ -223,20 +200,17 @@ export default function KPIBoardGrid() {
                     setDepartment3(res.data[2] ? res.data[2].line_code : "4001APS01")
                     setDepartment4(res.data[3] ? res.data[3].line_code : "4001APS02")
                 })
-                .finally(() => {
-                    setLoading(false)
-                })
         }
     }, [username])
 
     // useEffect(() => {
-    //     console.log(from, to);
-    // }, [from, to])
+    //     console.log(department);
+    // }, [department])
 
     return (
         <Fragment>
-            {isLoading && (
-                <div className="absolute inset-0 bg-gray-800/30 flex items-center justify-center backdrop-blur-sm z-20">
+            {!isLoading && (
+                <div className="absolute inset-0 bg-gray-800 flex items-center justify-center backdrop-blur-sm z-20">
                     <div role="status">
                         <svg
                             aria-hidden="true"
@@ -395,6 +369,7 @@ export default function KPIBoardGrid() {
                                 toDate={to}
                                 onSearch={() => setSearchTrigger(false)}  // Đặc biệt, bạn có thể thực hiện các hành động sau khi search xong ở đây
                                 searchTrigger={searchTrigger}
+                                ref={childRefFirst}
                             />
                         </div>
                     </div>
@@ -449,6 +424,7 @@ export default function KPIBoardGrid() {
                                 toDate={to}
                                 onSearch={() => setSearchTrigger(false)}  // Đặc biệt, bạn có thể thực hiện các hành động sau khi search xong ở đây
                                 searchTrigger={searchTrigger}
+                                ref={childRefSecond}
                             />
                         </div>
                     </div>
@@ -502,6 +478,7 @@ export default function KPIBoardGrid() {
                                 toDate={to}
                                 onSearch={() => setSearchTrigger(false)}  // Đặc biệt, bạn có thể thực hiện các hành động sau khi search xong ở đây
                                 searchTrigger={searchTrigger}
+                                ref={childRefThird}
                             />
                         </div>
                     </div>
@@ -555,6 +532,7 @@ export default function KPIBoardGrid() {
                                 toDate={to}
                                 onSearch={() => setSearchTrigger(false)}  // Đặc biệt, bạn có thể thực hiện các hành động sau khi search xong ở đây
                                 searchTrigger={searchTrigger}
+                                ref={childRefFour}
                             />
                         </div>
                     </div>

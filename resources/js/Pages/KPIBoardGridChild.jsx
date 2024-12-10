@@ -3,10 +3,11 @@ import TableIssue from "@/Components/TableIssue";
 import axios from "axios";
 import { closeSnackbar } from "notistack";
 import { enqueueSnackbar } from "notistack";
-import React, { Fragment, useEffect, useMemo, useState } from "react";
+import React, { forwardRef, Fragment, useEffect, useImperativeHandle, useMemo, useState } from "react";
+import generateTimeSlots from "../../../utilities/generateTimeSlots";
+import getWorkHoursMax from "../../../utilities/getWorkHoursMax";
 
-export default function KPIBoardGridChild({ departmentTemp, fromDate, toDate, onSearch, searchTrigger }) {
-    const [isLoading, setLoading] = useState(false);
+const KPIBoardGridChild = forwardRef(({ departmentTemp, fromDate, toDate, onSearch, searchTrigger }, ref) => {
     const [timeRefresh, setTimeRefresh] = useState(0);
     const [actualQuantity, setActualQuantity] = useState([
         0, 0, 0, 0, 0, 0, 0, 0,
@@ -45,13 +46,11 @@ export default function KPIBoardGridChild({ departmentTemp, fromDate, toDate, on
     }, [actualAllQuality]);
 
     const [listDepartment, setListDepartment] = useState([]);
-
+    const [staffDepartment, setStaffDepartment] = useState("");
     const [department, setDepartment] = useState(departmentTemp);
     const [from, setFrom] = useState("");
     const [to, setTo] = useState("");
-
-    const [staffDepartment, setStaffDepartment] = useState("");
-
+    const [labelsChartColumn, setLabelsChartColumn] = useState([])
 
     useEffect(() => {
         // Khi searchTrigger thay đổi, thực hiện hàm handleSearchChild
@@ -73,8 +72,6 @@ export default function KPIBoardGridChild({ departmentTemp, fromDate, toDate, on
 
     useEffect(() => {
         setFrom(fromDate);
-        console.log(fromDate);
-        
     }, [fromDate]);
 
     useEffect(() => {
@@ -98,15 +95,15 @@ export default function KPIBoardGridChild({ departmentTemp, fromDate, toDate, on
         return 0;
     }, [from, to]);
 
-    useEffect(() => {
-        const index = listDepartment.findIndex(
-            (item) => item.value === staffDepartment
-        );
-        if (index > -1) {
-            setDepartment(staffDepartment);
-            setTimeRefresh(Date.now());
-        }
-    }, [staffDepartment, listDepartment]);
+    // useEffect(() => {
+    //     const index = listDepartment.findIndex(
+    //         (item) => item.value === staffDepartment
+    //     );
+    //     if (index > -1) {
+    //         setDepartment(staffDepartment);
+    //         setTimeRefresh(Date.now());
+    //     }
+    // }, [staffDepartment, listDepartment]);
 
     const handleSetTargetQuality = (dept) => {
         if (dept.includes("S")) {
@@ -118,17 +115,61 @@ export default function KPIBoardGridChild({ departmentTemp, fromDate, toDate, on
         }
     };
 
-    useEffect(() => {
+    const handleCalculateWorkHour = (listWorkHours) => {
+        if(listWorkHours.length <= 0) {
+            // nếu không lấy được các khung giờ làm việc của chuyền trong database thì mặc định là 11 khung giờ
+            setLabelsChartColumn([
+                "07:30-08:30",
+                "08:30-09:30",
+                "09:30-10:30",
+                "10:30-12:00",
+                "12:00-13:30",
+                "13:30-14:30",
+                "14:30-15:30",
+                "15:30-16:30",
+                "16:30-17:30",
+                "17:30-18:30",
+                "18:30-20:30"
+            ])
+        } else {
+            // lấy ra thời gian sáng và chiều trong mảng thời gian làm việc
+            let startTime = ""
+            let endTime = ""
+            let findTypeAM = listWorkHours.find(item => item.datetype === "am")
+            let findTypePM = listWorkHours.find(item => item.datetype === "pm")
+
+            // gán thời gian bắt đầu và thời gian kết thúc để tính toán khung giờ
+            startTime = findTypeAM ? findTypeAM.f_hour : findTypePM.f_hour
+            endTime = findTypePM ? findTypePM.t_hour : findTypeAM.t_hour
+
+            // format lại thời gian lấy được để có thể generate ra các khung giờ
+            let [hoursStart, minutesStart] = startTime ? startTime.split(":") : "";
+            let [hoursEnd, minutesEnd] = endTime ? endTime.split(":") : "";
+            hoursStart = hoursStart.padStart(2, "0");
+            minutesStart = minutesStart.padStart(2, "0");
+            hoursEnd = hoursEnd.padStart(2, "0");
+            minutesEnd = minutesEnd.padStart(2, "0");
+
+            let formattedTimeStart = `${hoursStart}:${minutesStart}`;
+            let formattedTimeEnd = `${hoursEnd}:${minutesEnd}`;
+
+            // thực hiện gọi hàm generate các khung giờ
+            let resultLabels = generateTimeSlots(formattedTimeStart, formattedTimeEnd)
+
+            setLabelsChartColumn(resultLabels)
+        }
+    }
+
+    // xử lý lấy dữ liệu của 2 chart
+    const handleGetDataChart = () => {
         handleSetTargetQuality(department);
 
-        function ListenHandle(e) {
-            console.log(e);
-            
+        async function ListenHandle(e) {
             setActualQuantity(() => e.data.result[0]);
             setTargetQuantity(() => e.data.target);
             setActualQuality(() => e.data.result[1]);
             setActualAllQuality(() => e.data.actualAllRFT);
-            setLoading(false);
+            await handleCalculateWorkHour(e.data.workHours)
         }
 
         const today = new Date();
@@ -137,16 +178,15 @@ export default function KPIBoardGridChild({ departmentTemp, fromDate, toDate, on
         const dd = String(today.getDate()).padStart(2, '0');
 
         const formattedToday = yyyy + "-" + mm + "-" + dd;
-
+        
         if (from === to && (from === formattedToday || from === "")) {
-            setLoading(true);
             window.Echo.channel("department." + department).listen(
                 "RealTimeChart",
                 ListenHandle
             );
         } else {
+            window.Echo.leaveChannel("department." + department);
             if (isValid === 1) {
-                setLoading(true);
                 axios
                     .get(
                         "/api/query?department=" +
@@ -161,15 +201,62 @@ export default function KPIBoardGridChild({ departmentTemp, fromDate, toDate, on
                         setTargetQuantity(() => res.data[2]);
                         setActualQuality(() => res.data[1]);
                         setActualAllQuality(() => res.data[3]);
-                        setLoading(false);
+                        // setActualStitchingQuanlity(() => res.data[4] ? res.data[4] : 0)
+                        const resultWorkHoursMax = getWorkHoursMax(res.data[5])
+                        handleCalculateWorkHour(resultWorkHoursMax)
                     });
             }
         }
+    }
+
+    useEffect(() => {
+        handleGetDataChart()
+        // handleSetTargetQuality(department);
+
+        // function ListenHandle(e) {
+        //     // console.log(e);
+        //     setActualQuantity(() => e.data.result[0]);
+        //     setTargetQuantity(() => e.data.target);
+        //     setActualQuality(() => e.data.result[1]);
+        //     setActualAllQuality(() => e.data.actualAllRFT);
+        //     // gọi hàm tính toán các khung giờ làm việc
+        //     handleCalculateWorkHour(e.data.workHours)
+        // }
+
+        // const today = new Date();
+        // const yyyy = today.getFullYear();
+        // const mm = String(today.getMonth() + 1).padStart(2, '0');
+        // const dd = String(today.getDate()).padStart(2, '0');
+
+        // const formattedToday = yyyy + "-" + mm + "-" + dd;
+
+        // if (from === to && (from === formattedToday || from === "")) {
+        //     window.Echo.channel("department." + department).listen(
+        //         "RealTimeChart",
+        //         ListenHandle
+        //     );
+        // } else {
+        //     if (isValid === 1) {
+        //         axios
+        //             .get(
+        //                 "/api/query?department=" +
+        //                 department +
+        //                 "&from=" +
+        //                 from +
+        //                 "&to=" +
+        //                 to
+        //             )
+        //             .then((res) => {
+        //                 setActualQuantity(() => res.data[0]);
+        //                 setTargetQuantity(() => res.data[2]);
+        //                 setActualQuality(() => res.data[1]);
+        //                 setActualAllQuality(() => res.data[3]);
+        //             });
+        //     }
+        // }
 
         return function () {
-            if (from === to) {
-                window.Echo.leaveChannel("department." + department);
-            }
+            window.Echo.leaveChannel("department." + department);
         };
     }, [timeRefresh, department]);
 
@@ -182,10 +269,16 @@ export default function KPIBoardGridChild({ departmentTemp, fromDate, toDate, on
                 }))
             )
         );
-        axios.get("/api/get-user").then((res) => {
-            setStaffDepartment(res.data.staff_department);
-        });
+        // axios.get("/api/get-user").then((res) => {
+        //     // console.log(res.data.staff_department);
+        //     setStaffDepartment(res.data.staff_department);
+        // });
     }, []);
+
+    // Dùng useImperativeHandle để cho phép cha gọi hàm này
+    useImperativeHandle(ref, () => ({
+        triggerChildFunction: handleGetDataChart,
+    }));
 
     const handleSearchChild = () => {
         if ((from && !to) || (!from && to)) {
@@ -274,13 +367,11 @@ export default function KPIBoardGridChild({ departmentTemp, fromDate, toDate, on
             );
             return;
         }
-
-        if (!isLoading) setTimeRefresh(Date.now());
     };
 
     // useEffect(() => {
-    //     console.log(targetQuality);
-    // }, [targetQuality]);
+    //     console.log(department);
+    // }, [department]);
 
     return (
         <Fragment>
@@ -308,12 +399,22 @@ export default function KPIBoardGridChild({ departmentTemp, fromDate, toDate, on
                                 Phẩm chất
                             </div>
                             <div
-                                className={`bg-white px-2 text-xl xl:text-3xl rounded-b-xl font-bold flex flex-1 justify-center items-center ${isQualityPassed
+                                className={`bg-white px-2 text-xl xl:text-3xl rounded-b-xl font-bold flex flex-col gap-5 flex-1 justify-center items-center ${isQualityPassed
                                     ? "text-green-500"
                                     : "text-red-500"
                                 }`}
                             >
-                                {actualAllQuality}/{targetQuality[0]}
+                                <div>
+                                    {actualAllQuality}/{targetQuality[0]}
+                                </div>
+                                <div className="flex items-center justify-center pb-1">
+                                    <div className={`text-[24px] xl:text-[30px] font-bold ${isQualityPassed
+                                        ? "text-green-500"
+                                        : "text-red-500"
+                                    }`}>
+                                        % RFT
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -322,6 +423,7 @@ export default function KPIBoardGridChild({ departmentTemp, fromDate, toDate, on
                             <div className="[&_canvas]:h-full flex-1 pr-5">
                                 <ChartTwoColumn
                                     name="Bảng biểu sản lượng"
+                                    labels={labelsChartColumn}
                                     actual={actualQuantity}
                                     target={getTargetQuantity}
                                     nameActual="Sản lượng thực tế"
@@ -334,6 +436,7 @@ export default function KPIBoardGridChild({ departmentTemp, fromDate, toDate, on
                             <div className="[&_canvas]:h-full flex-1 pr-5">
                                 <ChartTwoColumn
                                     name="Bảng biểu chất lượng"
+                                    labels={labelsChartColumn}
                                     actual={actualQuality}
                                     target={targetQuality}
                                     nameActual="Chất lượng thực tế"
@@ -347,4 +450,6 @@ export default function KPIBoardGridChild({ departmentTemp, fromDate, toDate, on
             </div>
         </Fragment>
     );
-}
+})
+
+export default KPIBoardGridChild;

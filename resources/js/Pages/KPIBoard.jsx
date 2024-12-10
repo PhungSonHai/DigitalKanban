@@ -7,10 +7,11 @@ import { enqueueSnackbar } from "notistack";
 import React, { Fragment, useEffect, useMemo, useState } from "react";
 import { Link, usePage } from "@inertiajs/react";
 import getCurrentDate from "../../../utilities/getCurrentDate";
+import generateTimeSlots from "../../../utilities/generateTimeSlots";
+import getWorkHoursMax from "../../../utilities/getWorkHoursMax";
 
 export default function KPIBoard() {
     const [isLoading, setLoading] = useState(false);
-    const [timeRefresh, setTimeRefresh] = useState(0);
     const [actualQuantity, setActualQuantity] = useState([
         0, 0, 0, 0, 0, 0, 0, 0,
     ]);
@@ -52,10 +53,12 @@ export default function KPIBoard() {
     const [listDepartment, setListDepartment] = useState([]);
     const { deptBoardChild } = usePage().props;
     const [staffDepartment, setStaffDepartment] = useState("");
-    const [department, setDepartment] = useState("4001APL01");
+    const [department, setDepartment] = useState("");
 
     const [from, setFrom] = useState("");
     const [to, setTo] = useState("");
+
+    const [labelsChartColumn, setLabelsChartColumn] = useState([])
 
     const isValid = useMemo(() => {
         if (from === "" && to === "") {
@@ -78,6 +81,14 @@ export default function KPIBoard() {
         const currentDate = getCurrentDate()
         setFrom(currentDate)
         setTo(currentDate)
+
+        const timeoutId = setTimeout(() => {
+            setLoading(true)
+        }, 2000);
+
+        return () => {
+            clearTimeout(timeoutId);
+        };
     }, [])
 
     // useEffect(() => {
@@ -100,17 +111,61 @@ export default function KPIBoard() {
         }
     };
 
-    useEffect(() => {
-        handleSetTargetQuality(department);
+    const handleCalculateWorkHour = (listWorkHours) => {
+        if(listWorkHours.length <= 0) {
+            // nếu không lấy được các khung giờ làm việc của chuyền trong database thì mặc định là 11 khung giờ
+            setLabelsChartColumn([
+                "07:30-08:30",
+                "08:30-09:30",
+                "09:30-10:30",
+                "10:30-12:00",
+                "12:00-13:30",
+                "13:30-14:30",
+                "14:30-15:30",
+                "15:30-16:30",
+                "16:30-17:30",
+                "17:30-18:30",
+                "18:30-20:30"
+            ])
+        } else {
+            // lấy ra thời gian sáng và chiều trong mảng thời gian làm việc
+            let startTime = ""
+            let endTime = ""
+            let findTypeAM = listWorkHours.find(item => item.datetype === "am")
+            let findTypePM = listWorkHours.find(item => item.datetype === "pm")
 
-        function ListenHandle(e) {
-            console.log(e);
+            // gán thời gian bắt đầu và thời gian kết thúc để tính toán khung giờ
+            startTime = findTypeAM ? findTypeAM.f_hour : findTypePM.f_hour
+            endTime = findTypePM ? findTypePM.t_hour : findTypeAM.t_hour
+
+            // format lại thời gian lấy được để có thể generate ra các khung giờ
+            let [hoursStart, minutesStart] = startTime ? startTime.split(":") : "";
+            let [hoursEnd, minutesEnd] = endTime ? endTime.split(":") : "";
+            hoursStart = hoursStart.padStart(2, "0");
+            minutesStart = minutesStart.padStart(2, "0");
+            hoursEnd = hoursEnd.padStart(2, "0");
+            minutesEnd = minutesEnd.padStart(2, "0");
+
+            let formattedTimeStart = `${hoursStart}:${minutesStart}`;
+            let formattedTimeEnd = `${hoursEnd}:${minutesEnd}`;
+
+            // thực hiện gọi hàm generate các khung giờ
+            let resultLabels = generateTimeSlots(formattedTimeStart, formattedTimeEnd)
+
+            setLabelsChartColumn(resultLabels)
+        }
+    }
+
+    // xử lý lấy dữ liệu của 2 chart
+    const handleGetDataChart = () => {
+        handleSetTargetQuality(department);
+        async function ListenHandle(e) {
             setActualQuantity(() => e.data.result[0]);
             setTargetQuantity(() => e.data.target);
             setActualQuality(() => e.data.result[1]);
             setActualAllQuality(() => e.data.actualAllRFT);
             setActualStitchingQuanlity(() => [parseInt(String(e.data.actualStitchingQuanlity).replace("%", ""))])
-            setLoading(false);
+            await handleCalculateWorkHour(e.data.workHours)
         }
 
         const today = new Date();
@@ -119,16 +174,15 @@ export default function KPIBoard() {
         const dd = String(today.getDate()).padStart(2, '0');
 
         const formattedToday = yyyy + "-" + mm + "-" + dd;
-
+        
         if (from === to && (from === formattedToday || from === "")) {
-            setLoading(true);
             window.Echo.channel("department." + department).listen(
                 "RealTimeChart",
                 ListenHandle
             );
         } else {
+            window.Echo.leaveChannel("department." + department);
             if (isValid === 1) {
-                setLoading(true);
                 axios
                     .get(
                         "/api/query?department=" +
@@ -139,22 +193,27 @@ export default function KPIBoard() {
                         to
                     )
                     .then((res) => {
+                        console.log(res.data);
+                        
                         setActualQuantity(() => res.data[0]);
                         setTargetQuantity(() => res.data[2]);
                         setActualQuality(() => res.data[1]);
                         setActualAllQuality(() => res.data[3]);
                         setActualStitchingQuanlity(() => res.data[4] ? res.data[4] : 0)
-                        setLoading(false);
-                    });
+                        const resultWorkHoursMax = getWorkHoursMax(res.data[5])
+                        handleCalculateWorkHour(resultWorkHoursMax)
+                    })
             }
         }
+    }
+
+    useEffect(() => {
+        handleGetDataChart()
 
         return function () {
-            if (from === to) {
-                window.Echo.leaveChannel("department." + department);
-            }
+            window.Echo.leaveChannel("department." + department);
         };
-    }, [timeRefresh, isValid, department]);
+    }, [isValid, department]);
 
     useEffect(() => {
         if(deptBoardChild) {
@@ -177,6 +236,7 @@ export default function KPIBoard() {
         // });
     }, []);
 
+    // handle khi click nút tìm kiếm
     const handleSearch = () => {
         if ((from && !to) || (!from && to)) {
             const key = enqueueSnackbar(
@@ -265,12 +325,12 @@ export default function KPIBoard() {
             return;
         }
 
-        if (!isLoading) setTimeRefresh(Date.now());
+        handleGetDataChart()
     };
 
-    useEffect(() => {
-        console.log(department);
-    }, [department])
+    // useEffect(() => {
+    //     console.log(actualQuantity);
+    // }, [actualQuantity])
 
     // useEffect(() => {
     //     console.log(actualStitchingQuanlity);
@@ -278,8 +338,8 @@ export default function KPIBoard() {
 
     return (
         <Fragment>
-            {isLoading && (
-                <div className="absolute inset-0 bg-gray-800/30 flex items-center justify-center backdrop-blur-sm z-20">
+            {/* {isLoading && (
+                <div className="absolute inset-0 bg-gray-800/90 flex items-center justify-center backdrop-blur-sm z-20">
                     <div role="status">
                         <svg
                             aria-hidden="true"
@@ -300,7 +360,7 @@ export default function KPIBoard() {
                         <span className="sr-only">Loading...</span>
                     </div>
                 </div>
-            )}
+            )} */}
             <div className="h-screen flex flex-col select-none zoom-70 xl:zoom-100">
                 <div className="flex justify-between pt-1 pb-1 xl:pt-3 xl:pb-3 flex-row items-center gap-2">
                     <div className="bg-gray-500/90 px-3 py-1 xl:px-5 xl:py-2 rounded-r-full shadow-xl shadow-[lightblue]">
@@ -359,7 +419,7 @@ export default function KPIBoard() {
                         <div>
                             <button
                                 type="button"
-                                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-3 xl:px-5 py-0.5 xl:py-1.5 mr-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-blue-300 font-medium rounded-lg text-sm px-3 xl:px-5 py-0.5 xl:py-1.5 mr-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none focus:ring-0 dark:focus:ring-blue-800 outline-none ring-0 ring-offset-0 active:outline-none"
                                 onClick={handleSearch}
                             >
                                 Tìm kiếm
@@ -437,44 +497,64 @@ export default function KPIBoard() {
                             </div>
                         </div>
                     </div>
-                    <div className="w-full flex flex-col space-y-2 xl:space-y-5">
-                        <div className="flex-1 flex">
-                            <div className="[&_canvas]:h-full flex-1 pr-5">
-                                <ChartTwoColumn
-                                    name="Bảng biểu sản lượng"
-                                    actual={actualQuantity}
-                                    target={getTargetQuantity}
-                                    nameActual="Sản lượng thực tế"
-                                    nameTarget="Mục tiêu sản lượng"
-                                    isSmall={width <= 800}
-                                />
+                    <div className="w-full flex flex-col space-y-2 xl:space-y-5 relative">
+                        {
+                            !isLoading &&
+                            <div className='absolute inset-0 z-[1000] rounded-xl [background:_rgba(255,255,255,0.1)] [backdrop-filter:_blur(5px)] flex items-center justify-center'>
+                                <div role="status">
+                                    <svg aria-hidden="true" className="inline w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                                        <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+                                    </svg>
+                                    <span className="sr-only">Loading...</span>
+                                </div>
                             </div>
-                        </div>
-                        <div className="flex-1 flex">
-                            <div className="[&_canvas]:h-full flex-1 pr-5">
-                                {
-                                    department.includes("L")
-                                    ?
+                        }
+                        {
+                            isLoading &&
+                            <>
+                                <div className="flex-1 flex">
+                                    <div className="[&_canvas]:h-full flex-1 pr-5">
                                         <ChartTwoColumn
-                                            name="Bảng biểu chất lượng"
-                                            actual={actualQuality}
-                                            target={targetQuality}
-                                            nameActual="Chất lượng thực tế"
-                                            nameTarget="Mục tiêu chất lượng"
+                                            name="Bảng biểu sản lượng"
+                                            labels={labelsChartColumn}
+                                            actual={actualQuantity}
+                                            target={getTargetQuantity}
+                                            nameActual="Sản lượng thực tế"
+                                            nameTarget="Mục tiêu sản lượng"
                                             isSmall={width <= 800}
                                         />
-                                    :
-                                        <ChartStitchingQuanlity
-                                            name="Bảng biểu chất lượng"
-                                            actual={actualStitchingQuanlity}
-                                            target={targetQuality}
-                                            nameActual="Chất lượng thực tế"
-                                            nameTarget="Mục tiêu chất lượng"
-                                            isSmall={width <= 800}
-                                        />
-                                }
-                            </div>
-                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex-1 flex">
+                                    <div className="[&_canvas]:h-full flex-1 pr-5">
+                                        {
+                                            department.includes("L")
+                                            ?
+                                                <ChartTwoColumn
+                                                    name="Bảng biểu chất lượng"
+                                                    labels={labelsChartColumn}
+                                                    actual={actualQuality}
+                                                    target={targetQuality}
+                                                    nameActual="Chất lượng thực tế"
+                                                    nameTarget="Mục tiêu chất lượng"
+                                                    isSmall={width <= 800}
+                                                />
+                                            :
+                                                <ChartStitchingQuanlity
+                                                    name="Bảng biểu chất lượng"
+                                                    labels={labelsChartColumn}
+                                                    actual={actualStitchingQuanlity}
+                                                    target={targetQuality}
+                                                    nameActual="Chất lượng thực tế"
+                                                    nameTarget="Mục tiêu chất lượng"
+                                                    isSmall={width <= 800}
+                                                />
+                                        }
+                                    </div>
+                                </div>
+                            </>
+                        }
                     </div>
                 </div>
 

@@ -20,21 +20,21 @@ ChartJS.register(
     ChartDataLabels
 );
 
-const labels = [
-    "07:30-08:30",
-    "08:30-09:30",
-    "09:30-10:30",
-    "10:30-12:00",
-    "12:00-13:30",
-    "13:30-14:30",
-    "14:30-15:30",
-    "15:30-16:30",
-    "16:30-17:30",
-    "17:30-18:30",
-    "18:30-20:30",
-];
+// const labels = [
+//     "07:30-08:30",
+//     "08:30-09:30",
+//     "09:30-10:30",
+//     "10:30-12:00",
+//     "12:00-13:30",
+//     "13:30-14:30",
+//     "14:30-15:30",
+//     "15:30-16:30",
+//     "16:30-17:30",
+//     "17:30-18:30",
+//     "18:30-20:30"
+// ];
 
-export default function ChartTwoColumn({ name, nameActual = '1', nameTarget = '2', actual = [], target = [], isSmall = false }) {
+export default function ChartTwoColumn({ name, labels, nameActual = '1', nameTarget = '2', actual = [], target = [], isSmall = false }) {
     const options = {
         responsive: true,
         plugins: {

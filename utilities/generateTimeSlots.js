@@ -33,3 +33,5 @@ function generateTimeSlots(startTime, endTime) {
 
     return timeSlots;
 }
+
+export default generateTimeSlots

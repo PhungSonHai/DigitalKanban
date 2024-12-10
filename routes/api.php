@@ -418,13 +418,27 @@ Route::get("query", function (Request $request) {
         ) subquery
     ");
 
+    $listWorkHours = DB::select("
+        SELECT
+            D_DEPT,
+            WORK_DAY,
+            DATETYPE,
+            F_HOUR,
+            T_HOUR
+        FROM
+            MES_WORKINGHOURS_02
+        WHERE
+            D_DEPT = '{$department}' AND
+            WORK_DAY BETWEEN TO_DATE('".$from->format('d/m/Y')."', 'dd/mm/yyyy') AND TO_DATE('".$to->format('d/m/Y')."', 'dd/mm/yyyy')
+    ");
+
     for ($i = 0; $i < 11; $i++) {
         array_push($data, (int)$result[$i]->qty);
         array_push($data2, (int)$result2[$i]->rft);
     }
 
     // return [$data, $data2, (int)$result3[0]->qty, (int)$result4[0]->rft, empty($result5) ? [] : [(int)str_replace('%', '', $result5[0]->qty_percent_rft)]];
-    return [$data, $data2, (int)$result3[0]->qty, (int)$result4[0]->rft, $result5[0]->avg_qty_percent_rft];
+    return [$data, $data2, (int)$result3[0]->qty, (int)$result4[0]->rft, $result5[0]->avg_qty_percent_rft, $listWorkHours, $from, $to];
 });
 
 // Route::get("get-test", function () {
