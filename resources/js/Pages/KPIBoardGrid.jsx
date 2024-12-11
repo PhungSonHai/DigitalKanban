@@ -210,7 +210,7 @@ export default function KPIBoardGrid() {
     return (
         <Fragment>
             {!isLoading && (
-                <div className="absolute inset-0 bg-gray-800 flex items-center justify-center backdrop-blur-sm z-20">
+                <div className="absolute inset-0 bg-gray-800/80 flex items-center justify-center backdrop-blur-sm z-20">
                     <div role="status">
                         <svg
                             aria-hidden="true"

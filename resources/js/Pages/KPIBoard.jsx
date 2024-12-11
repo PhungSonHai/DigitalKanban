@@ -16,11 +16,6 @@ export default function KPIBoard() {
         0, 0, 0, 0, 0, 0, 0, 0,
     ]);
     const [targetQuantity, setTargetQuantity] = useState(0);
-    const getTargetQuantity = useMemo(() => {
-        return new Array(actualQuantity.length).fill(
-            Math.trunc(Number(targetQuantity) / actualQuantity.length)
-        );
-    }, [targetQuantity]);
     const getActualQuantity = useMemo(
         function () {
             return actualQuantity.reduce((a, b) => Number(a) + Number(b));
@@ -91,15 +86,12 @@ export default function KPIBoard() {
         };
     }, [])
 
-    // useEffect(() => {
-    //     const index = listDepartment.findIndex(
-    //         (item) => item.value === staffDepartment
-    //     );
-    //     if (index > -1) {
-    //         setDepartment(staffDepartment);
-    //         setTimeRefresh(Date.now());
-    //     }
-    // }, [staffDepartment, listDepartment]);
+    // tính toán số lượng các cột target
+    const getTargetQuantity = useMemo(() => {
+        return new Array(labelsChartColumn.length).fill(
+            Math.trunc(Number(targetQuantity) / labelsChartColumn.length)
+        );
+    }, [targetQuantity, labelsChartColumn]);
 
     const handleSetTargetQuality = (dept) => {
         if (dept.includes("S")) {
@@ -193,8 +185,6 @@ export default function KPIBoard() {
                         to
                     )
                     .then((res) => {
-                        console.log(res.data);
-                        
                         setActualQuantity(() => res.data[0]);
                         setTargetQuantity(() => res.data[2]);
                         setActualQuality(() => res.data[1]);

@@ -152,8 +152,8 @@ Route::get("query", function (Request $request) {
             time_from,
             time_to
         ORDER BY
-        time_from"
-    );
+        time_from
+    ");
 
     $result2 = DB::select("
         SELECT 

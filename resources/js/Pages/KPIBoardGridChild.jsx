@@ -12,12 +12,7 @@ const KPIBoardGridChild = forwardRef(({ departmentTemp, fromDate, toDate, onSear
     const [actualQuantity, setActualQuantity] = useState([
         0, 0, 0, 0, 0, 0, 0, 0,
     ]);
-    const [targetQuantity, setTargetQuantity] = useState(0);
-    const getTargetQuantity = useMemo(() => {
-        return new Array(actualQuantity.length).fill(
-            Math.trunc(Number(targetQuantity) / actualQuantity.length)
-        );
-    }, [targetQuantity]);
+    const [targetQuantity, setTargetQuantity] = useState(0)
     const getActualQuantity = useMemo(
         function () {
             return actualQuantity.reduce((a, b) => Number(a) + Number(b));
@@ -65,6 +60,13 @@ const KPIBoardGridChild = forwardRef(({ departmentTemp, fromDate, toDate, onSear
             }
         }
     }, [searchTrigger]);
+
+    // tính toán số lượng các cột target
+    const getTargetQuantity = useMemo(() => {
+        return new Array(labelsChartColumn.length).fill(
+            Math.trunc(Number(targetQuantity) / labelsChartColumn.length)
+        );
+    }, [targetQuantity, labelsChartColumn]);
 
     useEffect(() => {
         setDepartment(departmentTemp);
@@ -370,8 +372,8 @@ const KPIBoardGridChild = forwardRef(({ departmentTemp, fromDate, toDate, onSear
     };
 
     // useEffect(() => {
-    //     console.log(department);
-    // }, [department]);
+    //     console.log(targetQuantity, labelsChartColumn);
+    // }, [targetQuantity, labelsChartColumn]);
 
     return (
         <Fragment>
