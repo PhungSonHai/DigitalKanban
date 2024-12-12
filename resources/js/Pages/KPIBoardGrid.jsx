@@ -60,18 +60,18 @@ export default function KPIBoardGrid() {
         };
     }, [])
 
-    useEffect(() => {
-        const index = listDepartment.findIndex(
-            (item) => item.value === staffDepartment
-        );
+    // useEffect(() => {
+    //     const index = listDepartment.findIndex(
+    //         (item) => item.value === staffDepartment
+    //     );
         
-        if (index > -1) {
-            setDepartment(staffDepartment);
-            setTimeRefresh(Date.now());
-        } else {
-            setDepartment("4001APL01")
-        }
-    }, [staffDepartment, listDepartment]);
+    //     if (index > -1) {
+    //         setDepartment(staffDepartment);
+    //         setTimeRefresh(Date.now());
+    //     } else {
+    //         setDepartment("4001APL01")
+    //     }
+    // }, [staffDepartment, listDepartment]);
 
     useEffect(() => {
         axios.get("/api/get-department").then((res) =>
@@ -195,7 +195,7 @@ export default function KPIBoardGrid() {
         if(username) {
             axios.post("api/get-line-display", { username: username })
                 .then(res => {
-                    // setDepartment(res.data[0] ? res.data[0].line_code : "")
+                    setDepartment(res.data[0] ? res.data[0].line_code : "4001APL01")
                     setDepartment2(res.data[1] ? res.data[1].line_code : "4001APL02")
                     setDepartment3(res.data[2] ? res.data[2].line_code : "4001APS01")
                     setDepartment4(res.data[3] ? res.data[3].line_code : "4001APS02")

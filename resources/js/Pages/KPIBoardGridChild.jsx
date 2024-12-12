@@ -109,9 +109,9 @@ const KPIBoardGridChild = forwardRef(({ departmentTemp, fromDate, toDate, onSear
 
     const handleSetTargetQuality = (dept) => {
         if (dept.includes("S")) {
-            setTargetQuality(new Array(11).fill(90));
+            setTargetQuality(new Array(12).fill(90));
         } else if (dept.includes("L")) {
-            setTargetQuality(new Array(11).fill(88));
+            setTargetQuality(new Array(12).fill(88));
         } else {
             setTargetQuality([]);
         }
@@ -260,7 +260,7 @@ const KPIBoardGridChild = forwardRef(({ departmentTemp, fromDate, toDate, onSear
         return function () {
             window.Echo.leaveChannel("department." + department);
         };
-    }, [timeRefresh, department]);
+    }, [department]);
 
     useEffect(() => {
         axios.get("/api/get-department").then((res) =>

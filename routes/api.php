@@ -79,7 +79,8 @@ Route::post("get-line-display", function (Request $request) {
 });
 
 Route::get("get-list-user", function (Request $request) {
-    $data = UserToken::where("CompanyCode", "APHMESTEST02")->get();
+    // $data = UserToken::where("CompanyCode", "APHMESTEST02")->get();
+    $data = UserToken::where("CompanyCode", "aphmes")->get();
     return $data;
 });
 
