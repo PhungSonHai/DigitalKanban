@@ -6,6 +6,7 @@ import { enqueueSnackbar } from "notistack";
 import React, { forwardRef, Fragment, useEffect, useImperativeHandle, useMemo, useState } from "react";
 import generateTimeSlots from "../../../utilities/generateTimeSlots";
 import getWorkHoursMax from "../../../utilities/getWorkHoursMax";
+import calculateTotalWorkHours from "../../../utilities/calculateTotalWorkHours";
 
 const KPIBoardGridChild = forwardRef(({ departmentTemp, fromDate, toDate, onSearch, searchTrigger }, ref) => {
     const [timeRefresh, setTimeRefresh] = useState(0);
@@ -46,6 +47,7 @@ const KPIBoardGridChild = forwardRef(({ departmentTemp, fromDate, toDate, onSear
     const [from, setFrom] = useState("");
     const [to, setTo] = useState("");
     const [labelsChartColumn, setLabelsChartColumn] = useState([])
+    const [totalWorkHours, setTotalWorkHours] = useState(8)
 
     useEffect(() => {
         // Khi searchTrigger thay đổi, thực hiện hàm handleSearchChild
@@ -64,9 +66,9 @@ const KPIBoardGridChild = forwardRef(({ departmentTemp, fromDate, toDate, onSear
     // tính toán số lượng các cột target
     const getTargetQuantity = useMemo(() => {
         return new Array(labelsChartColumn.length).fill(
-            Math.trunc(Number(targetQuantity) / labelsChartColumn.length)
+            Math.trunc(Number(targetQuantity) / totalWorkHours)
         );
-    }, [targetQuantity, labelsChartColumn]);
+    }, [targetQuantity, labelsChartColumn, totalWorkHours]);
 
     useEffect(() => {
         setDepartment(departmentTemp);
@@ -172,6 +174,12 @@ const KPIBoardGridChild = forwardRef(({ departmentTemp, fromDate, toDate, onSear
             setActualQuality(() => e.data.result[1]);
             setActualAllQuality(() => e.data.actualAllRFT);
             await handleCalculateWorkHour(e.data.workHours)
+            if(e.data.workHours.length > 0) {
+                let totalWorkHoursTemp = calculateTotalWorkHours(e.data.workHours)
+                setTotalWorkHours(totalWorkHoursTemp)
+            } else {
+                setTotalWorkHours(8)
+            }
         }
 
         const today = new Date();
@@ -206,6 +214,12 @@ const KPIBoardGridChild = forwardRef(({ departmentTemp, fromDate, toDate, onSear
                         // setActualStitchingQuanlity(() => res.data[4] ? res.data[4] : 0)
                         const resultWorkHoursMax = getWorkHoursMax(res.data[5])
                         handleCalculateWorkHour(resultWorkHoursMax)
+                        if(resultWorkHoursMax.length > 0) {
+                            let totalWorkHoursTemp = calculateTotalWorkHours(resultWorkHoursMax)
+                            setTotalWorkHours(totalWorkHoursTemp)
+                        } else {
+                            setTotalWorkHours(8)
+                        }
                     });
             }
         }

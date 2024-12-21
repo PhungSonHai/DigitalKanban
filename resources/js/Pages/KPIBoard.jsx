@@ -9,6 +9,7 @@ import { Link, usePage } from "@inertiajs/react";
 import getCurrentDate from "../../../utilities/getCurrentDate";
 import generateTimeSlots from "../../../utilities/generateTimeSlots";
 import getWorkHoursMax from "../../../utilities/getWorkHoursMax";
+import calculateTotalWorkHours from "../../../utilities/calculateTotalWorkHours";
 
 export default function KPIBoard() {
     const [isLoading, setLoading] = useState(false);
@@ -54,6 +55,7 @@ export default function KPIBoard() {
     const [to, setTo] = useState("");
 
     const [labelsChartColumn, setLabelsChartColumn] = useState([])
+    const [totalWorkHours, setTotalWorkHours] = useState(8)
 
     const isValid = useMemo(() => {
         if (from === "" && to === "") {
@@ -89,9 +91,9 @@ export default function KPIBoard() {
     // tính toán số lượng các cột target
     const getTargetQuantity = useMemo(() => {
         return new Array(labelsChartColumn.length).fill(
-            Math.trunc(Number(targetQuantity) / labelsChartColumn.length)
+            Math.trunc(Number(targetQuantity) / totalWorkHours)
         );
-    }, [targetQuantity, labelsChartColumn]);
+    }, [targetQuantity, labelsChartColumn, totalWorkHours]);
 
     const handleSetTargetQuality = (dept) => {
         if (dept.includes("S")) {
@@ -114,11 +116,11 @@ export default function KPIBoard() {
                 "12:00-13:30",
                 "13:30-14:30",
                 "14:30-15:30",
-                "15:30-16:30",
-                "16:30-17:30",
-                "17:30-18:30",
-                "18:30-20:30"
+                "15:30-16:30"
             ])
+            // "16:30-17:30",
+            // "17:30-18:30",
+            // "18:30-20:30"
         } else {
             // lấy ra thời gian sáng và chiều trong mảng thời gian làm việc
             let startTime = ""
@@ -158,6 +160,12 @@ export default function KPIBoard() {
             setActualAllQuality(() => e.data.actualAllRFT);
             setActualStitchingQuanlity(() => [parseInt(String(e.data.actualStitchingQuanlity).replace("%", ""))])
             await handleCalculateWorkHour(e.data.workHours)
+            if(e.data.workHours.length > 0) {
+                let totalWorkHoursTemp = calculateTotalWorkHours(e.data.workHours)
+                setTotalWorkHours(totalWorkHoursTemp)
+            } else {
+                setTotalWorkHours(8)
+            }
         }
 
         const today = new Date();
@@ -192,6 +200,12 @@ export default function KPIBoard() {
                         setActualStitchingQuanlity(() => res.data[4] ? res.data[4] : 0)
                         const resultWorkHoursMax = getWorkHoursMax(res.data[5])
                         handleCalculateWorkHour(resultWorkHoursMax)
+                        if(resultWorkHoursMax.length > 0) {
+                            let totalWorkHoursTemp = calculateTotalWorkHours(resultWorkHoursMax)
+                            setTotalWorkHours(totalWorkHoursTemp)
+                        } else {
+                            setTotalWorkHours(8)
+                        }
                     })
             }
         }

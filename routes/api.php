@@ -87,7 +87,7 @@ Route::get("get-list-user", function (Request $request) {
 Route::get("get-user", function (Request $request) {
     $token = $request->header("access-token");
     // $token = "9f932648-c548-4bdc-996e-0b94224ca5c1";
-    $token = "ba676cfe-d4c0-45e1-b6b7-b44ac5372b50";
+    // $token = "5a167a2b-3857-4fb2-b6f7-46717f45fefd";
     if (!$token) return [];
     $data = UserToken::query()->where('UserToken', $token)->first();
     $userCode = $data->UserCode;
