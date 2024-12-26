@@ -201,8 +201,6 @@ const KPIBoardGridChild = forwardRef(({ departmentTemp, fromDate, toDate, onSear
                         to
                     )
                     .then((res) => {
-                        console.log(res.data);
-                        
                         setActualQuantity(() => res.data[0]);
                         setTargetQuantity(() => res.data[2]);
                         setActualQuality(() => res.data[1]);
