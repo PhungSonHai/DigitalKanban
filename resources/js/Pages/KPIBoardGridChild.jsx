@@ -7,6 +7,7 @@ import React, { forwardRef, Fragment, useEffect, useImperativeHandle, useMemo, u
 import generateTimeSlots from "../../../utilities/generateTimeSlots";
 import getWorkHoursMax from "../../../utilities/getWorkHoursMax";
 import calculateTotalWorkHours from "../../../utilities/calculateTotalWorkHours";
+import ChartStitchingQuanlity from "@/Components/ChartStitchingQuanlity";
 
 const KPIBoardGridChild = forwardRef(({ departmentTemp, fromDate, toDate, onSearch, searchTrigger }, ref) => {
     const [timeRefresh, setTimeRefresh] = useState(0);
@@ -31,6 +32,8 @@ const KPIBoardGridChild = forwardRef(({ departmentTemp, fromDate, toDate, onSear
 
     const [actualAllQuality, setActualAllQuality] = useState(0);
     const [targetAllQuality, setTargetAllQuality] = useState(100);
+
+    const [actualStitchingQuanlity, setActualStitchingQuanlity] = useState("")
 
     const width = document.body.clientWidth;
 
@@ -99,16 +102,6 @@ const KPIBoardGridChild = forwardRef(({ departmentTemp, fromDate, toDate, onSear
         return 0;
     }, [from, to]);
 
-    // useEffect(() => {
-    //     const index = listDepartment.findIndex(
-    //         (item) => item.value === staffDepartment
-    //     );
-    //     if (index > -1) {
-    //         setDepartment(staffDepartment);
-    //         setTimeRefresh(Date.now());
-    //     }
-    // }, [staffDepartment, listDepartment]);
-
     const handleSetTargetQuality = (dept) => {
         if (dept.includes("S")) {
             setTargetQuality(new Array(12).fill(90));
@@ -173,6 +166,7 @@ const KPIBoardGridChild = forwardRef(({ departmentTemp, fromDate, toDate, onSear
             setTargetQuantity(() => e.data.target);
             setActualQuality(() => e.data.result[1]);
             setActualAllQuality(() => e.data.actualAllRFT);
+            setActualStitchingQuanlity(() => [parseInt(String(e.data.actualStitchingQuanlity).replace("%", ""))])
             await handleCalculateWorkHour(e.data.workHours)
             if(e.data.workHours.length > 0) {
                 let totalWorkHoursTemp = calculateTotalWorkHours(e.data.workHours)
@@ -207,11 +201,13 @@ const KPIBoardGridChild = forwardRef(({ departmentTemp, fromDate, toDate, onSear
                         to
                     )
                     .then((res) => {
+                        console.log(res.data);
+                        
                         setActualQuantity(() => res.data[0]);
                         setTargetQuantity(() => res.data[2]);
                         setActualQuality(() => res.data[1]);
                         setActualAllQuality(() => res.data[3]);
-                        // setActualStitchingQuanlity(() => res.data[4] ? res.data[4] : 0)
+                        setActualStitchingQuanlity(() => res.data[4] ? res.data[4] : 0)
                         const resultWorkHoursMax = getWorkHoursMax(res.data[5])
                         handleCalculateWorkHour(resultWorkHoursMax)
                         if(resultWorkHoursMax.length > 0) {
@@ -450,15 +446,29 @@ const KPIBoardGridChild = forwardRef(({ departmentTemp, fromDate, toDate, onSear
                         </div>
                         <div className="flex-1 flex">
                             <div className="[&_canvas]:h-full flex-1 pr-5">
-                                <ChartTwoColumn
-                                    name="Bảng biểu chất lượng"
-                                    labels={labelsChartColumn}
-                                    actual={actualQuality}
-                                    target={targetQuality}
-                                    nameActual="Chất lượng thực tế"
-                                    nameTarget="Mục tiêu chất lượng"
-                                    isSmall={width <= 800}
-                                />
+                                {
+                                    department.includes("L")
+                                    ?
+                                        <ChartTwoColumn
+                                            name="Bảng biểu chất lượng"
+                                            labels={labelsChartColumn}
+                                            actual={actualQuality}
+                                            target={targetQuality}
+                                            nameActual="Chất lượng thực tế"
+                                            nameTarget="Mục tiêu chất lượng"
+                                            isSmall={width <= 800}
+                                        />
+                                    :
+                                        <ChartStitchingQuanlity
+                                            name="Bảng biểu chất lượng"
+                                            labels={labelsChartColumn}
+                                            actual={actualStitchingQuanlity}
+                                            target={targetQuality}
+                                            nameActual="Chất lượng thực tế"
+                                            nameTarget="Mục tiêu chất lượng"
+                                            isSmall={width <= 800}
+                                        />
+                                }
                             </div>
                         </div>
                     </div>

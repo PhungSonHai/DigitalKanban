@@ -42,7 +42,6 @@ export default function KPIBoard() {
     const isQualityPassed = useMemo(() => {
         if (targetAllQuality == 0) return false;
 
-        // return (actualAllQuality / targetQuality[0]) * 100 >= targetQuality[0];
         return actualAllQuality >= targetQuality[0] || actualStitchingQuanlity >= targetQuality[0];
     }, [actualAllQuality]);
 
