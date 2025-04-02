@@ -48,7 +48,7 @@ Route::post("test2", function (Request $request) {
 });
 
 Route::get("get-department", function () {
-    return Base005m::query()->where(['factory_sap' => 4001])->orderBy('DEP_SAP')->get(["DEP_SAP", "DEPARTMENT_CODE", "DEPARTMENT_NAME"]);
+    return Base005m::query()->where(['factory_sap' => 4001])->orderBy('DEP_SAP')->get(["DEP_SAP", "DEPARTMENT_CODE", "DEPARTMENT_NAME", "UDF01"]);
 });
 
 Route::get("get-list-department", function () {
@@ -85,9 +85,8 @@ Route::get("get-list-user", function (Request $request) {
 });
 
 Route::get("get-user", function (Request $request) {
-    $token = $request->header("access-token");
-    // $token = "9f932648-c548-4bdc-996e-0b94224ca5c1";
-    // $token = "5a167a2b-3857-4fb2-b6f7-46717f45fefd";
+    // $token = $request->header("access-token");
+    $token = "3b2e1b3a-82b2-438d-b4c7-8c4233d86ddf";
     if (!$token) return [];
     $data = UserToken::query()->where('UserToken', $token)->first();
     $userCode = $data->UserCode;

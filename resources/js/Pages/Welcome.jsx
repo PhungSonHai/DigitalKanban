@@ -15,7 +15,14 @@ export default function Welcome() {
     useEffect(() => {
         axios
             .get("/api/get-user")
-            .then((res) => setPermission(res.data.permission));
+            .then((res) => {
+                console.log(res);
+                
+                setPermission(res.data.permission)
+            })
+            .catch(err => {
+                console.log(err);
+            })
 
         const key = enqueueSnackbar("Chào mừng bạn đã quay lại Cuộc họp cấp bậc 1", {
             variant: "info",

@@ -9,7 +9,7 @@ import getWorkHoursMax from "../../../utilities/getWorkHoursMax";
 import calculateTotalWorkHours from "../../../utilities/calculateTotalWorkHours";
 import ChartStitchingQuanlity from "@/Components/ChartStitchingQuanlity";
 
-const KPIBoardGridChild = forwardRef(({ departmentTemp, fromDate, toDate, onSearch, searchTrigger }, ref) => {
+const KPIBoardGridChild = forwardRef(({ departmentTemp, fromDate, toDate, udf01, onSearch, searchTrigger }, ref) => {
     const [timeRefresh, setTimeRefresh] = useState(0);
     const [actualQuantity, setActualQuantity] = useState([
         0, 0, 0, 0, 0, 0, 0, 0,
@@ -37,13 +37,6 @@ const KPIBoardGridChild = forwardRef(({ departmentTemp, fromDate, toDate, onSear
 
     const width = document.body.clientWidth;
 
-    const isQualityPassed = useMemo(() => {
-        if (targetAllQuality == 0) return false;
-
-        // return (actualAllQuality / targetQuality[0]) * 100 >= targetQuality[0];
-        return actualAllQuality >= targetQuality[0];
-    }, [actualAllQuality]);
-
     const [listDepartment, setListDepartment] = useState([]);
     const [staffDepartment, setStaffDepartment] = useState("");
     const [department, setDepartment] = useState(departmentTemp);
@@ -51,6 +44,12 @@ const KPIBoardGridChild = forwardRef(({ departmentTemp, fromDate, toDate, onSear
     const [to, setTo] = useState("");
     const [labelsChartColumn, setLabelsChartColumn] = useState([])
     const [totalWorkHours, setTotalWorkHours] = useState(8)
+
+    const isQualityPassed = useMemo(() => {
+        if (targetAllQuality == 0) return false;
+
+        return (department.includes("L") ? actualAllQuality : actualStitchingQuanlity) >= targetQuality[0];
+    }, [department, actualAllQuality, actualStitchingQuanlity]);
 
     useEffect(() => {
         // Khi searchTrigger thay đổi, thực hiện hàm handleSearchChild
@@ -158,112 +157,150 @@ const KPIBoardGridChild = forwardRef(({ departmentTemp, fromDate, toDate, onSear
     }
 
     // xử lý lấy dữ liệu của 2 chart
+    // Cách 1
+    // const handleGetDataChart = () => {
+    //     handleSetTargetQuality(department);
+
+    //     async function ListenHandle(e) {
+    //         setActualQuantity(() => e.data.result[0]);
+    //         setTargetQuantity(() => e.data.target);
+    //         setActualQuality(() => e.data.result[1]);
+    //         setActualAllQuality(() => e.data.actualAllRFT);
+    //         setActualStitchingQuanlity(() => [parseInt(String(e.data.actualStitchingQuanlity).replace("%", ""))])
+    //         await handleCalculateWorkHour(e.data.workHours)
+    //         if(e.data.workHours.length > 0) {
+    //             let totalWorkHoursTemp = calculateTotalWorkHours(e.data.workHours)
+    //             setTotalWorkHours(totalWorkHoursTemp)
+    //         } else {
+    //             setTotalWorkHours(8)
+    //         }
+    //     }
+
+    //     return new Promise((resolve, reject) => {
+    //         const today = new Date();
+    //         const yyyy = today.getFullYear();
+    //         const mm = String(today.getMonth() + 1).padStart(2, '0');
+    //         const dd = String(today.getDate()).padStart(2, '0');
+
+    //         const formattedToday = yyyy + "-" + mm + "-" + dd;
+            
+    //         if (from === to && (from === formattedToday || from === "")) {
+    //             window.Echo.channel("department." + department).listen(
+    //                 "RealTimeChart",
+    //                 ListenHandle
+    //             );
+    //             resolve();
+    //         } else {
+    //             window.Echo.leaveChannel("department." + department);
+    //             if (isValid === 1) {
+    //                 axios
+    //                     .get(
+    //                         "/api/query?department=" +
+    //                         department +
+    //                         "&from=" +
+    //                         from +
+    //                         "&to=" +
+    //                         to
+    //                     )
+    //                     .then((res) => {
+    //                         setActualQuantity(() => res.data[0]);
+    //                         setTargetQuantity(() => res.data[2]);
+    //                         setActualQuality(() => res.data[1]);
+    //                         setActualAllQuality(() => res.data[3]);
+    //                         setActualStitchingQuanlity(() => res.data[4] ? res.data[4] : 0)
+    //                         const resultWorkHoursMax = getWorkHoursMax(res.data[5])
+    //                         handleCalculateWorkHour(resultWorkHoursMax)
+    //                         if(resultWorkHoursMax.length > 0) {
+    //                             let totalWorkHoursTemp = calculateTotalWorkHours(resultWorkHoursMax)
+    //                             setTotalWorkHours(totalWorkHoursTemp)
+    //                         } else {
+    //                             setTotalWorkHours(8)
+    //                         }
+    //                         resolve();
+    //                     })
+    //                     .catch(reject);
+    //             } else {
+    //                 resolve(); // Nếu isValid !== 1, vẫn resolve để không gây lỗi chờ Promise
+    //             }
+    //         }
+    //     })
+    // }
+
     const handleGetDataChart = () => {
         handleSetTargetQuality(department);
+    
+        return new Promise((resolve, reject) => {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+    
+            const formattedToday = yyyy + "-" + mm + "-" + dd;
+            
+            if (from === to && (from === formattedToday || from === "")) {
+                const channel = window.Echo.channel("department." + department);
+                
+                const ListenHandle = async (e) => {
+                    setActualQuantity(() => e.data.result[0]);
+                    setTargetQuantity(() => e.data.target);
+                    setActualQuality(() => e.data.result[1]);
+                    setActualAllQuality(() => e.data.actualAllRFT);
+                    setActualStitchingQuanlity(() => [parseInt(String(e.data.actualStitchingQuanlity).replace("%", ""))]);
+                    
+                    await handleCalculateWorkHour(e.data.workHours);
+    
+                    if (e.data.workHours.length > 0) {
+                        let totalWorkHoursTemp = calculateTotalWorkHours(e.data.workHours);
+                        setTotalWorkHours(totalWorkHoursTemp);
+                    } else {
+                        setTotalWorkHours(8);
+                    }
 
-        async function ListenHandle(e) {
-            setActualQuantity(() => e.data.result[0]);
-            setTargetQuantity(() => e.data.target);
-            setActualQuality(() => e.data.result[1]);
-            setActualAllQuality(() => e.data.actualAllRFT);
-            setActualStitchingQuanlity(() => [parseInt(String(e.data.actualStitchingQuanlity).replace("%", ""))])
-            await handleCalculateWorkHour(e.data.workHours)
-            if(e.data.workHours.length > 0) {
-                let totalWorkHoursTemp = calculateTotalWorkHours(e.data.workHours)
-                setTotalWorkHours(totalWorkHoursTemp)
+                    resolve();
+                };
+    
+                // Đăng ký sự kiện và đợi dữ liệu từ socket
+                channel.listen("RealTimeChart", ListenHandle);
             } else {
-                setTotalWorkHours(8)
+                window.Echo.leaveChannel("department." + department);
+                if (isValid === 1) {
+                    axios
+                        .get(
+                            "/api/query?department=" +
+                            department +
+                            "&from=" +
+                            from +
+                            "&to=" +
+                            to
+                        )
+                        .then((res) => {
+                            setActualQuantity(() => res.data[0]);
+                            setTargetQuantity(() => res.data[2]);
+                            setActualQuality(() => res.data[1]);
+                            setActualAllQuality(() => res.data[3]);
+                            setActualStitchingQuanlity(() => res.data[4] ? res.data[4] : 0);
+                            const resultWorkHoursMax = getWorkHoursMax(res.data[5]);
+                            handleCalculateWorkHour(resultWorkHoursMax);
+    
+                            if (resultWorkHoursMax.length > 0) {
+                                let totalWorkHoursTemp = calculateTotalWorkHours(resultWorkHoursMax);
+                                setTotalWorkHours(totalWorkHoursTemp);
+                            } else {
+                                setTotalWorkHours(8);
+                            }
+    
+                            resolve();
+                        })
+                        .catch(reject);
+                } else {
+                    resolve(); // Nếu isValid !== 1, vẫn resolve để không gây lỗi chờ Promise
+                }
             }
-        }
-
-        const today = new Date();
-        const yyyy = today.getFullYear();
-        const mm = String(today.getMonth() + 1).padStart(2, '0');
-        const dd = String(today.getDate()).padStart(2, '0');
-
-        const formattedToday = yyyy + "-" + mm + "-" + dd;
-        
-        if (from === to && (from === formattedToday || from === "")) {
-            window.Echo.channel("department." + department).listen(
-                "RealTimeChart",
-                ListenHandle
-            );
-        } else {
-            window.Echo.leaveChannel("department." + department);
-            if (isValid === 1) {
-                axios
-                    .get(
-                        "/api/query?department=" +
-                        department +
-                        "&from=" +
-                        from +
-                        "&to=" +
-                        to
-                    )
-                    .then((res) => {
-                        setActualQuantity(() => res.data[0]);
-                        setTargetQuantity(() => res.data[2]);
-                        setActualQuality(() => res.data[1]);
-                        setActualAllQuality(() => res.data[3]);
-                        setActualStitchingQuanlity(() => res.data[4] ? res.data[4] : 0)
-                        const resultWorkHoursMax = getWorkHoursMax(res.data[5])
-                        handleCalculateWorkHour(resultWorkHoursMax)
-                        if(resultWorkHoursMax.length > 0) {
-                            let totalWorkHoursTemp = calculateTotalWorkHours(resultWorkHoursMax)
-                            setTotalWorkHours(totalWorkHoursTemp)
-                        } else {
-                            setTotalWorkHours(8)
-                        }
-                    });
-            }
-        }
-    }
+        });
+    };
 
     useEffect(() => {
         handleGetDataChart()
-        // handleSetTargetQuality(department);
-
-        // function ListenHandle(e) {
-        //     // console.log(e);
-        //     setActualQuantity(() => e.data.result[0]);
-        //     setTargetQuantity(() => e.data.target);
-        //     setActualQuality(() => e.data.result[1]);
-        //     setActualAllQuality(() => e.data.actualAllRFT);
-        //     // gọi hàm tính toán các khung giờ làm việc
-        //     handleCalculateWorkHour(e.data.workHours)
-        // }
-
-        // const today = new Date();
-        // const yyyy = today.getFullYear();
-        // const mm = String(today.getMonth() + 1).padStart(2, '0');
-        // const dd = String(today.getDate()).padStart(2, '0');
-
-        // const formattedToday = yyyy + "-" + mm + "-" + dd;
-
-        // if (from === to && (from === formattedToday || from === "")) {
-        //     window.Echo.channel("department." + department).listen(
-        //         "RealTimeChart",
-        //         ListenHandle
-        //     );
-        // } else {
-        //     if (isValid === 1) {
-        //         axios
-        //             .get(
-        //                 "/api/query?department=" +
-        //                 department +
-        //                 "&from=" +
-        //                 from +
-        //                 "&to=" +
-        //                 to
-        //             )
-        //             .then((res) => {
-        //                 setActualQuantity(() => res.data[0]);
-        //                 setTargetQuantity(() => res.data[2]);
-        //                 setActualQuality(() => res.data[1]);
-        //                 setActualAllQuality(() => res.data[3]);
-        //             });
-        //     }
-        // }
 
         return function () {
             window.Echo.leaveChannel("department." + department);
@@ -415,7 +452,7 @@ const KPIBoardGridChild = forwardRef(({ departmentTemp, fromDate, toDate, onSear
                                 }`}
                             >
                                 <div>
-                                    {actualAllQuality}/{targetQuality[0]}
+                                    {department.includes("L") ? actualAllQuality : actualStitchingQuanlity}/{targetQuality[0]}
                                 </div>
                                 <div className="flex items-center justify-center pb-1">
                                     <div className={`text-[24px] xl:text-[30px] font-bold ${isQualityPassed
