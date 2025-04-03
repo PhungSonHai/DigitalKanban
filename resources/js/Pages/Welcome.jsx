@@ -16,8 +16,6 @@ export default function Welcome() {
         axios
             .get("/api/get-user")
             .then((res) => {
-                console.log(res);
-                
                 setPermission(res.data.permission)
             })
             .catch(err => {

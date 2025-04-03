@@ -255,7 +255,7 @@ const KPIBoardGridChild = forwardRef(({ departmentTemp, fromDate, toDate, udf01,
                     } else {
                         setTotalWorkHours(8);
                     }
-
+                    
                     resolve();
                 };
     

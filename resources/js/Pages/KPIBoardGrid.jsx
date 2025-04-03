@@ -53,13 +53,13 @@ export default function KPIBoardGrid() {
         setFrom(currentDate)
         setTo(currentDate)
 
-        // const timeoutId = setTimeout(() => {
-        //     setLoading(true)
-        // }, 7000);
+        const timeoutId = setTimeout(() => {
+            setLoading(true)
+        }, 15000);
 
-        // return () => {
-        //     clearTimeout(timeoutId);
-        // };
+        return () => {
+            clearTimeout(timeoutId);
+        };
     }, [])
 
     // useEffect(() => {
@@ -90,12 +90,6 @@ export default function KPIBoardGrid() {
             setStaffDepartment(res.data.staff_department)
         });
     }, []);
-
-    useEffect(() => {
-        if(from && to) {
-            handleSearch()
-        }
-    }, [from, to])
 
     const handleSearch = () => {
         if ((from && !to) || (!from && to)) {
@@ -185,21 +179,6 @@ export default function KPIBoardGrid() {
             return;
         }
 
-        // Đặt loadingCount về đúng số lượng component con
-        // const totalComponents = childRefs.current.length;
-        // setLoadingCount(totalComponents);
-
-        // let completedCount = 0; // Theo dõi số component đã hoàn thành
-
-        // childRefs.current.forEach((childRef) => {
-        //     if (childRef.current) {
-        //         childRef.current.triggerChildFunction().finally(() => {
-        //             completedCount++;
-        //             setLoadingCount(totalComponents - completedCount); // Giảm từ từ
-        //         });
-        //     }
-        // });
-
         setLoadingCount(childRefs.current.length); // Đặt số lượng loadingCount bằng số component con
         childRefs.current.forEach((childRef) => {
             if (childRef.current) {
@@ -223,13 +202,13 @@ export default function KPIBoardGrid() {
         }
     }, [username])
 
-    useEffect(() => {
-        console.log(loadingCount);
-    }, [loadingCount])
+    // useEffect(() => {
+    //     console.log(loadingCount);
+    // }, [loadingCount])
 
     return (
         <Fragment>
-            {(loadingCount > 0) && (
+            {(loadingCount > 0 || !isLoading) && (
                 <div className="absolute inset-0 bg-gray-900/80 flex items-center justify-center backdrop-blur-md z-20">
                     <div role="status">
                         <svg
