@@ -80,13 +80,13 @@ Route::post("get-line-display", function (Request $request) {
 
 Route::get("get-list-user", function (Request $request) {
     // $data = UserToken::where("CompanyCode", "APHMESTEST02")->get();
-    $data = UserToken::where("CompanyCode", "aphmes")->get();
+    $data = UserToken::where("CompanyCode", "aphmes-800")->get();
     return $data;
 });
 
 Route::get("get-user", function (Request $request) {
     // $token = $request->header("access-token");
-    $token = "083c27e3-8fd4-45db-b390-ebf303f4b0c6";
+    $token = "63f9e7b9-65a8-4c06-be93-ad0ff9bffdb5";
     if (!$token) return [];
     $data = UserToken::query()->where('UserToken', $token)->first();
     $userCode = $data->UserCode;
