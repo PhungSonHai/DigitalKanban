@@ -109,7 +109,7 @@ class MonitorAndBroadcast extends Command
 
     function getTarget($department)
     {
-        $data = DB::select("select work_qty from sjqdms_worktarget where work_day = TO_DATE('" . date('Y/m/d') . "', 'yyyy/mm/dd') and grt_dept = '$department'");
+        $data = DB::select("select work_qty from sjqdms_worktarget where work_day = TO_DATE('" . date('Y/m/d') . "', 'yyyy/mm/dd') and grt_dept = '$department' and org_id = '0'");
 
         if (count($data) == 0)
             return 0;
