@@ -28,7 +28,7 @@ export default function KPIBoardGrid() {
     const [from, setFrom] = useState("");
     const [to, setTo] = useState("");
     const [searchTrigger, setSearchTrigger] = useState(false);
-
+    const [gridMode, setGridMode] = useState("2x2");
     const [staffDepartment, setStaffDepartment] = useState("");
 
     const isValid = useMemo(() => {
@@ -66,7 +66,7 @@ export default function KPIBoardGrid() {
     //     const index = listDepartment.findIndex(
     //         (item) => item.value === staffDepartment
     //     );
-        
+
     //     if (index > -1) {
     //         setDepartment(staffDepartment);
     //         setTimeRefresh(Date.now());
@@ -191,7 +191,7 @@ export default function KPIBoardGrid() {
 
     // lấy các chuyền hiển thị ở 4 màn hình nhỏ dựa theo tài khoản đăng nhập
     useEffect(() => {
-        if(username) {
+        if (username) {
             axios.post("api/get-line-display", { username: username })
                 .then(res => {
                     setDepartment(res.data[0] ? res.data[0].line_code : "4001APL01")
@@ -298,7 +298,17 @@ export default function KPIBoardGrid() {
                         </div>
                     </div>
                     <div className="flex flex-row items-center">
-                        <div className="me-5">
+                        <div className="flex flex-row">
+                            <div className="px-2">
+                                <select
+                                    className="rounded-lg"
+                                    value={gridMode}
+                                    onChange={(e) => setGridMode(e.target.value)}
+                                >
+                                    <option value="2x2">2x2</option>
+                                    <option value="1x2">1x2</option>
+                                </select>
+                            </div>
                             <button
                                 onClick={() => {
                                     window.history.back();
@@ -345,7 +355,7 @@ export default function KPIBoardGrid() {
                                 </div>
                                 <div>
                                     <Link href={route("detailIssue", { department: department })}>
-                                        <button 
+                                        <button
                                             className="bg-red-500 text-white h-[34px] px-8 rounded-md"
                                         >
                                             Xem vấn đề
@@ -354,7 +364,7 @@ export default function KPIBoardGrid() {
                                 </div>
                                 <div>
                                     <Link href={route("KPIBoard", { deptBoardChild: department })}>
-                                        <button 
+                                        <button
                                             className="bg-gray-200 hover:bg-gray-300/70 text-gray-700 h-[34px] px-8 rounded-md font-semibold transition-all"
                                         >
                                             Xem chi tiết
@@ -401,17 +411,17 @@ export default function KPIBoardGrid() {
                                 </div>
                                 <div>
                                     <Link href={route("detailIssue", { department: department2 })}>
-                                        <button 
+                                        <button
                                             className="bg-red-500 text-white h-[34px] px-8 rounded-md"
                                         >
                                             Xem vấn đề
                                         </button>
                                     </Link>
                                 </div>
-                                
+
                                 <div>
                                     <Link href={route("KPIBoard", { deptBoardChild: department2 })}>
-                                        <button 
+                                        <button
                                             className="bg-gray-200 hover:bg-gray-300/70 text-gray-700 h-[34px] px-8 rounded-md font-semibold transition-all"
                                         >
                                             Xem chi tiết
@@ -433,116 +443,123 @@ export default function KPIBoardGrid() {
                     </div>
 
                     {/* Third cell */}
-                    <div className="col-span-1 row-span-1 w-full flex flex-col space-y-2 xl:space-y-5  border-2 border-red-400">
-                        {/* ... (ChartTwoColumn for Chất lượng) */}
-                        <div className="flex flex-1 flex-col bg-gray-100">
-                            <div className="pl-6 pt-2 flex items-center gap-4">
-                                <div className="flex w-1/2 text-xs xl:text-sm xl:w-[220px] pr-1 mb-1 xl:mb-0">
-                                    <span className="flex items-center px-1 xl:px-3 text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md dark:bg-gray-600 dark:text-gray-300 dark:border-gray-600 whitespace-nowrap text-center">
-                                        <span className="flex-1">Chuyền</span>
-                                    </span>
-                                    <select
-                                        id="countries"
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-r-lg focus:ring-blue-500 focus:border-blue-500 block w-full px-1 py-0.5 xl:px-2.5 xl:py-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        value={department3}
-                                        onChange={(event) => {
-                                            setDepartment3(event.target.value);
-                                        }}
-                                    >
-                                        {listDepartment.map((item, index) => (
-                                            <option key={index} value={item.value}>
-                                                {item.value}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div>
-                                    <Link href={route("detailIssue", { department: department3 })}>
-                                        <button 
-                                            className="bg-red-500 text-white h-[34px] px-8 rounded-md"
+                    {gridMode === "2x2" && (
+                        <div className="col-span-1 row-span-1 w-full flex flex-col space-y-2 xl:space-y-5  border-2 border-red-400" >
+                            {/* ... (ChartTwoColumn for Chất lượng) */}
+                            <div className="flex flex-1 flex-col bg-gray-100">
+                                <div className="pl-6 pt-2 flex items-center gap-4">
+                                    <div className="flex w-1/2 text-xs xl:text-sm xl:w-[220px] pr-1 mb-1 xl:mb-0">
+                                        <span className="flex items-center px-1 xl:px-3 text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md dark:bg-gray-600 dark:text-gray-300 dark:border-gray-600 whitespace-nowrap text-center">
+                                            <span className="flex-1">Chuyền</span>
+                                        </span>
+                                        <select
+                                            id="countries"
+                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-r-lg focus:ring-blue-500 focus:border-blue-500 block w-full px-1 py-0.5 xl:px-2.5 xl:py-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                            value={department3}
+                                            onChange={(event) => {
+                                                setDepartment3(event.target.value);
+                                            }}
                                         >
-                                            Xem vấn đề
-                                        </button>
-                                    </Link>
+                                            {listDepartment.map((item, index) => (
+                                                <option key={index} value={item.value}>
+                                                    {item.value}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <Link href={route("detailIssue", { department: department3 })}>
+                                            <button
+                                                className="bg-red-500 text-white h-[34px] px-8 rounded-md"
+                                            >
+                                                Xem vấn đề
+                                            </button>
+                                        </Link>
+                                    </div>
+                                    <div>
+                                        <Link href={route("KPIBoard", { deptBoardChild: department3 })}>
+                                            <button
+                                                className="bg-gray-200 hover:bg-gray-300/70 text-gray-700 h-[34px] px-8 rounded-md font-semibold transition-all"
+                                            >
+                                                Xem chi tiết
+                                            </button>
+                                        </Link>
+                                    </div>
                                 </div>
-                                <div>
-                                    <Link href={route("KPIBoard", { deptBoardChild: department3 })}>
-                                        <button 
-                                            className="bg-gray-200 hover:bg-gray-300/70 text-gray-700 h-[34px] px-8 rounded-md font-semibold transition-all"
-                                        >
-                                            Xem chi tiết
-                                        </button>
-                                    </Link>
-                                </div>
+                                <KPIBoardGridChild
+                                    departmentTemp={department3}
+                                    fromDate={from}
+                                    toDate={to}
+                                    udf01={listDepartment.find(item => item.value === department3)?.udf01}
+                                    onSearch={() => setSearchTrigger(false)}  // Đặc biệt, bạn có thể thực hiện các hành động sau khi search xong ở đây
+                                    searchTrigger={searchTrigger}
+                                    // ref={childRefThird}
+                                    ref={childRefs.current[2]}
+                                />
                             </div>
-                            <KPIBoardGridChild
-                                departmentTemp={department3}
-                                fromDate={from}
-                                toDate={to}
-                                udf01={listDepartment.find(item => item.value === department3)?.udf01}
-                                onSearch={() => setSearchTrigger(false)}  // Đặc biệt, bạn có thể thực hiện các hành động sau khi search xong ở đây
-                                searchTrigger={searchTrigger}
-                                // ref={childRefThird}
-                                ref={childRefs.current[2]}
-                            />
                         </div>
-                    </div>
+                    )}
+
 
                     {/* Fourth cell */}
-                    <div className="col-span-1 row-span-1 w-full flex flex-col space-y-2 xl:space-y-5  border-2 border-red-400">
-                        {/* ... (TableIssue or other component) */}
-                        <div className="flex flex-1 flex-col bg-gray-100">
-                            <div className="pl-6 pt-2 flex items-center gap-4">
-                                <div className="flex w-1/2 text-xs xl:text-sm xl:w-[220px] pr-1 mb-1 xl:mb-0">
-                                    <span className="flex items-center px-1 xl:px-3 text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md dark:bg-gray-600 dark:text-gray-300 dark:border-gray-600 whitespace-nowrap text-center">
-                                        <span className="flex-1">Chuyền</span>
-                                    </span>
-                                    <select
-                                        id="countries"
-                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-r-lg focus:ring-blue-500 focus:border-blue-500 block w-full px-1 py-0.5 xl:px-2.5 xl:py-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                                        value={department4}
-                                        onChange={(event) => {
-                                            setDepartment4(event.target.value);
-                                        }}
-                                    >
-                                        {listDepartment.map((item, index) => (
-                                            <option key={index} value={item.value}>
-                                                {item.value}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div>
-                                    <Link href={route("detailIssue", { department: department4 })}>
-                                        <button 
-                                            className="bg-red-500 text-white h-[34px] px-8 rounded-md"
+                    {gridMode === "2x2" && (
+                        <div className="col-span-1 row-span-1 w-full flex flex-col space-y-2 xl:space-y-5  border-2 border-red-400">
+                            {/* ... (TableIssue or other component) */}
+                            <div className="flex flex-1 flex-col bg-gray-100">
+                                <div className="pl-6 pt-2 flex items-center gap-4">
+                                    <div className="flex w-1/2 text-xs xl:text-sm xl:w-[220px] pr-1 mb-1 xl:mb-0">
+                                        <span className="flex items-center px-1 xl:px-3 text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md dark:bg-gray-600 dark:text-gray-300 dark:border-gray-600 whitespace-nowrap text-center">
+                                            <span className="flex-1">Chuyền</span>
+                                        </span>
+                                        <select
+                                            id="countries"
+                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-r-lg focus:ring-blue-500 focus:border-blue-500 block w-full px-1 py-0.5 xl:px-2.5 xl:py-1.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                            value={department4}
+                                            onChange={(event) => {
+                                                setDepartment4(event.target.value);
+                                            }}
                                         >
-                                            Xem vấn đề
-                                        </button>
-                                    </Link>
+                                            {listDepartment.map((item, index) => (
+                                                <option key={index} value={item.value}>
+                                                    {item.value}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <Link href={route("detailIssue", { department: department4 })}>
+                                            <button
+                                                className="bg-red-500 text-white h-[34px] px-8 rounded-md"
+                                            >
+                                                Xem vấn đề
+                                            </button>
+                                        </Link>
+                                    </div>
+                                    <div>
+                                        <Link href={route("KPIBoard", { deptBoardChild: department4 })}>
+                                            <button
+                                                className="bg-gray-200 hover:bg-gray-300/70 text-gray-700 h-[34px] px-8 rounded-md font-semibold transition-all"
+                                            >
+                                                Xem chi tiết
+                                            </button>
+                                        </Link>
+                                    </div>
                                 </div>
-                                <div>
-                                    <Link href={route("KPIBoard", { deptBoardChild: department4 })}>
-                                        <button 
-                                            className="bg-gray-200 hover:bg-gray-300/70 text-gray-700 h-[34px] px-8 rounded-md font-semibold transition-all"
-                                        >
-                                            Xem chi tiết
-                                        </button>
-                                    </Link>
-                                </div>
+                                <KPIBoardGridChild
+                                    departmentTemp={department4}
+                                    fromDate={from}
+                                    toDate={to}
+                                    udf01={listDepartment.find(item => item.value === department4)?.udf01}
+                                    onSearch={() => setSearchTrigger(false)}  // Đặc biệt, bạn có thể thực hiện các hành động sau khi search xong ở đây
+                                    searchTrigger={searchTrigger}
+                                    // ref={childRefFour}
+                                    ref={childRefs.current[3]}
+                                />
                             </div>
-                            <KPIBoardGridChild
-                                departmentTemp={department4}
-                                fromDate={from}
-                                toDate={to}
-                                udf01={listDepartment.find(item => item.value === department4)?.udf01}
-                                onSearch={() => setSearchTrigger(false)}  // Đặc biệt, bạn có thể thực hiện các hành động sau khi search xong ở đây
-                                searchTrigger={searchTrigger}
-                                // ref={childRefFour}
-                                ref={childRefs.current[3]}
-                            />
                         </div>
-                    </div>
+                    )}
+
+
                 </div>
             </div>
         </Fragment>
