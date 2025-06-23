@@ -114,18 +114,33 @@ const KPIBoardGridChild = forwardRef(({ departmentTemp, fromDate, toDate, udf01,
     const handleCalculateWorkHour = (listWorkHours) => {
         if(listWorkHours.length <= 0) {
             // nếu không lấy được các khung giờ làm việc của chuyền trong database thì mặc định là 11 khung giờ
+            // setLabelsChartColumn([
+            //     "07:30-08:30",
+            //     "08:30-09:30",
+            //     "09:30-10:30",
+            //     "10:30-12:00",
+            //     "12:00-13:30",
+            //     "13:30-14:30",
+            //     "14:30-15:30",
+            //     "15:30-16:30",
+            //     "16:30-17:30",
+            //     "17:30-18:30",
+            //     "18:30-20:30"
+            // ])
             setLabelsChartColumn([
                 "07:30-08:30",
                 "08:30-09:30",
                 "09:30-10:30",
-                "10:30-12:00",
-                "12:00-13:30",
+                "10:30-11:30",
+                "11:30-12:30",
+                "12:30-13:30",
                 "13:30-14:30",
                 "14:30-15:30",
                 "15:30-16:30",
                 "16:30-17:30",
                 "17:30-18:30",
-                "18:30-20:30"
+                "18:30-19:30",
+                "19:30-20:30",
             ])
         } else {
             // lấy ra thời gian sáng và chiều trong mảng thời gian làm việc
@@ -149,8 +164,14 @@ const KPIBoardGridChild = forwardRef(({ departmentTemp, fromDate, toDate, udf01,
             let formattedTimeStart = `${hoursStart}:${minutesStart}`;
             let formattedTimeEnd = `${hoursEnd}:${minutesEnd}`;
 
+            // console.log(formattedTimeStart);
+            // console.log(formattedTimeEnd);
+            
             // thực hiện gọi hàm generate các khung giờ
             let resultLabels = generateTimeSlots(formattedTimeStart, formattedTimeEnd)
+
+            // console.log(resultLabels);
+            
 
             setLabelsChartColumn(resultLabels)
         }
@@ -280,6 +301,8 @@ const KPIBoardGridChild = forwardRef(({ departmentTemp, fromDate, toDate, udf01,
                             setActualAllQuality(() => res.data[3]);
                             setActualStitchingQuanlity(() => res.data[4] ? res.data[4] : 0);
                             const resultWorkHoursMax = getWorkHoursMax(res.data[5]);
+                            console.log(resultWorkHoursMax);
+                            
                             handleCalculateWorkHour(resultWorkHoursMax);
     
                             if (resultWorkHoursMax.length > 0) {
@@ -288,7 +311,7 @@ const KPIBoardGridChild = forwardRef(({ departmentTemp, fromDate, toDate, udf01,
                             } else {
                                 setTotalWorkHours(8);
                             }
-    
+
                             resolve();
                         })
                         .catch(reject);
@@ -417,8 +440,8 @@ const KPIBoardGridChild = forwardRef(({ departmentTemp, fromDate, toDate, udf01,
     };
 
     // useEffect(() => {
-    //     console.log(targetQuantity, labelsChartColumn);
-    // }, [targetQuantity, labelsChartColumn]);
+    //     console.log(labelsChartColumn);
+    // }, [labelsChartColumn]);
 
     return (
         <Fragment>
